@@ -39,10 +39,9 @@ class FilmorateApplicationTests {
 
 		HttpClient client = HttpClient.newHttpClient();
 		URI uri = URI.create("http://localhost:8080/users");
-		User userNew = new User(0, "dolore","Nick Name", "mail@mail.ru", LocalDate.parse("1946-08-20",
-				DateUtils.formatter));
-		User userAdded = new User(1,"dolore","Nick Name", "mail@mail.ru", LocalDate.parse("1946-08-20",
-				DateUtils.formatter));
+		User userNew = createUser();
+		System.out.println("userNew: " + userNew.toString());
+		User userAdded = updateUser();
 		String json = gson.toJson(userNew);
 		System.out.println("json: " + json);
 		final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -55,8 +54,30 @@ class FilmorateApplicationTests {
 		User userActual = gson.fromJson(response.body(), userType);
 
 		assertAll(() -> assertEquals(200, response.statusCode()),
-				() -> assertNotNull(userActual, "Задача не добавляется"),
-				() -> assertEquals(userAdded, userActual, "Задачи не совпадают"));
+				() -> assertNotNull(userActual, "Пользователь не добавляется"),
+				() -> assertEquals(userAdded, userActual, "Пользователи не совпадают"));
+
+	}
+
+	private User createUser() {
+		User user = new User();
+		user.setEmail("mail@mail.ru");
+		user.setLogin("Login");
+		user.setName("Name");
+		user.setBirthday(LocalDate.parse("1946-08-20",
+				DateUtils.formatter));
+		return user;
+	}
+
+	private User updateUser() {
+		User user = new User();
+		user.setId(1);
+		user.setEmail("mail@mail.ru");
+		user.setLogin("Login");
+		user.setName("Name");
+		user.setBirthday(LocalDate.parse("1946-08-20",
+				DateUtils.formatter));
+		return user;
 	}
 
 }

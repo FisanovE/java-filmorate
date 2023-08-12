@@ -16,7 +16,7 @@ import java.util.*;
 @Slf4j
 @RestController
 @RequestMapping ("/films")
-public class FilmController {
+	public class FilmController {
 
 	private final Map<Integer, Film> films = new HashMap<>();
 	private int counter = 1;
@@ -28,6 +28,7 @@ public class FilmController {
 		film.setId(counter);
 		counter++;
 		films.put(film.getId(), film);
+		log.info("Добавлен фильм {}.", film);
 		return films.get(film.getId());
 		//return film;
 	}
@@ -43,6 +44,7 @@ public class FilmController {
 			}
 			films.put(currentFilm.getId(), film);
 		}
+		log.info("Изменён фильм {}.", film);
 		return films.get(film.getId());
 		//return film;
 	}

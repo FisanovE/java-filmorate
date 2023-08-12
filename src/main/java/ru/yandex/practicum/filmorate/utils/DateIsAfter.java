@@ -9,13 +9,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.time.LocalDate;
 
-@Retention (RetentionPolicy.RUNTIME)
+@Retention (RetentionPolicy.RUNTIME) //RUNTIME: аннотация сохраняется в файле .class во время компиляции и доступна через JVM во время выполнения
 @Constraint (validatedBy = DateIsAfterThisValidator.class)
 @Past
 public @interface DateIsAfter {
 	String message() default "Дата релиза должна быть не ранее {value}";
 
-	Class<?>[] groups() default {};
+	Class<?>[] groups() default {}; //сужает действие аннотации к заданному классу
 
 	Class<? extends Payload>[] payload() default {};
 

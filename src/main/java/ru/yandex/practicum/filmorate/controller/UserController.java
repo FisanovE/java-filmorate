@@ -29,6 +29,7 @@ public class UserController {
 		user.setId(counter);
 		counter++;
 		users.put(user.getId(), user);
+		log.info("Добавлен пользователь {}.", user);
 		return users.get(user.getId());
 		//return user;
 	}
@@ -45,6 +46,7 @@ public class UserController {
 			}
 		}
 		users.put(user.getId(), user);
+		log.info("Изменён пользователь {}.", user);
 		return users.get(user.getId());
 		//return user;
 	}
