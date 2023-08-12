@@ -28,7 +28,8 @@ public class FilmController {
 		film.setId(counter);
 		counter++;
 		films.put(film.getId(), film);
-		return film;
+		return films.get(film.getId());
+		//return film;
 	}
 
 
@@ -42,7 +43,8 @@ public class FilmController {
 			}
 			films.put(currentFilm.getId(), film);
 		}
-		return film;
+		return films.get(film.getId());
+		//return film;
 	}
 
 

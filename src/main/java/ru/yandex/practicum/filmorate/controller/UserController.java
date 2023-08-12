@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+//@Controller
 @Slf4j
 @RestController
 @RequestMapping ("/users")
@@ -29,8 +29,8 @@ public class UserController {
 		user.setId(counter);
 		counter++;
 		users.put(user.getId(), user);
-		//return users.get(user.getId());
-		return user;
+		return users.get(user.getId());
+		//return user;
 	}
 
 	@PutMapping
@@ -45,7 +45,8 @@ public class UserController {
 			}
 		}
 		users.put(user.getId(), user);
-		return user;
+		return users.get(user.getId());
+		//return user;
 	}
 
 	@GetMapping
