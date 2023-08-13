@@ -21,17 +21,3 @@ public @interface DateIsAfter {
 
 	String value() default "1895-12-28";
 }
-
-class DateIsAfterThisValidator implements ConstraintValidator<DateIsAfter, LocalDate> {
-	private LocalDate minimumDate;
-
-	@Override
-	public void initialize(DateIsAfter constraintAnnotation) {
-		minimumDate = LocalDate.parse(constraintAnnotation.value());
-	}
-
-	@Override
-	public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-		return value == null || !value.isBefore(minimumDate);
-	}
-}
