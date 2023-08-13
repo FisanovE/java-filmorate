@@ -7,9 +7,7 @@ import java.time.LocalDate;
 
 public class GsonUtils {
 
-
 	public static Gson getGson() {
-		return new GsonBuilder() .registerTypeAdapter(LocalDate.class, new CustomLocalDateAdapter().nullSafe()) .create();
+		return new GsonBuilder().registerTypeAdapter(LocalDate.class, new CustomLocalDateAdapter().nullSafe()).create();
 	}
-
 }
