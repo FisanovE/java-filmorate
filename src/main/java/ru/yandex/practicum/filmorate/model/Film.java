@@ -4,12 +4,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
+import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.utils.DateIsAfter;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class Film {
 	private int id;
 

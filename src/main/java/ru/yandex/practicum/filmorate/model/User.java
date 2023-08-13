@@ -5,12 +5,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-//@AllArgsConstructor
+
+@Builder
 public class User {
 	int id;
 
@@ -24,19 +26,6 @@ public class User {
 	private String name;
 
 	@Past (message = "Дата рождения не должна быть в будущем")
-	//@NotNull
 	private LocalDate birthday;
 
-	/*public User(String email, String login, LocalDate birthday) {
-		this.email = email;
-		this.login = login;
-		this.birthday = birthday;
-	}
-
-	public User(String email, String login, String name, LocalDate birthday) {
-		this.email = email;
-		this.login = login;
-		this.name = name;
-		this.birthday = birthday;
-	}*/
 }
