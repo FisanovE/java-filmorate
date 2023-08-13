@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.utils;
 
 import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.validation.constraints.Past;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.time.LocalDate;
 
 @Retention (RetentionPolicy.RUNTIME) //RUNTIME: аннотация сохраняется в файле .class во время компиляции и доступна через JVM во время выполнения
 @Constraint (validatedBy = DateIsAfterThisValidator.class)
