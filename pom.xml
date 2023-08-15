@@ -16,6 +16,9 @@
 	<properties>
 		<java.version>11</java.version>
 		<spring.boot.version>3.1.0</spring.boot.version>
+		<junit.version>5.10.0</junit.version>
+		<lombok.version>1.18.26</lombok.version>
+		<gson.version>2.10.1</gson.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -27,7 +30,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-			<!--suppress UnresolvedMavenProperty -->
 			<version>${spring.boot.version}</version>
 			<exclusions>
 				<exclusion>
@@ -40,7 +42,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.26</version>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -52,14 +54,14 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.10.0</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.10.1</version>
+			<version>${gson.version}</version>
 		</dependency>
 
 

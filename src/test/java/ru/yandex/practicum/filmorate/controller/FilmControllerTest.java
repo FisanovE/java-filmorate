@@ -31,7 +31,7 @@ class FilmControllerTest {
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 
-		assertFalse(list.isEmpty(), "Фильм не добавляется");
+		assertFalse(list.isEmpty(), "Film not added");
 	}
 
 	@Test
@@ -42,14 +42,8 @@ class FilmControllerTest {
 		filmNew.setName(notValidName);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("Не верный формат названия: \"" + notValidName + "\"", exception.getMessage()),
+				ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("Invalid title format: \"" + notValidName + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -63,15 +57,9 @@ class FilmControllerTest {
 		filmNew.setDescription(notValidDescription);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("Максимальная длина описания — 200 символов, у вас:  \"" +
-						notValidDescription.length() + "\" символов", exception.getMessage()),
+				ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \"" +
+						notValidDescription.length() + "\" characters", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -83,14 +71,8 @@ class FilmControllerTest {
 		filmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("Дата релиза фильма не должна быть раньше 1895.12.28, у вас: \"" +
+				ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \"" +
 						notValidReleaseDate + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
@@ -103,14 +85,8 @@ class FilmControllerTest {
 		filmNew.setDuration(notValidDuration);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("Продолжительность фильма должна быть положительной, у вас:  \"" + notValidDuration, exception.getMessage()),
+				ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \"" + notValidDuration, exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -124,8 +100,8 @@ class FilmControllerTest {
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 
 		assertAll(
-				() -> assertFalse(list.isEmpty(), "Фильм не добавляется"),
-				() -> assertEquals(filmAdded, list.get(0), "Фильмы не совпадают"));
+				() -> assertFalse(list.isEmpty(), "Film not added"),
+				() -> assertEquals(filmAdded, list.get(0), "Films are not equal"));
 	}
 
 	@Test
@@ -135,7 +111,7 @@ class FilmControllerTest {
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 
-		assertFalse(list.isEmpty(), "Список пуст");
+		assertFalse(list.isEmpty(), "The list is empty");
 	}
 
 	private Film createFilm() {
