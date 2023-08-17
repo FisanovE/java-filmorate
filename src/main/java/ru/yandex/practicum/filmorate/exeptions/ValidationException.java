@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.exeptions;
 
-public class ValidationException extends Exception {
+public class ValidationException extends RuntimeException {
 	public ValidationException() {
 	}
 

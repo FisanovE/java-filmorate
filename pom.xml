@@ -12,10 +12,9 @@
 	<artifactId>filmorate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>filmorate</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Developing a backend for the movie rating service</description>
 	<properties>
 		<java.version>11</java.version>
-		<spring.boot.version>3.1.0</spring.boot.version>
 		<junit.version>5.10.0</junit.version>
 		<lombok.version>1.18.26</lombok.version>
 		<gson.version>2.10.1</gson.version>
@@ -30,7 +29,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-			<version>${spring.boot.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>

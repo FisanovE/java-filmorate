@@ -20,11 +20,9 @@ public class UserController {
 	private int counter = 1;
 
 	@PostMapping
-	public User addNewUser(@Valid @RequestBody User user) throws ValidationException {
+	public User addNewUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: POST /users");
-		checkingUserForValid(user);
 		setLoginAsNameIfNameIsEmpty(user);
-
 		user.setId(counter);
 		counter++;
 		users.put(user.getId(), user);
@@ -33,11 +31,9 @@ public class UserController {
 	}
 
 	@PutMapping
-	public User updateUser(@Valid @RequestBody User user) throws ValidationException {
+	public User updateUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: PUT /users");
-		checkingUserForValid(user);
 		setLoginAsNameIfNameIsEmpty(user);
-
 		for (User currentUser : users.values()) {
 			if (currentUser.getEmail().equals(user.getEmail())) {
 				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
@@ -54,22 +50,9 @@ public class UserController {
 		return new ArrayList<>(users.values());
 	}
 
-	private void checkingUserForValid(User user) throws ValidationException {
-		if (user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-			throw new ValidationException("Invalid e-mail format: \"" + user.getEmail() + "\"");
-		}
-		if (user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-			throw new ValidationException("Wrong login: \"" + user.getLogin() + "\"");
-		}
-		if (user.getBirthday().isAfter(LocalDate.now())) {
-			throw new ValidationException("Date of birth cannot be in the future: \"" + user.getBirthday() + "\"");
-		}
-	}
-
 	private void setLoginAsNameIfNameIsEmpty(User user) {
 		if (user.getName() == null || user.getName().isBlank()) {
 			user.setName(user.getLogin());
 		}
 	}
-
 }

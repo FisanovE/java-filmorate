@@ -7,18 +7,27 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
 	private User user;
-	UserController controller;
+	private UserController controller;
+	private Validator validator;
+	private Set<ConstraintViolation<User>> violations;
 
 	@BeforeEach
 	void init() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
 		controller = new UserController();
 	}
 
@@ -38,11 +47,9 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidEmail = "mailmail.ru";
 		userNew.setEmail(notValidEmail);
-		List<User> list  = new ArrayList<>(controller.getAllUsers());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewUser(userNew));
-		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(userNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
@@ -51,11 +58,9 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidEmail = "";
 		userNew.setEmail(notValidEmail);
-		List<User> list  = new ArrayList<>(controller.getAllUsers());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewUser(userNew));
-		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(userNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
@@ -64,11 +69,9 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidLogin = "";
 		userNew.setLogin(notValidLogin);
-		List<User> list  = new ArrayList<>(controller.getAllUsers());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewUser(userNew));
-		assertAll(() -> assertEquals("Wrong login: \"" + notValidLogin + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(userNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
@@ -77,16 +80,14 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidLogin = " ";
 		userNew.setLogin(notValidLogin);
-		List<User> list  = new ArrayList<>(controller.getAllUsers());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewUser(userNew));
-		assertAll(() -> assertEquals("Wrong login: \"" + notValidLogin + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(userNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
 	@DisplayName ("Name пуст")
-	void shouldReturnExceptionWhenNameNewUserIsEmpty() throws ValidationException {
+	void shouldReturnExceptionWhenNameNewUserIsEmpty() {
 		User userNew = createUser();
 		String name = "";
 		userNew.setName(name);
@@ -103,16 +104,14 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidBirthday = "2027-08-20";
 		userNew.setBirthday(LocalDate.parse(notValidBirthday, DateUtils.formatter));
-		List<User> list  = new ArrayList<>(controller.getAllUsers());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewUser(userNew));
-		assertAll(() -> assertEquals("Date of birth cannot be in the future: \"" + notValidBirthday + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(userNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
 	@DisplayName ("Обновление пользователя ")
-	void shouldUpdateUser() throws ValidationException {
+	void shouldUpdateUser() {
 		User userNew = createUser();
 		User userAdded = updateUser();
 		controller.addNewUser(userNew);
@@ -126,7 +125,7 @@ class UserControllerTest {
 
 	@Test
 	@DisplayName ("Получение списка пользователей")
-	void shouldReturnListUsers() throws ValidationException {
+	void shouldReturnListUsers() {
 		User userNew = createUser();
 		controller.addNewUser(userNew);
 		List<User> list  = new ArrayList<>(controller.getAllUsers());

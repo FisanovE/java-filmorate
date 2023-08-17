@@ -3,30 +3,37 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
 	private Film film;
-	FilmController controller;
+	private FilmController controller;
+	private Validator validator;
+	private Set<ConstraintViolation<Film>> violations;
 
 	@BeforeEach
 	void init() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
 		controller = new FilmController();
 	}
 
 	@Test
 	@DisplayName ("Добавление нового фильма")
-	void shouldAddNewFilmWhenEmailIsValid() throws ValidationException {
+	void shouldAddNewFilmWhenEmailIsValid() {
 		Film filmNew = createFilm();
-		System.out.println("filmNew: " + filmNew.toString());
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 
@@ -36,14 +43,13 @@ class FilmControllerTest {
 	@Test
 	@DisplayName ("Валидация: Name пуст")
 	void shouldReturnExceptionWhenNameNewFilmIsEmpty() {
+
 		Film filmNew = createFilm();
 		String notValidName = "";
 		filmNew.setName(notValidName);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("Invalid title format: \"" + notValidName + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(filmNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
@@ -54,26 +60,21 @@ class FilmControllerTest {
 				"famous for. Critics do not respond to him in any way, because they have not seen him once. The audience " +
 				"is enthusiastically silent about him for the same reason.";
 		filmNew.setDescription(notValidDescription);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \"" +
-						notValidDescription.length() + "\" characters", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(filmNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
 	@DisplayName ("Валидация: releaseDate раньше 1895.12.28")
-	void shouldReturnExceptionWhenReleaseDateNewFilmIsNotValid() {
+	void shouldReturnExceptionWhenReleaseDateNewFilmIsNotValid2() {
+
 		Film filmNew = createFilm();
 		String notValidReleaseDate = "1795-12-28";
 		filmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \"" +
-						notValidReleaseDate + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(filmNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
@@ -82,16 +83,14 @@ class FilmControllerTest {
 		Film filmNew = createFilm();
 		int notValidDuration = -1;
 		filmNew.setDuration(notValidDuration);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \"" + notValidDuration, exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		violations = validator.validate(filmNew);
+		assertFalse(violations.isEmpty(), violations.toString());
+		violations.clear();
 	}
 
 	@Test
 	@DisplayName ("Обновление фильма ")
-	void shouldUpdateFilm() throws ValidationException {
+	void shouldUpdateFilm() {
 		Film filmNew = createFilm();
 		Film filmAdded = updateFilm();
 		controller.addNewFilm(filmNew);
@@ -105,7 +104,7 @@ class FilmControllerTest {
 
 	@Test
 	@DisplayName ("Получение списка пользователей")
-	void shouldReturnListFilms() throws ValidationException {
+	void shouldReturnListFilms() {
 		Film filmNew = createFilm();
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());

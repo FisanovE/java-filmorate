@@ -22,9 +22,8 @@ public class FilmController {
 
 
 	@PostMapping
-	public Film addNewFilm(@Valid @RequestBody Film film) throws ValidationException {
+	public Film addNewFilm(@Valid @RequestBody Film film) {
 		log.info("Received request to endpoint: POST /films");
-		checkingFilmForValid(film);
 		film.setId(counter);
 		counter++;
 		films.put(film.getId(), film);
@@ -32,11 +31,9 @@ public class FilmController {
 		return films.get(film.getId());
 	}
 
-
 	@PutMapping
-	public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+	public Film updateFilm(@Valid @RequestBody Film film) {
 		log.info("Received request to endpoint: PUT /films");
-		checkingFilmForValid(film);
 		for (Film currentFilm : films.values()) {
 			if (currentFilm.getName().equals(film.getName()) && currentFilm.getReleaseDate()
 																		   .equals(film.getReleaseDate())) {
@@ -48,14 +45,13 @@ public class FilmController {
 		return films.get(film.getId());
 	}
 
-
 	@GetMapping
 	public Collection<Film> getAllFilms() {
 		log.info("Received request to endpoint: GET /films");
 		return films.values();
 	}
 
-	private void checkingFilmForValid(Film film) throws ValidationException {
+	private void checkingFilmForValid(Film film) {
 		if (film.getName().isBlank()) {
 			throw new ValidationException("Invalid title format: \"" + film.getName() + "\"");
 		}
@@ -70,5 +66,4 @@ public class FilmController {
 			throw new ValidationException("The duration of the film should be positive, you have:  \"" + film.getDuration());
 		}
 	}
-
 }

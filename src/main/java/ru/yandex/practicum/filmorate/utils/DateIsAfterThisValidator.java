@@ -4,8 +4,11 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-class DateIsAfterThisValidator implements ConstraintValidator<DateIsAfter, LocalDate> {
+public class DateIsAfterThisValidator implements ConstraintValidator<DateIsAfter, LocalDate> {
 	private LocalDate minimumDate;
+
+	public DateIsAfterThisValidator() {
+	}
 
 	@Override
 	public void initialize(DateIsAfter constraintAnnotation) {
