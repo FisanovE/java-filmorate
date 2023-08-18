@@ -15,6 +15,7 @@ public class User {
 	@Email (message = "Invalid e-mail format")
 	private String email;
 
+	@NotNull
 	@Pattern(regexp = "^[a-zA-Z0-9]{3,12}$",
 			message = "Login field must not be empty and contain spaces")
 	private String login;

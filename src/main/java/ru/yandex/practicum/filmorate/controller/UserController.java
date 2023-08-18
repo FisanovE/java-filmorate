@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -22,25 +19,22 @@ public class UserController {
 	public User addNewUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: POST /users");
 		setLoginAsNameIfNameIsEmpty(user);
+		checkingRepeat(users, user);
 		user.setId(counter);
 		counter++;
 		users.put(user.getId(), user);
 		log.info("User added: {}.", user);
-		return users.get(user.getId());
+		return user;
 	}
 
 	@PutMapping
 	public User updateUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: PUT /users");
 		setLoginAsNameIfNameIsEmpty(user);
-		for (User currentUser : users.values()) {
-			if (currentUser.getEmail().equals(user.getEmail())) {
-				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
-			}
-		}
+		checkingRepeat(users, user);
 		users.put(user.getId(), user);
 		log.info("User updated:  {}.", user);
-		return users.get(user.getId());
+		return user;
 	}
 
 	@GetMapping
@@ -52,6 +46,15 @@ public class UserController {
 	private void setLoginAsNameIfNameIsEmpty(User user) {
 		if (user.getName() == null || user.getName().isBlank()) {
 			user.setName(user.getLogin());
+		}
+	}
+
+	private void checkingRepeat(Map<Integer, User> users, User user) {
+		for (User currentUser : users.values()) {
+			if (Objects.equals(currentUser.getEmail(), user.getEmail()) && !Objects.equals(currentUser.getId(),
+					user.getId())) {
+				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
+			}
 		}
 	}
 }
