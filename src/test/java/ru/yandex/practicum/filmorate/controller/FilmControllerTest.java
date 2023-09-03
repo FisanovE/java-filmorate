@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import javax.validation.ConstraintViolation;
@@ -27,7 +29,7 @@ class FilmControllerTest {
 	void init() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
-		controller = new FilmController();
+		controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
 	}
 
 	@Test
@@ -112,6 +114,57 @@ class FilmControllerTest {
 		assertFalse(list.isEmpty(), "The list is empty");
 	}
 
+	@Test
+	@DisplayName ("Добавление лайка")
+	void shouldAddLike() {
+		Film filmNew = createFilm();
+		Film filmAdded = controller.addNewFilm(filmNew);
+
+		controller.addLike(filmAdded.getId(), 2L);
+
+		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
+		List<Long> likes  = new ArrayList<>(films.get(0).getLikes());
+
+		assertAll(
+				() -> assertFalse(likes.isEmpty(), "Like not added"),
+				() -> assertEquals(2, likes.get(0), "Films id are not equal"));
+	}
+
+	@Test
+	@DisplayName ("Удаление лайка")
+	void shouldDeleteLike() {
+		Film filmNew = createFilm();
+		Film filmAdded = controller.addNewFilm(filmNew);
+		controller.addLike(filmAdded.getId(), 2L);
+
+		controller.deleteLike(filmAdded.getId(), 2L);
+
+		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
+		List<Long> likes  = new ArrayList<>(films.get(0).getLikes());
+
+		assertTrue(likes.isEmpty(), "Likes list must by empty");
+	}
+
+	@Test
+	@DisplayName ("Получение списка лучших фильмов")
+	void shouldReturnTopRatingFilms() {
+		Film filmNew1 = createFilm();
+		Film filmNew2 = createFilm();
+		filmNew2.setName("Name Film2");
+		Film filmAdded1 = controller.addNewFilm(filmNew1);
+		Film filmAdded2 = controller.addNewFilm(filmNew2);
+		controller.addLike(filmAdded1.getId(), 2L);
+		controller.addLike(filmAdded1.getId(), 3L);
+		controller.addLike(filmAdded2.getId(), 2L);
+
+		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
+
+		assertAll(
+				() -> assertFalse(films.isEmpty(), "Rating list must by not empty"),
+				() -> assertEquals(filmAdded2.getId(), films.get(0).getId(), "Films id are not equal"),
+				() -> assertEquals(2, films.size(), "List`s size not equal 2"));
+	}
+
 	private Film createFilm() {
 		film = film.builder()
 				   .name("Name Film")
@@ -124,7 +177,7 @@ class FilmControllerTest {
 
 	private Film updateFilm() {
 		film = film.builder()
-				   .id(1)
+				   .id(1L)
 				   .name("updateName Film")
 				   .description("blah-blah-blah")
 				   .releaseDate(LocalDate.of(2022, 5, 12))

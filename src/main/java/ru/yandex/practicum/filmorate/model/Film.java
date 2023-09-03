@@ -9,11 +9,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
 public class Film {
-	private int id;
+	private Long id;
 
 	@NotBlank (message = "Film title must not be empty")
 	private String name;
@@ -27,4 +28,6 @@ public class Film {
 
 	@Positive (message = "The duration of the film should be positive")
 	private int duration;
+
+	private Set<Long> likes;
 }

@@ -1,57 +1,63 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @RestController
+@Component
+@RequiredArgsConstructor
 @RequestMapping ("/films")
 public class FilmController {
 
-	private final Map<Integer, Film> films = new HashMap<>();
-	private int counter = 1;
-
-
+	private final FilmService filmService;
 	@PostMapping
 	public Film addNewFilm(@Valid @RequestBody Film film) {
 		log.info("Received request to endpoint: POST /films");
-		checkingRepeat(films, film);
-		film.setId(counter);
-		counter++;
-		films.put(film.getId(), film);
-		log.info("Film added: {}.", film);
-		return film;
+		return filmService.addNewFilm(film);
 	}
 
 	@PutMapping
 	public Film updateFilm(@Valid @RequestBody Film film) {
 		log.info("Received request to endpoint: PUT /films");
-		checkingRepeat(films, film);
-		films.put(film.getId(), film);
-		log.info("Film updated: {}.", film);
-		return film;
+		return filmService.updateFilm(film);
+	}
+
+	@GetMapping ("/{id}")
+	public Film getFilmById(@PathVariable (required = false) Long id) {
+		log.info("Received request to endpoint: GET /films/{}", id);
+		return filmService.getFilmById(id);
 	}
 
 	@GetMapping
 	public Collection<Film> getAllFilms() {
 		log.info("Received request to endpoint: GET /films");
-		return films.values();
+		return filmService.getAllFilms();
 	}
 
-	private void checkingRepeat(Map<Integer, Film> films, Film film) {
-		for (Film currentFilm : films.values()) {
-			if (Objects.equals(currentFilm.getName(), film.getName()) && Objects.equals(currentFilm.getReleaseDate(),
-					film.getReleaseDate()) && !Objects.equals(currentFilm.getId(), film.getId())) {
-				throw new ValidationException("This information for the movie " + film.getName() + " is already available.");
-			}
-		}
+	@PutMapping ("/{id}/like/{userId}")
+	public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+		log.info("Received request to endpoint: PUT /films/{}/like/{}", id, userId);
+		filmService.addLike(id, userId);
 	}
+
+	@DeleteMapping ("/{id}/like/{userId}")
+	public void deleteLike(@PathVariable (required = false) Long id, @PathVariable (required = false) Long userId) {
+		log.info("Received request to endpoint: DELETE /films/{}/like/{}", id, userId);
+		filmService.deleteLike(id, userId);
+	}
+
+	@GetMapping ("/popular")
+	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
+		log.info("Received request to endpoint: GET /films/popular?count={}", count);
+		return filmService.getTopRatingFilms(count);
+	}
+
 }

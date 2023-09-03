@@ -1,60 +1,73 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
 
 @Slf4j
 @RestController
+@Component
+@RequiredArgsConstructor
 @RequestMapping ("/users")
 public class UserController {
-	private final Map<Integer, User> users = new HashMap<>();
-	private int counter = 1;
+	private final UserService userService;
 
 	@PostMapping
 	public User addNewUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: POST /users");
-		setLoginAsNameIfNameIsEmpty(user);
-		checkingRepeat(users, user);
-		user.setId(counter);
-		counter++;
-		users.put(user.getId(), user);
-		log.info("User added: {}.", user);
-		return user;
+		return userService.addNewUser(user);
 	}
 
 	@PutMapping
 	public User updateUser(@Valid @RequestBody User user) {
 		log.info("Received request to endpoint: PUT /users");
-		setLoginAsNameIfNameIsEmpty(user);
-		checkingRepeat(users, user);
-		users.put(user.getId(), user);
-		log.info("User updated:  {}.", user);
-		return user;
+		return userService.updateUser(user);
+	}
+
+	@GetMapping ("/{id}")
+	public User getUserById(@PathVariable (required = false) String id) {
+		log.info("Received request to endpoint: GET /users/{}", id);
+		return userService.getUserById(Long.parseLong(id));
 	}
 
 	@GetMapping
 	public Collection<User> getAllUsers() {
-		log.info("Received request to endpoint: GET /films");
-		return new ArrayList<>(users.values());
+		log.info("Received request to endpoint: GET /users");
+		return userService.getAllUsers();
 	}
 
-	private void setLoginAsNameIfNameIsEmpty(User user) {
-		if (user.getName() == null || user.getName().isBlank()) {
-			user.setName(user.getLogin());
+	@PutMapping ("/{id}/friends/{friendId}")
+	public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+		log.info("Received request to endpoint: PUT /users/{}/friends/{}", id, friendId);
+		Long id1 = id;
+		if (id1.equals(friendId)) {
+			throw new IllegalArgumentException("You can't add yourself as a friend:  " + friendId);
+		} else {
+			userService.addFriend(id, friendId);
 		}
 	}
 
-	private void checkingRepeat(Map<Integer, User> users, User user) {
-		for (User currentUser : users.values()) {
-			if (Objects.equals(currentUser.getEmail(), user.getEmail()) && !Objects.equals(currentUser.getId(),
-					user.getId())) {
-				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
-			}
-		}
+	@DeleteMapping ("/{id}/friends/{friendId}")
+	public void deleteFriend(@PathVariable (required = false) Long id, @PathVariable (required = false) Long friendId) {
+		log.info("Received request to endpoint: DELETE /users/{}/friends/{}", id, friendId);
+		userService.deleteFriend(id, friendId);
+	}
+
+	@GetMapping ("/{id}/friends")
+	public Collection<User> getAllFriendsOfUser(@PathVariable (required = false) Long id) {
+		log.info("Received request to endpoint: GET /users/{}/friends", id);
+		return userService.getAllFriendsOfUser(id);
+	}
+
+	@GetMapping ("/{id}/friends/common/{otherId}")
+	public Collection<User> getMutualFriends(@PathVariable (required = false) Long id, @PathVariable (required = false) Long otherId) {
+		log.info("Received request to endpoint: GET /users/{}/friends/common/{}", id, otherId);
+		return userService.getMutualFriends(id, otherId);
 	}
 }

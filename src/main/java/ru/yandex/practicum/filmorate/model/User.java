@@ -5,19 +5,19 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 
 @Data
 @Builder
 public class User {
-	private int id;
+	private Long id;
 
 	@NotBlank (message = "Email field must not be empty")
 	@Email (message = "Invalid e-mail format")
 	private String email;
 
 	@NotNull
-	@Pattern(regexp = "^[a-zA-Z0-9]{3,12}$",
-			message = "Login field must not be empty and contain spaces")
+	@Pattern (regexp = "^[a-zA-Z0-9]{3,12}$", message = "Login field must not be empty and contain spaces")
 	private String login;
 
 	private String name;
@@ -26,4 +26,5 @@ public class User {
 	@PastOrPresent (message = "Date of birth cannot be in the future")
 	private LocalDate birthday;
 
+	private HashSet<Long> friends;
 }
