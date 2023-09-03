@@ -48,7 +48,7 @@ public class FilmService {
 	public void addLike(Long id, Long userId) {
 		Film filmLiked = filmStorage.getFilmById(id);
 		if (filmLiked.getLikes() == null) {
-			filmLiked.setLikes(Stream.of(userId).collect(Collectors.toCollection(HashSet :: new)));
+			filmLiked.setLikes(Stream.of(userId).collect(Collectors.toCollection(HashSet::new)));
 		} else {
 			Set<Long> set = filmLiked.getLikes();
 			set.add(userId);
