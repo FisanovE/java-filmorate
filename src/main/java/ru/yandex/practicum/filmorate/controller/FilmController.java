@@ -18,6 +18,7 @@ import java.util.Collection;
 public class FilmController {
 
 	private final FilmService filmService;
+
 	@PostMapping
 	public Film addNewFilm(@Valid @RequestBody Film film) {
 		log.info("Received request to endpoint: POST /films");
@@ -59,5 +60,4 @@ public class FilmController {
 		log.info("Received request to endpoint: GET /films/popular?count={}", count);
 		return filmService.getTopRatingFilms(count);
 	}
-
 }
