@@ -123,7 +123,7 @@ class FilmControllerTest {
 		controller.addLike(filmAdded.getId(), 2L);
 
 		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
-		List<Long> likes  = new ArrayList<>(films.get(0).getLikes());
+		List<Long> likes  = new ArrayList<>(films.get(0).getLikedUsersIds());
 
 		assertAll(
 				() -> assertFalse(likes.isEmpty(), "Like not added"),
@@ -140,7 +140,7 @@ class FilmControllerTest {
 		controller.deleteLike(filmAdded.getId(), 2L);
 
 		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
-		List<Long> likes  = new ArrayList<>(films.get(0).getLikes());
+		List<Long> likes  = new ArrayList<>(films.get(0).getLikedUsersIds());
 
 		assertTrue(likes.isEmpty(), "Likes list must by empty");
 	}

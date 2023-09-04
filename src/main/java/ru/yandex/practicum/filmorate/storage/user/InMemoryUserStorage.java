@@ -58,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
 	private void checkingRepeat(Map<Long, User> users, User user) {
 		for (User currentUser : users.values()) {
-			if (Objects.equals(currentUser.getEmail(), user.getEmail()) && !Objects.equals(currentUser.getId(), user.getId())) {
+			if (Objects.equals(currentUser.getEmail(), user.getEmail()) && !users.containsKey(user.getId())) {
 				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
 			}
 		}

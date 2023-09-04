@@ -21,43 +21,43 @@ public class FilmController {
 
 	@PostMapping
 	public Film addNewFilm(@Valid @RequestBody Film film) {
-		log.info("Received request to endpoint: POST /films");
+		log.info("Endpoint -> Create film");
 		return filmService.addNewFilm(film);
 	}
 
 	@PutMapping
 	public Film updateFilm(@Valid @RequestBody Film film) {
-		log.info("Received request to endpoint: PUT /films");
+		log.info("Endpoint -> Update film");
 		return filmService.updateFilm(film);
 	}
 
 	@GetMapping ("/{id}")
 	public Film getFilmById(@PathVariable (required = false) Long id) {
-		log.info("Received request to endpoint: GET /films/{}", id);
+		log.info("Endpoint -> Get film {}", id);
 		return filmService.getFilmById(id);
 	}
 
 	@GetMapping
 	public Collection<Film> getAllFilms() {
-		log.info("Received request to endpoint: GET /films");
+		log.info("Endpoint -> Get films");
 		return filmService.getAllFilms();
 	}
 
 	@PutMapping ("/{id}/like/{userId}")
 	public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-		log.info("Received request to endpoint: PUT /films/{}/like/{}", id, userId);
+		log.info("Endpoint -> Update film {}, liked user {}", id, userId);
 		filmService.addLike(id, userId);
 	}
 
 	@DeleteMapping ("/{id}/like/{userId}")
 	public void deleteLike(@PathVariable (required = false) Long id, @PathVariable (required = false) Long userId) {
-		log.info("Received request to endpoint: DELETE /films/{}/like/{}", id, userId);
+		log.info("Endpoint -> Delete in film {}, like user {}", id, userId);
 		filmService.deleteLike(id, userId);
 	}
 
 	@GetMapping ("/popular")
 	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
-		log.info("Received request to endpoint: GET /films/popular?count={}", count);
+		log.info("Endpoint ->  Get rating films, count {}", count);
 		return filmService.getTopRatingFilms(count);
 	}
 }
