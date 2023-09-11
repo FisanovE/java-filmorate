@@ -13,15 +13,17 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
 
 	private final Map<Long, User> users = new HashMap<>();
+	private final Map<String, Long> emails = new HashMap<>();
 	private Long counter = 1L;
 
 	@Override
 	public User addNewUser(User user) {
 		setLoginAsNameIfNameIsEmpty(user);
-		checkingRepeat(users, user);
+		checkingRepeat(emails, user);
 		user.setId(counter);
 		counter++;
 		users.put(user.getId(), user);
+		emails.put(user.getEmail(), user.getId());
 		log.info("User added: {}.", user);
 		return user;
 	}
@@ -32,7 +34,6 @@ public class InMemoryUserStorage implements UserStorage {
 			throw new NotFoundException("Invalid User ID:  " + user.getId());
 		}
 		setLoginAsNameIfNameIsEmpty(user);
-		checkingRepeat(users, user);
 		users.put(user.getId(), user);
 		log.info("User updated:  {}.", user);
 		return user;
@@ -56,11 +57,9 @@ public class InMemoryUserStorage implements UserStorage {
 		}
 	}
 
-	private void checkingRepeat(Map<Long, User> users, User user) {
-		for (User currentUser : users.values()) {
-			if (Objects.equals(currentUser.getEmail(), user.getEmail()) && !users.containsKey(user.getId())) {
-				throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
-			}
+	private void checkingRepeat(Map<String, Long> emails, User user) {
+		if (emails.containsKey(user.getEmail())) {
+			throw new ValidationException("This email is already registered: \"" + user.getEmail() + "\"");
 		}
 	}
 }

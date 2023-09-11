@@ -3,33 +3,24 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
 	private User user;
 	private UserController controller;
-	private Validator validator;
-	private Set<ConstraintViolation<User>> violations;
 
 	@BeforeEach
 	void init() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		validator = factory.getValidator();
 		controller = new UserController(new UserService(new InMemoryUserStorage()));
 	}
 
@@ -49,9 +40,15 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidEmail = "mailmail.ru";
 		userNew.setEmail(notValidEmail);
-		violations = validator.validate(userNew);
-		assertFalse(violations.isEmpty(), violations.toString());
-		violations.clear();
+		List<User> list  = new ArrayList<>(controller.getAllUsers());
+		final ValidationException exception = assertThrows(
+				ValidationException.class,
+				new Executable() {
+					@Override
+					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+				});
+		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
+				() -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -60,9 +57,15 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidEmail = "";
 		userNew.setEmail(notValidEmail);
-		violations = validator.validate(userNew);
-		assertFalse(violations.isEmpty(), violations.toString());
-		violations.clear();
+		List<User> list  = new ArrayList<>(controller.getAllUsers());
+		final ValidationException exception = assertThrows(
+				ValidationException.class,
+				new Executable() {
+					@Override
+					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+				});
+		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
+				() -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -71,9 +74,15 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidLogin = "";
 		userNew.setLogin(notValidLogin);
-		violations = validator.validate(userNew);
-		assertFalse(violations.isEmpty(), violations.toString());
-		violations.clear();
+		List<User> list  = new ArrayList<>(controller.getAllUsers());
+		final ValidationException exception = assertThrows(
+				ValidationException.class,
+				new Executable() {
+					@Override
+					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+				});
+		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
+				() -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -82,9 +91,15 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidLogin = " ";
 		userNew.setLogin(notValidLogin);
-		violations = validator.validate(userNew);
-		assertFalse(violations.isEmpty(), violations.toString());
-		violations.clear();
+		List<User> list  = new ArrayList<>(controller.getAllUsers());
+		final ValidationException exception = assertThrows(
+				ValidationException.class,
+				new Executable() {
+					@Override
+					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+				});
+		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
+				() -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -105,9 +120,15 @@ class UserControllerTest {
 		User userNew = createUser();
 		String notValidBirthday = "2027-08-20";
 		userNew.setBirthday(LocalDate.parse(notValidBirthday, DateUtils.formatter));
-		violations = validator.validate(userNew);
-		assertFalse(violations.isEmpty(), violations.toString());
-		violations.clear();
+		List<User> list  = new ArrayList<>(controller.getAllUsers());
+		final ValidationException exception = assertThrows(
+				ValidationException.class,
+				new Executable() {
+					@Override
+					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+				});
+		assertAll(() -> assertEquals("Date of birth cannot be in the future: \"" + notValidBirthday + "\"", exception.getMessage()),
+				() -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
