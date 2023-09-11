@@ -8,8 +8,6 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
-
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -23,14 +21,14 @@ public class FilmController {
 	private final FilmService filmService;
 
 	@PostMapping
-	public Film addNewFilm(@Valid @RequestBody Film film) {
+	public Film addNewFilm(@RequestBody Film film) {
 		log.info("Endpoint -> Create film");
 		checkingFilmForValid(film);
 		return filmService.addNewFilm(film);
 	}
 
 	@PutMapping
-	public Film updateFilm(@Valid @RequestBody Film film) {
+	public Film updateFilm(@RequestBody Film film) {
 		log.info("Endpoint -> Update film");
 		checkingFilmForValid(film);
 		return filmService.updateFilm(film);

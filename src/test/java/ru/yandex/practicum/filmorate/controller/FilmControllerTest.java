@@ -37,15 +37,17 @@ class FilmControllerTest {
 	@Test
 	@DisplayName ("Валидация: Name пуст")
 	void shouldReturnExceptionWhenNameNewFilmIsEmpty() {
-		Film FilmNew = createFilm();
+		Film filmNew = createFilm();
 		String notValidName = "";
-		FilmNew.setName(notValidName);
+		filmNew.setName(notValidName);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewFilm(FilmNew);}
+					public void execute() throws ValidationException {
+						controller.addNewFilm(filmNew);
+					}
 				});
 		assertAll(() -> assertEquals("Invalid title format: \"" + notValidName + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
@@ -54,17 +56,19 @@ class FilmControllerTest {
 	@Test
 	@DisplayName ("Валидация: Description больше 200 символов")
 	void shouldReturnExceptionWhenDescriptionNewFilmMoreThan200Char() {
-		Film FilmNew = createFilm();
+		Film filmNew = createFilm();
 		String notValidDescription = "This is a pretty famous film that no one has ever seen. That's exactly what he's " +
 				"famous for. Critics do not respond to him in any way, because they have not seen him once. The audience " +
 				"is enthusiastically silent about him for the same reason.";
-		FilmNew.setDescription(notValidDescription);
+		filmNew.setDescription(notValidDescription);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewFilm(FilmNew);}
+					public void execute() throws ValidationException {
+						controller.addNewFilm(filmNew);
+					}
 				});
 		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \"" +
 						notValidDescription.length() + "\" characters", exception.getMessage()),
@@ -74,15 +78,17 @@ class FilmControllerTest {
 	@Test
 	@DisplayName ("Валидация: releaseDate раньше 1895.12.28")
 	void shouldReturnExceptionWhenReleaseDateNewFilmIsNotValid() {
-		Film FilmNew = createFilm();
+		Film filmNew = createFilm();
 		String notValidReleaseDate = "1795-12-28";
-		FilmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
+		filmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewFilm(FilmNew);}
+					public void execute() throws ValidationException {
+						controller.addNewFilm(filmNew);
+					}
 				});
 		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \"" +
 						notValidReleaseDate + "\"", exception.getMessage()),
@@ -92,15 +98,17 @@ class FilmControllerTest {
 	@Test
 	@DisplayName ("Валидация: duration отрицательная")
 	void shouldReturnExceptionWhenDurationNewFilmIsNotValid() {
-		Film FilmNew = createFilm();
+		Film filmNew = createFilm();
 		int notValidDuration = -1;
-		FilmNew.setDuration(notValidDuration);
+		filmNew.setDuration(notValidDuration);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewFilm(FilmNew);}
+					public void execute() throws ValidationException {
+						controller.addNewFilm(filmNew);
+					}
 				});
 		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \"" + notValidDuration, exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));

@@ -45,7 +45,9 @@ class UserControllerTest {
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+					public void execute() throws ValidationException {
+						controller.addNewUser(userNew);
+					}
 				});
 		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
@@ -62,7 +64,9 @@ class UserControllerTest {
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+					public void execute() throws ValidationException {
+						controller.addNewUser(userNew);
+					}
 				});
 		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
@@ -79,7 +83,9 @@ class UserControllerTest {
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+					public void execute() throws ValidationException {
+						controller.addNewUser(userNew);
+					}
 				});
 		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
@@ -96,7 +102,9 @@ class UserControllerTest {
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+					public void execute() throws ValidationException {
+						controller.addNewUser(userNew);
+					}
 				});
 		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
@@ -125,7 +133,9 @@ class UserControllerTest {
 				ValidationException.class,
 				new Executable() {
 					@Override
-					public void execute() throws ValidationException {controller.addNewUser(userNew);}
+					public void execute() throws ValidationException {
+						controller.addNewUser(userNew);
+					}
 				});
 		assertAll(() -> assertEquals("Date of birth cannot be in the future: \"" + notValidBirthday + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));

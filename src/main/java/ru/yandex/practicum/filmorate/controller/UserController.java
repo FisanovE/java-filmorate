@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -23,14 +21,14 @@ public class UserController {
 	private final UserService userService;
 
 	@PostMapping
-	public User addNewUser(@Valid @RequestBody User user) {
+	public User addNewUser(@RequestBody User user) {
 		log.info("Endpoint -> Create user");
 		checkingUserForValid(user);
 		return userService.addNewUser(user);
 	}
 
 	@PutMapping
-	public User updateUser(@Valid @RequestBody User user) {
+	public User updateUser(@RequestBody User user) {
 		log.info("Endpoint -> Update user");
 		checkingUserForValid(user);
 		return userService.updateUser(user);
