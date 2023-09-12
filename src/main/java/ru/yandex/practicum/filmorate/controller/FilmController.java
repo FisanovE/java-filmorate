@@ -1,57 +1,82 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import javax.validation.Valid;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.utils.DateUtils;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @RestController
+@Component
+@RequiredArgsConstructor
 @RequestMapping ("/films")
 public class FilmController {
 
-	private final Map<Integer, Film> films = new HashMap<>();
-	private int counter = 1;
-
+	private final FilmService filmService;
 
 	@PostMapping
-	public Film addNewFilm(@Valid @RequestBody Film film) {
-		log.info("Received request to endpoint: POST /films");
-		checkingRepeat(films, film);
-		film.setId(counter);
-		counter++;
-		films.put(film.getId(), film);
-		log.info("Film added: {}.", film);
-		return film;
+	public Film addNewFilm(@RequestBody Film film) {
+		log.info("Endpoint -> Create film");
+		checkingFilmForValid(film);
+		return filmService.addNewFilm(film);
 	}
 
 	@PutMapping
-	public Film updateFilm(@Valid @RequestBody Film film) {
-		log.info("Received request to endpoint: PUT /films");
-		checkingRepeat(films, film);
-		films.put(film.getId(), film);
-		log.info("Film updated: {}.", film);
-		return film;
+	public Film updateFilm(@RequestBody Film film) {
+		log.info("Endpoint -> Update film");
+		checkingFilmForValid(film);
+		return filmService.updateFilm(film);
+	}
+
+	@GetMapping ("/{id}")
+	public Film getFilmById(@PathVariable (required = false) Long id) {
+		log.info("Endpoint -> Get film {}", id);
+		return filmService.getFilmById(id);
 	}
 
 	@GetMapping
 	public Collection<Film> getAllFilms() {
-		log.info("Received request to endpoint: GET /films");
-		return films.values();
+		log.info("Endpoint -> Get films");
+		return filmService.getAllFilms();
 	}
 
-	private void checkingRepeat(Map<Integer, Film> films, Film film) {
-		for (Film currentFilm : films.values()) {
-			if (Objects.equals(currentFilm.getName(), film.getName()) && Objects.equals(currentFilm.getReleaseDate(),
-					film.getReleaseDate()) && !Objects.equals(currentFilm.getId(), film.getId())) {
-				throw new ValidationException("This information for the movie " + film.getName() + " is already available.");
-			}
+	@PutMapping ("/{id}/like/{userId}")
+	public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+		log.info("Endpoint -> Update film {}, liked user {}", id, userId);
+		filmService.addLike(id, userId);
+	}
+
+	@DeleteMapping ("/{id}/like/{userId}")
+	public void deleteLike(@PathVariable (required = false) Long id, @PathVariable (required = false) Long userId) {
+		log.info("Endpoint -> Delete in film {}, like user {}", id, userId);
+		filmService.deleteLike(id, userId);
+	}
+
+	@GetMapping ("/popular")
+	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
+		log.info("Endpoint ->  Get rating films, count {}", count);
+		return filmService.getTopRatingFilms(count);
+	}
+
+	private void checkingFilmForValid(Film film) throws ValidationException {
+		if (film.getName().isBlank()) {
+			throw new ValidationException("Invalid title format: \"" + film.getName() + "\"");
+		}
+		if (film.getDescription().length() > 200) {
+			throw new ValidationException("The maximum description length is 200 characters, you have: \"" + film.getDescription()
+																												 .length() + "\" characters");
+		}
+		if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateUtils.formatter))) {
+			throw new ValidationException("Movie release date should not be earlier than 1895.12.28, you have: \"" + film.getReleaseDate() + "\"");
+		}
+		if (film.getDuration() < 0) {
+			throw new ValidationException("The duration of the film should be positive, you have:  \"" + film.getDuration());
 		}
 	}
 }
