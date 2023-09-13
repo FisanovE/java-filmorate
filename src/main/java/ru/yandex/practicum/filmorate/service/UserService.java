@@ -37,76 +37,81 @@ public class UserService {
 		if (idUser.equals(idFriend)) {
 			throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
 		} else {
-		User user = userStorage.getUserById(idUser);
-		User friend = userStorage.getUserById(idFriend);
-		HashSet<Long> userFriends;
-		HashSet<Long> friendFriends;
-		if (user.getFriendIds() == null) {
-			userFriends = new HashSet<>();
-		} else {
-			userFriends = (HashSet<Long>) user.getFriendIds();
-		}
-		userFriends.add(idFriend);
-		user.setFriendIds(userFriends);
-		if (friend.getFriendIds() == null) {
-			friendFriends = new HashSet<>();
-		} else {
-			friendFriends = (HashSet<Long>) friend.getFriendIds();
-		}
-		friendFriends.add(idUser);
-		friend.setFriendIds(friendFriends);
-		userStorage.updateUser(user);
-		userStorage.updateUser(friend);
+			User user = userStorage.getUserById(idUser);
+			User friend = userStorage.getUserById(idFriend);
+			HashMap<Long, Boolean> userFriends;
+			HashMap<Long, Boolean> friendFriends;
+			if (user.getFriendsId() == null) {
+				userFriends = new HashMap<>();
+			} else {
+				userFriends = (HashMap<Long, Boolean>) user.getFriendsId();
+			}
+			userFriends.put(idFriend, false);
+			user.setFriendsId(userFriends);
+			if (friend.getFriendsId() == null) {
+				friendFriends = new HashMap<>();
+			} else {
+				friendFriends = (HashMap<Long, Boolean>) friend.getFriendsId();
+			}
+			friendFriends.put(idUser, false);
+			friend.setFriendsId(friendFriends);
+			userStorage.updateUser(user);
+			userStorage.updateUser(friend);
 		}
 	}
 
 	public void deleteFriend(Long idUser, Long idFriend) {
 		User user = userStorage.getUserById(idUser);
 		User friend = userStorage.getUserById(idFriend);
-		HashSet<Long> userFriends;
-		HashSet<Long> friendFriends;
-		if (user.getFriendIds() == null || !user.getFriendIds().contains(idFriend)) {
+		HashMap<Long, Boolean> userFriends;
+		HashMap<Long, Boolean> friendFriends;
+		if (user.getFriendsId() == null || !user.getFriendsId().containsKey(idFriend)) {
 			throw new NotFoundException("User ID is missing from friends:  " + idFriend);
 		} else {
-			userFriends = (HashSet<Long>) user.getFriendIds();
-			user.setFriendIds(userFriends);
+			userFriends = (HashMap<Long, Boolean>) user.getFriendsId();
+			user.setFriendsId(userFriends);
 		}
 		userFriends.remove(idFriend);
-		if (friend.getFriendIds() == null || !friend.getFriendIds().contains(idUser)) {
+		if (friend.getFriendsId() == null || !friend.getFriendsId().containsKey(idUser)) {
 			throw new NotFoundException("User ID is missing from friends:  " + idUser);
 		} else {
-			friendFriends = (HashSet<Long>) friend.getFriendIds();
+			friendFriends = (HashMap<Long, Boolean>) friend.getFriendsId();
 		}
 		friendFriends.remove(idUser);
-		friend.setFriendIds(friendFriends);
-		user.setFriendIds(userFriends);
+		friend.setFriendsId(friendFriends);
+		user.setFriendsId(userFriends);
 		userStorage.updateUser(user);
 		userStorage.updateUser(friend);
 	}
 
 	public Collection<User> getAllFriendsOfUser(Long idUser) {
 		ArrayList<User> friends = new ArrayList<>();
-		if ((userStorage.getUserById(idUser).getFriendIds() == null)) {
+		if ((userStorage.getUserById(idUser).getFriendsId() == null)) {
 			return new ArrayList<>();
 		}
-		HashSet<Long> idAllFriends = (HashSet<Long>) userStorage.getUserById(idUser).getFriendIds();
-		for (Long id : idAllFriends) {
+		HashMap<Long, Boolean> idAllFriends = (HashMap<Long, Boolean>) userStorage.getUserById(idUser).getFriendsId();
+		for (Long id : idAllFriends.keySet()) {
 			friends.add(userStorage.getUserById(id));
 		}
-		Collections.sort(friends, (o1, o2) -> (int) (o1.getId() - o2.getId()));
+		/*for (Long id : idAllFriends.keySet()) {
+			if(idAllFriends.get(id) == true){
+				friends.add(userStorage.getUserById(id));
+			}
+		}*/
+		friends.sort((o1, o2) -> (int) (o1.getId() - o2.getId()));
 		return friends;
 	}
 
 
 	public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
-		if (userStorage.getUserById(idUser).getFriendIds() == null || userStorage.getUserById(idOtherUser)
-																				 .getFriendIds() == null) {
+		if (userStorage.getUserById(idUser).getFriendsId() == null || userStorage.getUserById(idOtherUser)
+																				 .getFriendsId() == null) {
 			return new HashSet<>();
 		}
 		Set<Long> mutualId;
 		Set<User> mutualFriends = new HashSet<>();
-		Collection<Long> userFriends = userStorage.getUserById(idUser).getFriendIds();
-		Collection<Long> otherUserFriends = userStorage.getUserById(idOtherUser).getFriendIds();
+		Collection<Long> userFriends = userStorage.getUserById(idUser).getFriendsId().keySet();
+		Collection<Long> otherUserFriends = userStorage.getUserById(idOtherUser).getFriendsId().keySet();
 		mutualId = userFriends.stream().filter(otherUserFriends::contains).collect(Collectors.toSet());
 		for (Long id : mutualId) {
 			mutualFriends.add(userStorage.getUserById(id));
