@@ -112,7 +112,7 @@ public class UserService {
 		Set<User> mutualFriends = new HashSet<>();
 		Collection<Long> userFriends = userStorage.getUserById(idUser).getFriendsId().keySet();
 		Collection<Long> otherUserFriends = userStorage.getUserById(idOtherUser).getFriendsId().keySet();
-		mutualId = userFriends.stream().filter(otherUserFriends :: contains).collect(Collectors.toSet());
+		mutualId = userFriends.stream().filter(otherUserFriends::contains).collect(Collectors.toSet());
 		for (Long id : mutualId) {
 			mutualFriends.add(userStorage.getUserById(id));
 		}
