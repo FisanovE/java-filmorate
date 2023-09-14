@@ -13,6 +13,7 @@ Java 11, REST Spring Boot, Maven, Lombock, SLF4J
 
 <summary>Примеры SQL-запросов для основных операций приложения.</summary>
 
+
 Получение списка всех фильмов
 ```
 SELECT *
