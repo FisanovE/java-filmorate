@@ -25,11 +25,10 @@ import java.util.Optional;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor (onConstructor_ = @Autowired)
-class FilmoRateApplicationTests {
+class FilmorateApplicationTests {
 
 	@Qualifier("userDbStorage")
 	private final UserStorage userStorage;
-	
 	@Qualifier ("filmDbStorage")
 	private final FilmStorage filmStorage;
 	private User user;
