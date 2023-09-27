@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -21,7 +25,8 @@ import java.util.stream.Stream;
 @RequestMapping ("/films")
 public class FilmService {
 
-	private final InMemoryFilmStorage filmStorage;
+	@Qualifier ("filmDbStorage")
+	private final FilmStorage filmStorage;
 
 	public Film addNewFilm(Film film) {
 		return filmStorage.addNewFilm(film);
@@ -40,41 +45,30 @@ public class FilmService {
 	}
 
 	public void addLike(Long id, Long userId) {
-		Film filmLiked = filmStorage.getFilmById(id);
-		if (filmLiked.getLikedUsersIds() == null) {
-			filmLiked.setLikedUsersIds(Stream.of(userId).collect(Collectors.toCollection(HashSet::new)));
-		} else {
-			Set<Long> set = filmLiked.getLikedUsersIds();
-			set.add(userId);
-			filmLiked.setLikedUsersIds(set);
-		}
-		filmStorage.updateFilm(filmLiked);
+		filmStorage.addLike(id, userId);
 	}
 
 	public void deleteLike(Long id, Long userId) {
-		if (filmStorage.getFilmById(id).getLikedUsersIds() == null || !filmStorage.getFilmById(id).getLikedUsersIds()
-																				  .contains(userId)) {
-			throw new NotFoundException("User ID is missing from likes:  " + userId);
-		} else {
-			Film filmLiked = filmStorage.getFilmById(id);
-			Set<Long> idUsers = filmLiked.getLikedUsersIds();
-			idUsers.remove(userId);
-			filmLiked.setLikedUsersIds(idUsers);
-			filmStorage.updateFilm(filmLiked);
-		}
+		filmStorage.deleteLike(id, userId);
 	}
 
-	Comparator<Film> filmComparator = (film1, film2) -> {
-		if (film1.getLikedUsersIds() == null || film1.getLikedUsersIds().isEmpty()) {
-			return 1;
-		} else if (film2.getLikedUsersIds() == null || film2.getLikedUsersIds().isEmpty()) {
-			return -1;
-		}
-		return film2.getLikedUsersIds().size() - film1.getLikedUsersIds().size();
-	};
-
 	public Collection<Film> getTopRatingFilms(int count) {
-		return filmStorage.getAllFilms().stream().sorted(filmComparator).limit(count)
-						  .collect(Collectors.toSet());
+		return filmStorage.getTopRatingFilms(count);
+	}
+
+	public Collection<Genre> getAllGenres() {
+		return filmStorage.getAllGenres();
+	}
+
+	public Genre getGenresById(Long id) {
+		return filmStorage.getGenresById(id);
+	}
+
+	public Collection<Mpa> getAllRatingsMpa() {
+		return filmStorage.getAllRatingsMpa();
+	}
+
+	public Mpa getRatingsMpaById(Long id) {
+		return filmStorage.getRatingsMpaById(id);
 	}
 }

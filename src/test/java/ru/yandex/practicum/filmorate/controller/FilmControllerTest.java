@@ -7,7 +7,7 @@ import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ class FilmControllerTest {
 
 	@Test
 	@DisplayName ("Добавление нового фильма")
-	void shouldAddNewFilmWhenEmailIsValid() {
+	void shouldAddNewFilm() {
 		Film filmNew = createFilm();
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
@@ -129,8 +129,8 @@ class FilmControllerTest {
 	}
 
 	@Test
-	@DisplayName ("Получение списка пользователей")
-	void shouldReturnListFilms() {
+	@DisplayName ("Получение списка всех фильмов")
+	void shouldReturnListAllFilms() {
 		Film filmNew = createFilm();
 		controller.addNewFilm(filmNew);
 		List<Film> list  = new ArrayList<>(controller.getAllFilms());
