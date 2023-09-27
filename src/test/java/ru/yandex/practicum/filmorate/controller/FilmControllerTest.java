@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ class FilmControllerTest {
 	void shouldAddNewFilm() {
 		Film filmNew = createFilm();
 		controller.addNewFilm(filmNew);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
 
 		assertFalse(list.isEmpty(), "Film not added");
 	}
@@ -40,15 +40,8 @@ class FilmControllerTest {
 		Film filmNew = createFilm();
 		String notValidName = "";
 		filmNew.setName(notValidName);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
+		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
 		assertAll(() -> assertEquals("Invalid title format: \"" + notValidName + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
@@ -57,21 +50,14 @@ class FilmControllerTest {
 	@DisplayName ("Валидация: Description больше 200 символов")
 	void shouldReturnExceptionWhenDescriptionNewFilmMoreThan200Char() {
 		Film filmNew = createFilm();
-		String notValidDescription = "This is a pretty famous film that no one has ever seen. That's exactly what he's " +
-				"famous for. Critics do not respond to him in any way, because they have not seen him once. The audience " +
-				"is enthusiastically silent about him for the same reason.";
+		String notValidDescription = "This is a pretty famous film that no one has ever seen. That's exactly what he's "
+				+ "famous for. Critics do not respond to him in any way, because they have not seen him once. " +
+				"The audience is enthusiastically silent about him for the same reason.";
 		filmNew.setDescription(notValidDescription);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \"" +
-						notValidDescription.length() + "\" characters", exception.getMessage()),
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
+		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \""
+				+ notValidDescription.length() + "\" characters", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -81,18 +67,10 @@ class FilmControllerTest {
 		Film filmNew = createFilm();
 		String notValidReleaseDate = "1795-12-28";
 		filmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \"" +
-						notValidReleaseDate + "\"", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
+		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \""
+				+ notValidReleaseDate + "\"", exception.getMessage()), () -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -101,17 +79,10 @@ class FilmControllerTest {
 		Film filmNew = createFilm();
 		int notValidDuration = -1;
 		filmNew.setDuration(notValidDuration);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
-		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewFilm(filmNew);
-					}
-				});
-		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \"" + notValidDuration, exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
+		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
+		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \""
+				+ notValidDuration, exception.getMessage()), () -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -121,11 +92,10 @@ class FilmControllerTest {
 		Film filmAdded = updateFilm();
 		controller.addNewFilm(filmNew);
 		controller.updateFilm(filmAdded);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
 
-		assertAll(
-				() -> assertFalse(list.isEmpty(), "Film not added"),
-				() -> assertEquals(filmAdded, list.get(0), "Films are not equal"));
+		assertAll(() -> assertFalse(list.isEmpty(), "Film not added"), () -> assertEquals(filmAdded,
+				list.get(0), "Films are not equal"));
 	}
 
 	@Test
@@ -133,7 +103,7 @@ class FilmControllerTest {
 	void shouldReturnListAllFilms() {
 		Film filmNew = createFilm();
 		controller.addNewFilm(filmNew);
-		List<Film> list  = new ArrayList<>(controller.getAllFilms());
+		List<Film> list = new ArrayList<>(controller.getAllFilms());
 
 		assertFalse(list.isEmpty(), "The list is empty");
 	}
@@ -146,12 +116,11 @@ class FilmControllerTest {
 
 		controller.addLike(filmAdded.getId(), 2L);
 
-		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
-		List<Long> likes  = new ArrayList<>(films.get(0).getLikedUsersIds());
+		List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10));
+		List<Long> likes = new ArrayList<>(films.get(0).getLikedUsersIds());
 
-		assertAll(
-				() -> assertFalse(likes.isEmpty(), "Like not added"),
-				() -> assertEquals(2, likes.get(0), "Films id are not equal"));
+		assertAll(() -> assertFalse(likes.isEmpty(), "Like not added"), () -> assertEquals(2,
+				likes.get(0), "Films id are not equal"));
 	}
 
 	@Test
@@ -163,8 +132,8 @@ class FilmControllerTest {
 
 		controller.deleteLike(filmAdded.getId(), 2L);
 
-		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
-		List<Long> likes  = new ArrayList<>(films.get(0).getLikedUsersIds());
+		List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10));
+		List<Long> likes = new ArrayList<>(films.get(0).getLikedUsersIds());
 
 		assertTrue(likes.isEmpty(), "Likes list must by empty");
 	}
@@ -181,32 +150,29 @@ class FilmControllerTest {
 		controller.addLike(filmAdded1.getId(), 3L);
 		controller.addLike(filmAdded2.getId(), 2L);
 
-		List<Film> films  = new ArrayList<>(controller.getTopRatingFilms(10));
+		List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10));
 
-		assertAll(
-				() -> assertFalse(films.isEmpty(), "Rating list must by not empty"),
-				() -> assertEquals(filmAdded2.getId(), films.get(0).getId(), "Films id are not equal"),
+		assertAll(() -> assertFalse(films.isEmpty(), "Rating list must by not empty"),
+				() -> assertEquals(filmAdded1.getId(), films.get(0).getId(), "Films id are not equal"),
 				() -> assertEquals(2, films.size(), "List`s size not equal 2"));
 	}
 
 	private Film createFilm() {
-		film = film.builder()
+		return Film.builder()
 				   .name("Name Film")
 				   .description("blah-blah-blah")
 				   .releaseDate(LocalDate.of(2022, 8, 20))
 				   .duration(120)
 				   .build();
-		return film;
+
 	}
 
 	private Film updateFilm() {
-		film = film.builder()
-				   .id(1L)
+		return Film.builder().id(1L)
 				   .name("updateName Film")
 				   .description("blah-blah-blah")
 				   .releaseDate(LocalDate.of(2022, 5, 12))
 				   .duration(60)
 				   .build();
-		return film;
 	}
 }

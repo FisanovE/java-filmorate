@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.impl.UserDbStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +21,7 @@ class UserControllerTest {
 
 	@BeforeEach
 	void init() {
-		controller = new UserController(new UserService(new UserDbStorage(new JdbcTemplate())));
+		controller = new UserController(new UserService(new InMemoryUserStorage()));
 	}
 
 	@Test
@@ -44,13 +42,7 @@ class UserControllerTest {
 		userNew.setEmail(notValidEmail);
 		List<User> list  = new ArrayList<>(controller.getAllUsers());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewUser(userNew);
-					}
-				});
+				ValidationException.class, () -> controller.addNewUser(userNew));
 		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
@@ -63,13 +55,7 @@ class UserControllerTest {
 		userNew.setEmail(notValidEmail);
 		List<User> list  = new ArrayList<>(controller.getAllUsers());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewUser(userNew);
-					}
-				});
+				ValidationException.class, () -> controller.addNewUser(userNew));
 		assertAll(() -> assertEquals("Invalid e-mail format: \"" + notValidEmail + "\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
@@ -82,14 +68,9 @@ class UserControllerTest {
 		userNew.setLogin(notValidLogin);
 		List<User> list  = new ArrayList<>(controller.getAllUsers());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewUser(userNew);
-					}
-				});
-		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
+				ValidationException.class, () -> controller.addNewUser(userNew));
+		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin +
+						"\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -101,14 +82,9 @@ class UserControllerTest {
 		userNew.setLogin(notValidLogin);
 		List<User> list  = new ArrayList<>(controller.getAllUsers());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewUser(userNew);
-					}
-				});
-		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin + "\"", exception.getMessage()),
+				ValidationException.class, () -> controller.addNewUser(userNew));
+		assertAll(() -> assertEquals("Login field must not be empty and contain spaces: \"" + notValidLogin +
+						"\"", exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -120,8 +96,8 @@ class UserControllerTest {
 		userNew.setName(name);
 		controller.addNewUser(userNew);
 		List<User> list = new ArrayList<>(controller.getAllUsers());
-		assertAll(() -> assertFalse(list.isEmpty(), "User is not added"), () -> assertEquals(userNew.getLogin(), list.get(0)
-																													 .getName(), "Logins are not equal"));
+		assertAll(() -> assertFalse(list.isEmpty(), "User is not added"), () -> assertEquals(userNew.getLogin(),
+				list.get(0).getName(), "Logins are not equal"));
 	}
 
 	@Test
@@ -132,14 +108,9 @@ class UserControllerTest {
 		userNew.setBirthday(LocalDate.parse(notValidBirthday, DateUtils.formatter));
 		List<User> list  = new ArrayList<>(controller.getAllUsers());
 		final ValidationException exception = assertThrows(
-				ValidationException.class,
-				new Executable() {
-					@Override
-					public void execute() throws ValidationException {
-						controller.addNewUser(userNew);
-					}
-				});
-		assertAll(() -> assertEquals("Date of birth cannot be in the future: \"" + notValidBirthday + "\"", exception.getMessage()),
+				ValidationException.class, () -> controller.addNewUser(userNew));
+		assertAll(() -> assertEquals("Date of birth cannot be in the future: \"" + notValidBirthday + "\"",
+						exception.getMessage()),
 				() -> assertTrue(list.isEmpty()));
 	}
 
@@ -152,7 +123,8 @@ class UserControllerTest {
 		controller.updateUser(userAdded);
 		List<User> list = new ArrayList<>(controller.getAllUsers());
 
-		assertAll(() -> assertFalse(list.isEmpty(), "User is not added"), () -> assertEquals(userAdded, list.get(0), "Users are not equal"));
+		assertAll(() -> assertFalse(list.isEmpty(), "User is not added"),
+				() -> assertEquals(userAdded, list.get(0), "Users are not equal"));
 	}
 
 	@Test
@@ -264,14 +236,20 @@ class UserControllerTest {
 	}
 
 	private User createUser() {
-		user = User.builder().email("mail@mail.ru").login("Login").name("Name").birthday(LocalDate.of(2022, 8, 20))
+		return User.builder()
+				   .email("mail@mail.ru")
+				   .login("Login")
+				   .name("Name")
+				   .birthday(LocalDate.of(2022, 8, 20))
 				   .build();
-		return user;
 	}
 
 	private User updateUser() {
-		user = User.builder().id(1L).email("mail@yandex.ru").login("LoginUpdate").name("NameUpdate")
+		return User.builder()
+				   .id(1L)
+				   .email("mail@yandex.ru")
+				   .login("LoginUpdate")
+				   .name("NameUpdate")
 				   .birthday(LocalDate.of(1946, 8, 20)).build();
-		return user;
 	}
 }

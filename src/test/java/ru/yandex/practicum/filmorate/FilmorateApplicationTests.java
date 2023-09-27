@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.test.context.jdbc.Sql;
-import org.yaml.snakeyaml.util.ArrayUtils;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -19,16 +15,9 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.impl.UserDbStorage;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +25,6 @@ import java.util.Optional;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor (onConstructor_ = @Autowired)
-@TestMethodOrder (MethodOrderer.OrderAnnotation.class)
 class FilmoRateApplicationTests {
 
 	@Qualifier("userDbStorage")
@@ -48,7 +36,6 @@ class FilmoRateApplicationTests {
 	private Film film;
 
 	@Test
-	//@Order (1)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление нового пользователя")
 	void shouldAddNewUser() {
@@ -61,12 +48,11 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(2)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получеие пользователя по ID")
 	void shouldReturnUserById() {
 		User userNew = createUser();
-		User userAdded = userStorage.addNewUser(userNew);
+		userStorage.addNewUser(userNew);
 
 		Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(1L));
 
@@ -75,12 +61,11 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(3)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Обновление пользователя")
 	void shouldUpdateUser() {
 		User userNew = createUser();
-		User userAdded = userStorage.addNewUser(userNew);
+		userStorage.addNewUser(userNew);
 
 		User userUpdate = updateUser();
 
@@ -90,7 +75,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(4)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка пользователей")
 	void shouldReturnListUsers() {
@@ -103,7 +87,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(5)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление друга")
 	void shouldAddFriend() throws ValidationException {
@@ -121,14 +104,13 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(6)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка друзей пользователя")
 	void shouldAllFriendsByUser() throws ValidationException {
 		User userNew = createUser();
 		User userAdded = userStorage.addNewUser(userNew);
 		User userNew2 = createUser();
-		User userAdded2 = userStorage.addNewUser(userNew2);
+		userStorage.addNewUser(userNew2);
 		userStorage.addFriend(1L, 2L);
 
 		List<User> listAllFriendsOfUser = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded.getId()));
@@ -137,7 +119,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(7)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка общих друзей")
 	void shouldMutualFriends() throws ValidationException {
@@ -159,7 +140,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(8)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Удаление друга")
 	void shouldDeleteFriend() throws ValidationException {
@@ -199,7 +179,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(9)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление нового фильма")
 	void shouldAddNewFilm() {
@@ -210,7 +189,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(10)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Обновление фильма ")
 	void shouldUpdateFilm() {
@@ -225,7 +203,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(11)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка всех фильмов")
 	void shouldReturnListAllFilms() {
@@ -236,7 +213,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(12)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление лайка")
 	void shouldAddLike() {
@@ -252,7 +228,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(13)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка лучших фильмов")
 	void shouldReturnTopRatingFilms() {
@@ -285,7 +260,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(14)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Удаление лайка")
 	void shouldDeleteLike() {
@@ -306,7 +280,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(15)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка всех жанров")
 	void shouldReturnListAllGenres() {
@@ -317,7 +290,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(16)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение жанра по ID")
 	void shouldReturnGenresById() {
@@ -326,7 +298,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(17)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка всех рейтингов МРА")
 	void shouldReturnListAllRatingsMpa() {
@@ -337,7 +308,6 @@ class FilmoRateApplicationTests {
 	}
 
 	@Test
-	//@Order(18)
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение рейтинга МРА по ID")
 	void shouldReturnRatingsMpaById() {

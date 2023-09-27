@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -119,19 +118,14 @@ public class InMemoryUserStorage implements UserStorage {
 		for (Long id : idAllFriends.keySet()) {
 			friends.add(getUserById(id));
 		}
-		/*for (Long id : idAllFriends.keySet()) {
-			if(idAllFriends.get(id) == true){
-				friends.add(userStorage.getUserById(id));
-			}
-		}*/
+
 		friends.sort((o1, o2) -> (int) (o1.getId() - o2.getId()));
 		return friends;
 	}
 
 	@Override
 	public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
-		if (getUserById(idUser).getFriendsId() == null || getUserById(idOtherUser)
-																				 .getFriendsId() == null) {
+		if (getUserById(idUser).getFriendsId() == null || getUserById(idOtherUser).getFriendsId() == null) {
 			return new HashSet<>();
 		}
 		Set<Long> mutualId;

@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
+
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -17,7 +18,6 @@ import java.util.Collection;
 @RestController
 @Component
 @RequiredArgsConstructor
-//@RequestMapping ("/films")
 public class FilmController {
 
 	private final FilmService filmService;
@@ -82,7 +82,7 @@ public class FilmController {
 		}
 	}
 
-	@GetMapping("/genres")
+	@GetMapping ("/genres")
 	public Collection<Genre> getAllGenres() {
 		log.info("Endpoint -> Get genres");
 		return filmService.getAllGenres();

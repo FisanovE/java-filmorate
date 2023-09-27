@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
@@ -78,8 +77,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	@Override
 	public void deleteLike(Long id, Long userId) {
-		if (getFilmById(id).getLikedUsersIds() == null || !getFilmById(id).getLikedUsersIds()
-																				  .contains(userId)) {
+		if (getFilmById(id).getLikedUsersIds() == null || !getFilmById(id).getLikedUsersIds().contains(userId)) {
 			throw new NotFoundException("User ID is missing from likes:  " + userId);
 		} else {
 			Film filmLiked = getFilmById(id);
@@ -89,7 +87,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 			updateFilm(filmLiked);
 		}
 	}
-
 
 	Comparator<Film> filmComparator = (film1, film2) -> {
 		if (film1.getLikedUsersIds() == null || film1.getLikedUsersIds().isEmpty()) {
@@ -102,8 +99,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	@Override
 	public Collection<Film> getTopRatingFilms(int count) {
-		return getAllFilms().stream().sorted(filmComparator).limit(count)
-						  .collect(Collectors.toSet());
+		return getAllFilms().stream().sorted(filmComparator).limit(count).collect(Collectors.toSet());
 	}
 
 	@Override
@@ -125,5 +121,4 @@ public class InMemoryFilmStorage implements FilmStorage {
 	public Mpa getRatingsMpaById(Long id) {
 		return null;
 	}
-
 }
