@@ -18,6 +18,21 @@ import java.util.stream.Stream;
 public class InMemoryFilmStorage implements FilmStorage {
 
 	private final Map<Long, Film> films = new HashMap<>();
+	private final Map<Long, Genre> genres = Map.of(
+			1L, Genre.builder().id(1L).name("Комедия").build(),
+			2L, Genre.builder().id(2L).name("Драма").build(),
+			3L, Genre.builder().id(3L).name("Мультфильм").build(),
+			4L, Genre.builder().id(4L).name("Триллер").build(),
+			5L, Genre.builder().id(5L).name("Документальный").build(),
+			6L, Genre.builder().id(6L).name("Боевик").build()
+	);
+	private final Map<Long, Mpa> ratingsMpa = Map.of(
+			1L, Mpa.builder().id(1L).name("G").build(),
+			2L, Mpa.builder().id(2L).name("PG").build(),
+			3L, Mpa.builder().id(3L).name("PG-13").build(),
+			4L, Mpa.builder().id(4L).name("R").build(),
+			5L, Mpa.builder().id(5L).name("NC-17").build()
+	);
 	private Long counter = 1L;
 
 	@Override
@@ -104,21 +119,29 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	@Override
 	public Collection<Genre> getAllGenres() {
-		return null;
+		return genres.values().stream().sorted(Comparator.comparing(Genre::getId)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Genre getGenresById(Long id) {
-		return null;
+		if (genres.containsKey(id)) {
+			return genres.get(id);
+		} else {
+			throw new NotFoundException("Genre ID is missing:  " + id);
+		}
 	}
 
 	@Override
 	public Collection<Mpa> getAllRatingsMpa() {
-		return null;
+		return ratingsMpa.values().stream().sorted(Comparator.comparing(Mpa::getId)).collect(Collectors.toList());
 	}
 
 	@Override
 	public Mpa getRatingsMpaById(Long id) {
-		return null;
+		if (ratingsMpa.containsKey(id)) {
+			return ratingsMpa.get(id);
+		} else {
+			throw new NotFoundException("Ratings Mpa ID is missing:  " + id);
+		}
 	}
 }

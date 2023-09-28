@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -16,10 +15,10 @@ import java.util.Collection;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@RequestMapping ("/films")
 public class FilmService {
 
 	@Qualifier ("filmDbStorage")
+	//@Qualifier ("inMemoryFilmStorage")
 	private final FilmStorage filmStorage;
 
 	public Film addNewFilm(Film film) {
