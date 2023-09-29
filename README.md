@@ -1,7 +1,11 @@
 # **Filmorate**
+
 ### Описание проекта
+
 Разработка бэкенд части для сервиса оценки фильмов пользователями и формирования рейтинга фильмов на их основе.
+
 ### Стек используемых технологий 
+
 Java 11, REST Spring Boot, Maven, Lombock, SLF4J
 
 ### Схема базы данных
@@ -15,17 +19,17 @@ Java 11, REST Spring Boot, Maven, Lombock, SLF4J
 
 
 Получение списка всех фильмов
-```
+```sql
 SELECT *
 FROM FILMS;
 ```
 Получение списка всех пользователей
-```
+```sql
 SELECT *
 FROM USERS;
 ```
 Получение списка 5 самых популярных фильмов
-```
+```sql
 SELECT F.NAME AS TITLE,
 COUNT(L.USER_ID) AS LIKES_VALUE
 FROM FILMS AS F
@@ -36,7 +40,7 @@ LIMIT 5;
 ```
 
 Получение списка общих друзей с другим пользователем
-```
+```sql
 SELECT U.NAME AS USER,
 U2.NAME AS FRIEND
 FROM USERS AS U

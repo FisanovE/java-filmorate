@@ -6,8 +6,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
+
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -15,50 +18,49 @@ import java.util.Collection;
 @RestController
 @Component
 @RequiredArgsConstructor
-@RequestMapping ("/films")
 public class FilmController {
 
 	private final FilmService filmService;
 
-	@PostMapping
+	@PostMapping ("/films")
 	public Film addNewFilm(@RequestBody Film film) {
 		log.info("Endpoint -> Create film");
 		checkingFilmForValid(film);
 		return filmService.addNewFilm(film);
 	}
 
-	@PutMapping
+	@PutMapping ("/films")
 	public Film updateFilm(@RequestBody Film film) {
 		log.info("Endpoint -> Update film");
 		checkingFilmForValid(film);
 		return filmService.updateFilm(film);
 	}
 
-	@GetMapping ("/{id}")
+	@GetMapping ("/films/{id}")
 	public Film getFilmById(@PathVariable (required = false) Long id) {
 		log.info("Endpoint -> Get film {}", id);
 		return filmService.getFilmById(id);
 	}
 
-	@GetMapping
+	@GetMapping ("/films")
 	public Collection<Film> getAllFilms() {
 		log.info("Endpoint -> Get films");
 		return filmService.getAllFilms();
 	}
 
-	@PutMapping ("/{id}/like/{userId}")
+	@PutMapping ("/films/{id}/like/{userId}")
 	public void addLike(@PathVariable Long id, @PathVariable Long userId) {
 		log.info("Endpoint -> Update film {}, liked user {}", id, userId);
 		filmService.addLike(id, userId);
 	}
 
-	@DeleteMapping ("/{id}/like/{userId}")
+	@DeleteMapping ("/films/{id}/like/{userId}")
 	public void deleteLike(@PathVariable (required = false) Long id, @PathVariable (required = false) Long userId) {
 		log.info("Endpoint -> Delete in film {}, like user {}", id, userId);
 		filmService.deleteLike(id, userId);
 	}
 
-	@GetMapping ("/popular")
+	@GetMapping ("/films/popular")
 	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
 		log.info("Endpoint ->  Get rating films, count {}", count);
 		return filmService.getTopRatingFilms(count);
@@ -79,4 +81,29 @@ public class FilmController {
 			throw new ValidationException("The duration of the film should be positive, you have:  \"" + film.getDuration());
 		}
 	}
+
+	@GetMapping ("/genres")
+	public Collection<Genre> getAllGenres() {
+		log.info("Endpoint -> Get genres");
+		return filmService.getAllGenres();
+	}
+
+	@GetMapping ("/genres/{id}")
+	public Genre getGenresById(@PathVariable (required = false) Long id) {
+		log.info("Endpoint -> Get genres id {}", id);
+		return filmService.getGenresById(id);
+	}
+
+	@GetMapping ("/mpa")
+	public Collection<Mpa> getAllRatingsMpa() {
+		log.info("Endpoint -> Get mpa");
+		return filmService.getAllRatingsMpa();
+	}
+
+	@GetMapping ("/mpa/{id}")
+	public Mpa getRatingsMpaById(@PathVariable (required = false) Long id) {
+		log.info("Endpoint -> Get mpa id {}", id);
+		return filmService.getRatingsMpaById(id);
+	}
+
 }
