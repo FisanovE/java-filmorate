@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
 
 @Slf4j
 @RestController
