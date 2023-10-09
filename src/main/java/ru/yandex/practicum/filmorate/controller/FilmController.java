@@ -61,18 +61,18 @@ public class FilmController {
 		filmService.deleteLike(id, userId);
 	}
 
-	/*@GetMapping ("/films/popular")
+	@GetMapping ("/films/popular")
 	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
 		log.info("Endpoint ->  Get rating films, count {}", count);
 		return filmService.getTopRatingFilms(count);
-	}*/
+	}
 
-	@GetMapping ("/films/popular")
+	/*@GetMapping ("/films/popular")
 	public Collection<Film> getTopRatingFilmsByYearAndGenre(@RequestParam Integer count, @RequestParam Long genreId,
 															Integer year) {
 		log.info("Endpoint ->  Get rating films, count {}, genreId {}, year {},", count, genreId, year);
 		return Collections.EMPTY_LIST;
-	}
+	}*/
 
 	private void checkingFilmForValid(Film film) throws ValidationException {
 		if (film.getName().isBlank()) {
