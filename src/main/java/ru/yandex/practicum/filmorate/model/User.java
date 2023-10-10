@@ -9,10 +9,10 @@ import java.util.Map;
 @Data
 @Builder
 public class User {
-	private Long id;
-	private String email;
-	private String login;
-	private String name;
-	private LocalDate birthday;
-	private Map<Long, Boolean> friendsId;
+    private Long id;
+    private String email;
+    private String login;
+    private String name;
+    private LocalDate birthday;
+    private Map<Long, Boolean> friendsId;
 }

@@ -31,6 +31,7 @@ public class FilmService {
     }
 
     public Film getFilmById(Long filmId) {
+        checkFilmExist(filmId);
         return filmStorage.getFilmById(filmId);
     }
 
@@ -39,10 +40,12 @@ public class FilmService {
     }
 
     public void addLike(Long id, Long userId) {
+        checkFilmExist(id);
         filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(Long id, Long userId) {
+        checkFilmExist(id);
         filmStorage.deleteLike(id, userId);
     }
 
@@ -55,6 +58,7 @@ public class FilmService {
     }
 
     public Genre getGenresById(Long id) {
+        checkFilmExist(id);
         return filmStorage.getGenresById(id);
     }
 
@@ -63,13 +67,19 @@ public class FilmService {
     }
 
     public Mpa getRatingsMpaById(Long id) {
+        checkFilmExist(id);
         return filmStorage.getRatingsMpaById(id);
     }
 
     public void deleteFilm(Long id) {
-        if (filmStorage.getFilmById(id) != null) {
-            filmStorage.deleteFilm(id);
-        } else throw new NotFoundException("The user with id does not exist!");
+        checkFilmExist(id);
+        filmStorage.deleteFilm(id);
+    }
+
+    private void checkFilmExist(Long id) {
+        if (filmStorage.getFilmById(id) == null) {
+            throw new NotFoundException("There is no such film!");
+        }
     }
 
 }
