@@ -72,7 +72,6 @@ public class FilmService {
     }
 
     public void deleteFilm(Long id) {
-        checkFilmExist(id);
         filmStorage.deleteFilm(id);
     }
 
