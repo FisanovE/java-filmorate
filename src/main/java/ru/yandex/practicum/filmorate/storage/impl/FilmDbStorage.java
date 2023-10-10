@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
 
 	private final JdbcTemplate jdbcTemplate;
-	DirectorRowMapper directorRowMapper;
 
 	@Autowired
 	public FilmDbStorage(JdbcTemplate jdbcTemplate) {

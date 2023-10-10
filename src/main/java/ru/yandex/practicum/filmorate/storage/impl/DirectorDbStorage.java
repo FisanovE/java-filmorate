@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.PreparedStatement;
@@ -23,7 +22,6 @@ import java.util.Objects;
 public class DirectorDbStorage implements DirectorStorage {
 
 	private final JdbcTemplate jdbcTemplate;
-	private DirectorRowMapper directorRowMapper;
 	private static final String sqlAddNewDirector = "INSERT INTO directors (director_name) VALUES (?)";
 	private static final String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
 	private static final String sqlGetDirectorById = "SELECT * FROM directors WHERE director_id = ?";
@@ -54,7 +52,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
 	@Override
 	public Director updateDirector(Director director) {
-		try {int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
+		try {
+			int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
 			log.info("Director update: {} {}", director.getId(), director.getName());
 			return director;
 		} catch (DataIntegrityViolationException e) {

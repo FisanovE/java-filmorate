@@ -34,7 +34,6 @@ class FilmorateApplicationTests {
 	private final DirectorStorage directorStorage;
 	private User user;
 	private Film film;
-	private Director director;
 
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
