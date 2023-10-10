@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -43,8 +44,11 @@ public class UserService {
 		}
 	}
 
-	public void deleteUser(Integer id) {
-		userStorage.deleteUser(id);
+	public void deleteUser(Long id) {
+		if (userStorage.getUserById(id) != null) {
+			userStorage.deleteUser(id);
+		} else throw new NotFoundException("There is no such user!");
+
 	}
 
 	public void deleteFriend(Long idUser, Long idFriend) {

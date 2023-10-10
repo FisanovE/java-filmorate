@@ -30,6 +30,6 @@ public interface FilmStorage {
 
 	Mpa getRatingsMpaById(Long id);
 
-	void deleteFilm(Integer filmId);
+	void deleteFilm(Long filmId);
 }
 
