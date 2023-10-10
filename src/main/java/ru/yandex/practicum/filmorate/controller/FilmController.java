@@ -105,10 +105,9 @@ public class FilmController {
 		log.info("Endpoint -> Get mpa id {}", id);
 		return filmService.getRatingsMpaById(id);
 	}
+
 	@DeleteMapping("/films/{id}")
 	public void delete(@PathVariable Integer id) {
 		filmService.deleteFilm(id);
 	}
-
-
 }
