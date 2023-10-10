@@ -139,4 +139,9 @@ public class InMemoryUserStorage implements UserStorage {
 		return mutualFriends;
 	}
 
+	@Override
+	public void deleteUser(Integer id) {
+
+	}
+
 }

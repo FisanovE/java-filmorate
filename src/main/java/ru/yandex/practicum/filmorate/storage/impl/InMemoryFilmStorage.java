@@ -144,4 +144,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 			throw new NotFoundException("Ratings Mpa ID is missing:  " + id);
 		}
 	}
+
+	@Override
+	public void deleteFilm(Integer filmId) {
+
+	}
 }

@@ -86,5 +86,9 @@ public class UserController {
 			throw new ValidationException("Date of birth cannot be in the future: \"" + user.getBirthday() + "\"");
 		}
 	}
+	@DeleteMapping("/{id}")
+	public void deleteUser(@PathVariable Integer id) {
+		userService.deleteUser(id);
+	}
 
 }

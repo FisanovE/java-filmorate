@@ -211,4 +211,12 @@ public class FilmDbStorage implements FilmStorage {
 		}
 		return mpa;
 	}
+
+	@Override
+	public void deleteFilm(Integer filmId) {
+
+		final String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
+
+		jdbcTemplate.update(sqlQuery, filmId);
+	}
 }

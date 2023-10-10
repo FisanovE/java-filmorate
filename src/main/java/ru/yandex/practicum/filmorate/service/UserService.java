@@ -43,6 +43,10 @@ public class UserService {
 		}
 	}
 
+	public void deleteUser(Integer id) {
+		userStorage.deleteUser(id);
+	}
+
 	public void deleteFriend(Long idUser, Long idFriend) {
 		userStorage.deleteFriend(idUser, idFriend);
 	}
@@ -61,4 +65,5 @@ public class UserService {
 			user.setName(user.getLogin());
 		}
 	}
+
 }

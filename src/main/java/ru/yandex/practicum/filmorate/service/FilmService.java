@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 
 import java.util.Collection;
 
@@ -64,4 +65,9 @@ public class FilmService {
 	public Mpa getRatingsMpaById(Long id) {
 		return filmStorage.getRatingsMpaById(id);
 	}
+
+	public void deleteFilm(int id) {
+		filmStorage.deleteFilm(id);
+	}
+
 }
