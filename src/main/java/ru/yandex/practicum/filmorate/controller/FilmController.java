@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -106,4 +108,13 @@ public class FilmController {
 		return filmService.getRatingsMpaById(id);
 	}
 
+	@GetMapping ("/films/director/{directorId}")
+	public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+		log.info("Endpoint ->  Get films/directorId {} sortBy {} ", directorId, sortBy);
+		if (Objects.equals(sortBy, "year") || Objects.equals(sortBy, "likes")) {
+			return filmService.getAllFilmsByDirector(directorId, sortBy);
+		} else {
+			throw new NotFoundException("Invalid RequestParam:  " + sortBy);
+		}
+	}
 }

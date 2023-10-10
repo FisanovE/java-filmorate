@@ -6,7 +6,7 @@
 
 ### Стек используемых технологий 
 
-Java 11, REST Spring Boot, Maven, Lombock, SLF4J
+Java 11, REST Spring Boot, Maven, Lombock, SLF4J, JUnit, AssertJ, H2 database
 
 ### Схема базы данных
 

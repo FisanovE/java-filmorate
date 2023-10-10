@@ -29,5 +29,7 @@ public interface FilmStorage {
 	Collection<Mpa> getAllRatingsMpa();
 
 	Mpa getRatingsMpaById(Long id);
+
+	Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
 }
 

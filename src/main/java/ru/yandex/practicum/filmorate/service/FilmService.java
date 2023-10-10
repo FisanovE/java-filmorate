@@ -64,4 +64,8 @@ public class FilmService {
 	public Mpa getRatingsMpaById(Long id) {
 		return filmStorage.getRatingsMpaById(id);
 	}
+
+	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+		return filmStorage.getAllFilmsByDirector(id, sortBy);
+	}
 }
