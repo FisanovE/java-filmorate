@@ -15,66 +15,66 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
 
-	@Qualifier ("userDbStorage")
-	private final UserStorage userStorage;
+    @Qualifier("userDbStorage")
+    private final UserStorage userStorage;
 
-	public User addNewUser(User user) {
-		setLoginAsNameIfNameIsEmpty(user);
-		return userStorage.addNewUser(user);
-	}
+    public User addNewUser(User user) {
+        setLoginAsNameIfNameIsEmpty(user);
+        return userStorage.addNewUser(user);
+    }
 
-	public User updateUser(User user) {
-		setLoginAsNameIfNameIsEmpty(user);
-		return userStorage.updateUser(user);
-	}
+    public User updateUser(User user) {
+        setLoginAsNameIfNameIsEmpty(user);
+        return userStorage.updateUser(user);
+    }
 
-	public User getUserById(Long userId) {
-		return userStorage.getUserById(userId);
-	}
+    public User getUserById(Long userId) {
+        return userStorage.getUserById(userId);
+    }
 
-	public Collection<User> getAllUsers() {
-		return userStorage.getAllUsers();
-	}
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
 
-	public void addFriend(Long idUser, Long idFriend) {
-		checkUserExist(idUser);
-		if (idUser.equals(idFriend)) {
-			throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
-		}else{
-			userStorage.addFriend(idUser, idFriend);
-		}
-	}
+    public void addFriend(Long idUser, Long idFriend) {
+        checkUserExist(idUser);
+        if (idUser.equals(idFriend)) {
+            throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
+        } else {
+            userStorage.addFriend(idUser, idFriend);
+        }
+    }
 
-	public void deleteUser(Long id) {
-		checkUserExist(id);
-		userStorage.deleteUser(id);
-	}
+    public void deleteUser(Long id) {
+        checkUserExist(id);
+        userStorage.deleteUser(id);
+    }
 
-	public void deleteFriend(Long idUser, Long idFriend) {
-		checkUserExist(idUser);
-		userStorage.deleteFriend(idUser, idFriend);
-	}
+    public void deleteFriend(Long idUser, Long idFriend) {
+        checkUserExist(idUser);
+        userStorage.deleteFriend(idUser, idFriend);
+    }
 
-	public Collection<User> getAllFriendsOfUser(Long idUser) {
-		checkUserExist(idUser);
-		return userStorage.getAllFriendsOfUser(idUser);
-	}
+    public Collection<User> getAllFriendsOfUser(Long idUser) {
+        checkUserExist(idUser);
+        return userStorage.getAllFriendsOfUser(idUser);
+    }
 
 
-	public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
-		checkUserExist(idUser);
-		return userStorage.getMutualFriends(idUser, idOtherUser);
-	}
+    public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
+        checkUserExist(idUser);
+        return userStorage.getMutualFriends(idUser, idOtherUser);
+    }
 
-	private void setLoginAsNameIfNameIsEmpty(User user) {
-		if (user.getName() == null || user.getName().isBlank()) {
-			user.setName(user.getLogin());
-		}
-	}
+    private void setLoginAsNameIfNameIsEmpty(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+    }
 
-	private void checkUserExist(Long id) {
-		if (userStorage.getUserById(id) == null) {
-			throw new NotFoundException("There is no such user!");
-		}
-	}
+    private void checkUserExist(Long id) {
+        if (userStorage.getUserById(id) == null) {
+            throw new NotFoundException("There is no such user!");
+        }
+    }
 }
