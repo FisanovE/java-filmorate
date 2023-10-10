@@ -118,6 +118,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 	}
 
 	@Override
+	public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
+		return Collections.emptyList();
+	}
+
+	@Override
 	public Collection<Genre> getAllGenres() {
 		return genres.values().stream().sorted(Comparator.comparing(Genre::getId)).collect(Collectors.toList());
 	}

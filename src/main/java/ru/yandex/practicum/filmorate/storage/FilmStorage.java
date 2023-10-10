@@ -22,6 +22,8 @@ public interface FilmStorage {
 
 	Collection<Film> getTopRatingFilms(int count);
 
+	Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year);
+
 	Collection<Genre> getAllGenres();
 
 	Genre getGenresById(Long id);

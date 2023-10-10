@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 
 @Slf4j
 @RestController
@@ -61,17 +62,17 @@ public class FilmController {
 	}
 
 	@GetMapping ("/films/popular")
-	public Collection<Film> getTopRatingFilms(@RequestParam (defaultValue = "10", required = false) Integer count) {
-		log.info("Endpoint ->  Get rating films, count {}", count);
-		return filmService.getTopRatingFilms(count);
-	}
+	public Collection<Film> getTopRatingFilms (@RequestParam (defaultValue = "10", required = false) Integer count,
+											   @RequestParam (defaultValue = "-1", required = false) Long genreId,
+											   @RequestParam (defaultValue = "-1", required = false) Integer year) {
 
-	/*@GetMapping ("/films/popular")
-	public Collection<Film> getTopRatingFilmsByYearAndGenre(@RequestParam Integer count, @RequestParam Long genreId,
-															Integer year) {
 		log.info("Endpoint ->  Get rating films, count {}, genreId {}, year {},", count, genreId, year);
-		return Collections.EMPTY_LIST;
-	}*/
+		if (genreId != -1 && year != -1) {
+			return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
+		} else {
+			return filmService.getTopRatingFilms(count);
+		}
+	}
 
 	private void checkingFilmForValid(Film film) throws ValidationException {
 		if (film.getName().isBlank()) {

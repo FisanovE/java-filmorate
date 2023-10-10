@@ -168,6 +168,11 @@ public class FilmDbStorage implements FilmStorage {
 	}
 
 	@Override
+	public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
+		return Collections.emptyList();
+	}
+
+	@Override
 	public Collection<Genre> getAllGenres() {
 		String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
 
