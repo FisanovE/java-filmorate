@@ -372,7 +372,7 @@ class FilmorateApplicationTests {
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Удаление режиссёра по ID")
 	void shouldDeleteDirectorById() {
-		directorStorage.deleteDirectorById(2L);
+		directorStorage.deleteDirectorById(1L);
 		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
 
 		assertThat(genres).isNotEmpty();
