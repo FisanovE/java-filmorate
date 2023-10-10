@@ -37,30 +37,32 @@ public class UserService {
 	}
 
 	public void addFriend(Long idUser, Long idFriend) {
+		checkUserExist(idUser);
 		if (idUser.equals(idFriend)) {
 			throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
-		} else {
+		}else{
 			userStorage.addFriend(idUser, idFriend);
 		}
 	}
 
 	public void deleteUser(Long id) {
-		if (userStorage.getUserById(id) != null) {
-			userStorage.deleteUser(id);
-		} else throw new NotFoundException("There is no such user!");
-
+		checkUserExist(id);
+		userStorage.deleteUser(id);
 	}
 
 	public void deleteFriend(Long idUser, Long idFriend) {
+		checkUserExist(idUser);
 		userStorage.deleteFriend(idUser, idFriend);
 	}
 
 	public Collection<User> getAllFriendsOfUser(Long idUser) {
+		checkUserExist(idUser);
 		return userStorage.getAllFriendsOfUser(idUser);
 	}
 
 
 	public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
+		checkUserExist(idUser);
 		return userStorage.getMutualFriends(idUser, idOtherUser);
 	}
 
@@ -70,4 +72,9 @@ public class UserService {
 		}
 	}
 
+	private void checkUserExist(Long id) {
+		if (userStorage.getUserById(id) == null) {
+			throw new NotFoundException("There is no such user!");
+		}
+	}
 }

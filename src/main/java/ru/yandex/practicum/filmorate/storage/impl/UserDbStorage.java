@@ -84,6 +84,7 @@ public class UserDbStorage implements UserStorage {
 		if (idFriend <= 0) {
 			throw new NotFoundException("Invalid User ID:  " + idFriend);
 		}
+
 		String sqlRequest = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
 		int rowsUpdated = jdbcTemplate.update(sqlRequest, idUser, idFriend);
 
@@ -119,6 +120,6 @@ public class UserDbStorage implements UserStorage {
 		final String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
 		jdbcTemplate.update(sqlQuery, id);
 		final String sqlQueryToFiends = "DELETE FROM friends WHERE (USER_ID = ? OR friend_id = ?)";
-		jdbcTemplate.update(sqlQueryToFiends, id);
+		jdbcTemplate.update(sqlQueryToFiends, id, id);
 	}
 }
