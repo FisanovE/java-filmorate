@@ -106,7 +106,7 @@ public class FilmController {
 		return filmService.getRatingsMpaById(id);
 	}
 
-	@DeleteMapping("/films/{id}")
+	@DeleteMapping ("/films/{id}")
 	public void delete(@PathVariable Integer id) {
 		filmService.deleteFilm(id);
 	}
