@@ -84,7 +84,11 @@ public class FilmDbStorage implements FilmStorage {
 			String sql = "SELECT * FROM films WHERE film_id = ?";
 			Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
 			film.setMpa(getMpaFromDataBase(id));
-			film.setGenres(getGenresFromDataBase(id));
+			if (getGenresFromDataBase(id).isEmpty()) {
+				film.setGenres(null);
+			} else {
+				film.setGenres(getGenresFromDataBase(id));
+			}
 			film.setDirectors(getDirectorsFromDataBase(id));
 			log.info("Film found: {} {}", id, film.getName());
 			return film;
@@ -100,7 +104,11 @@ public class FilmDbStorage implements FilmStorage {
 
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
-			film.setGenres(getGenresFromDataBase(film.getId()));
+			if (getGenresFromDataBase(film.getId()).isEmpty()) {
+				film.setGenres(null);
+			} else {
+				film.setGenres(getGenresFromDataBase(film.getId()));
+			}
 			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 
@@ -170,7 +178,11 @@ public class FilmDbStorage implements FilmStorage {
 
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
-			film.setGenres(getGenresFromDataBase(film.getId()));
+			if (getGenresFromDataBase(film.getId()).isEmpty()) {
+				film.setGenres(null);
+			} else {
+				film.setGenres(getGenresFromDataBase(film.getId()));
+			}
 			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 		return films;
