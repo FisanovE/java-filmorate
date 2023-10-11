@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
 
 	private final JdbcTemplate jdbcTemplate;
+	DirectorStorage directorStorage;
 
 	@Autowired
 	public FilmDbStorage(JdbcTemplate jdbcTemplate) {
@@ -52,6 +54,7 @@ public class FilmDbStorage implements FilmStorage {
 		setMpaInDataBase(film);
 		setGenreInDataBase(film);
 		setDirectorInDataBase(film);
+
 
 		log.info("Film added: {} {}", film.getId(), film.getName());
 		return film;
@@ -82,7 +85,7 @@ public class FilmDbStorage implements FilmStorage {
 			Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
 			film.setMpa(getMpaFromDataBase(id));
 			film.setGenres(getGenresFromDataBase(id));
-			film.setDirector(getDirectorsFromDataBase(id));
+			film.setDirectors(getDirectorsFromDataBase(id));
 			log.info("Film found: {} {}", id, film.getName());
 			return film;
 		} catch (EmptyResultDataAccessException e) {
@@ -98,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
 			film.setGenres(getGenresFromDataBase(film.getId()));
-			film.setDirector(getDirectorsFromDataBase(film.getId()));
+			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 
 		return films;
@@ -168,7 +171,7 @@ public class FilmDbStorage implements FilmStorage {
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
 			film.setGenres(getGenresFromDataBase(film.getId()));
-			film.setDirector(getDirectorsFromDataBase(film.getId()));
+			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 		return films;
 	}
@@ -223,9 +226,9 @@ public class FilmDbStorage implements FilmStorage {
 		String sqlDeleteDirector = "DELETE FROM films_directors WHERE film_id = ?";
 		jdbcTemplate.update(sqlDeleteDirector, film.getId());
 
-		if (film.getDirector() != null && !film.getDirector().isEmpty()) {
-			List<Director> list = film.getDirector().stream().distinct().collect(Collectors.toList());
-			film.setDirector(list);
+		if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+			List<Director> list = film.getDirectors().stream().distinct().collect(Collectors.toList());
+			film.setDirectors(list);
 			for (Director director : list) {
 				String sqlDirectors = "INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)";
 				jdbcTemplate.update(sqlDirectors, film.getId(), director.getId());
@@ -263,7 +266,7 @@ public class FilmDbStorage implements FilmStorage {
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
 			film.setGenres(getGenresFromDataBase(film.getId()));
-			film.setDirector(getDirectorsFromDataBase(film.getId()));
+			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 		return films;
 	}
