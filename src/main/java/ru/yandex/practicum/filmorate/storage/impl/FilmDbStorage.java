@@ -246,6 +246,14 @@ public class FilmDbStorage implements FilmStorage {
 	}
 
 	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+		SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
+		if (mpaRows.next()) {
+			log.info("Director found: {}", id);
+		} else {
+			log.info("Invalid Director ID: {}", id);
+			throw new NotFoundException("Invalid Director ID: " + id);
+		}
+
 		String sql;
 		if (Objects.equals(sortBy, "likes")) {
 			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.user_id) " +
