@@ -70,6 +70,7 @@ public class FilmDbStorage implements FilmStorage {
 			}*/
 			setMpaInDataBase(film);
 			setGenreInDataBase(film);
+			film.setGenres(getGenresFromDataBase(film.getId()));
 			setDirectorInDataBase(film);
 			log.info("Film update: {} {}", film.getId(), film.getName());
 			return film;
@@ -143,8 +144,9 @@ public class FilmDbStorage implements FilmStorage {
 
 	private List<Genre> getGenresFromDataBase(Long id) {
 		String sql = "SELECT genre_id, genre_name FROM genres WHERE genre_id IN (SELECT genre_id " + "FROM films_genres WHERE film_id = ?)";
-		return jdbcTemplate.query(sql, (rs, rowNum) -> Genre.builder().id(rs.getLong("genre_id"))
+		List<Genre> list = jdbcTemplate.query(sql, (rs, rowNum) -> Genre.builder().id(rs.getLong("genre_id"))
 															.name(rs.getString("genre_name")).build(), id);
+		return list;
 	}
 
 	@Override
