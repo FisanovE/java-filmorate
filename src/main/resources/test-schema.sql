@@ -67,3 +67,11 @@ film_id BIGINT REFERENCES public.films (film_id) ON DELETE SET NULL,
 user_id BIGINT REFERENCES public.users (user_id) ON DELETE SET NULL,
 UNIQUE (film_id, user_id)
 );
+
+INSERT INTO directors (director_name) VALUES
+    ('Стивен Спилберг'),
+    ('Мартин Скорсезе'),
+    ('Джеймс Кэмерон'),
+    ('Джордж Лукас'),
+    ('Квентин Тарантино'),
+    ('Дэвид Финчер');

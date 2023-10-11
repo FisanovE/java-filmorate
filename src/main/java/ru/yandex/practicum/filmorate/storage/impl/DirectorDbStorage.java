@@ -2,13 +2,14 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
@@ -36,6 +37,9 @@ public class DirectorDbStorage implements DirectorStorage {
 
 	@Override
 	public Director addNewDirector(Director director) {
+		if (director.getName().isBlank()) {
+			throw new ValidationException("Invalid name format: \"" + director.getName() + "\"");
+		}
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(sqlAddNewDirector, Statement.RETURN_GENERATED_KEYS);
@@ -52,13 +56,12 @@ public class DirectorDbStorage implements DirectorStorage {
 
 	@Override
 	public Director updateDirector(Director director) {
-		try {
-			int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
-			log.info("Director update: {} {}", director.getId(), director.getName());
-			return director;
-		} catch (DataIntegrityViolationException e) {
+		int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
+		log.info("Director update: {} {}", director.getId(), director.getName());
+		if (rowsUpdated != 1) {
 			throw new NotFoundException("Invalid Director ID:  " + director.getId());
 		}
+		return director;
 	}
 
 	@Override
