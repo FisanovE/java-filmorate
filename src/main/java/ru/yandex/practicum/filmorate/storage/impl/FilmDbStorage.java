@@ -155,7 +155,9 @@ public class FilmDbStorage implements FilmStorage {
 
 	@Override
 	public Collection<Film> getTopRatingFilms(int count) {
-		String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION FROM FILMS AS F " + "LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID GROUP BY F.FILM_ID ORDER BY COUNT(L.USER_ID) DESC " + "LIMIT ?;";
+		String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION FROM FILMS AS F " +
+				"LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID GROUP BY F.FILM_ID ORDER BY COUNT(L.USER_ID) DESC "
+				+ "LIMIT ?;";
 
 		List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), count);
 
@@ -169,7 +171,39 @@ public class FilmDbStorage implements FilmStorage {
 
 	@Override
 	public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-		return Collections.emptyList();
+		log.info("вошли в базу");
+
+		List<Film> films;
+		StringJoiner joiner = new StringJoiner(" ");
+		String sqlEnd = "GROUP BY F.FILM_ID ORDER BY COUNT(L.USER_ID) DESC " +
+				"LIMIT ?;";
+		joiner.add("SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION FROM FILMS AS F " +
+				"LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID " +
+				"LEFT JOIN FILMS_GENRES AS FG ON F.FILM_ID = FG.FILM_ID");
+		if (genreId != -1 && year != -1) {
+			joiner.add("WHERE YEAR(F.RELEASE_DATE) = ? AND FG.GENRE_ID = ?");
+			String sql = joiner.add(sqlEnd)
+					.toString();
+			log.info("вошли в поиск 2/2000");
+			films = jdbcTemplate.query(sql, new FilmRowMapper(), year, genreId, count);
+		} else if (genreId != -1) {
+			joiner.add("WHERE FG.GENRE_ID = ?");
+			String sql = joiner.add(sqlEnd)
+					.toString();
+			films = jdbcTemplate.query(sql, new FilmRowMapper(), genreId, count);
+		} else {
+			joiner.add("WHERE YEAR(F.RELEASE_DATE) = ?");
+			String sql = joiner.add(sqlEnd)
+					.toString();
+			films = jdbcTemplate.query(sql, new FilmRowMapper(), year, count);
+		}
+
+		for (Film film : films) {
+			film.setMpa(getMpaFromDataBase(film.getId()));
+			film.setGenres(getGenresFromDataBase(film.getId()));
+		}
+
+		return films;
 	}
 
 	@Override

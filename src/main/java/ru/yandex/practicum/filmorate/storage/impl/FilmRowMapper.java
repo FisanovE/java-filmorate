@@ -13,6 +13,7 @@ public class FilmRowMapper implements RowMapper<Film> {
 		return Film.builder().id(rs.getLong("film_id")).name(rs.getString("name"))
 				   .description(rs.getString("description"))
 				   .releaseDate(Objects.requireNonNull(rs.getDate("release_date")).toLocalDate())
-				   .duration(rs.getInt("duration")).build();
+				   .duration(rs.getInt("duration")).
+				build();
 	}
 }

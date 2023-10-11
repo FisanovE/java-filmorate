@@ -67,7 +67,7 @@ public class FilmController {
 											   @RequestParam (defaultValue = "-1", required = false) Integer year) {
 
 		log.info("Endpoint ->  Get rating films, count {}, genreId {}, year {},", count, genreId, year);
-		if (genreId != -1 && year != -1) {
+		if (genreId != -1 || year != -1) {
 			return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
 		} else {
 			return filmService.getTopRatingFilms(count);
