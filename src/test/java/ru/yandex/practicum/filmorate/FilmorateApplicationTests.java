@@ -16,6 +16,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -256,6 +259,37 @@ class FilmorateApplicationTests {
 		assertThat(films.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded1.getId()));
 		assertThat(films.get(1)).isEqualTo(filmStorage.getFilmById(filmAdded2.getId()));
 		assertThat(films.get(2)).isEqualTo(filmStorage.getFilmById(filmAdded3.getId()));
+
+		Film filmNew4 = createFilm();
+		filmNew4.setName("Name Film4");
+		filmNew4.setGenres(List.of(Genre.builder().id(1L).build()));
+		Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
+
+		List<Film> filmsByGenre = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 1l, -1));
+
+		assertThat(filmsByGenre).isNotEmpty().hasSize(1);
+		assertThat(filmsByGenre.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded4.getId()));
+
+		Film filmNew5 = createFilm();
+		filmNew5.setName("Name Film5");
+		filmNew5.setReleaseDate(LocalDate.of(2020, 01, 01));
+		Film filmAdded5 = filmStorage.addNewFilm(filmNew5);
+
+		List<Film> filmsByYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, -1, 2020));
+
+		assertThat(filmsByYear).isNotEmpty().hasSize(1);
+		assertThat(filmsByYear.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded5.getId()));
+
+		Film filmNew6 = createFilm();
+		filmNew6.setName("Name Film5");
+		filmNew6.setReleaseDate(LocalDate.of(2021, 01, 01));
+		filmNew6.setGenres(List.of(Genre.builder().id(2L).build()));
+		Film filmAdded6 = filmStorage.addNewFilm(filmNew6);
+
+		List<Film> filmsByGenreAndYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
+
+		assertThat(filmsByGenreAndYear).isNotEmpty().hasSize(1);
+		assertThat(filmsByGenreAndYear.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded6.getId()));
 	}
 
 	@Test
