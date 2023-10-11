@@ -84,11 +84,7 @@ public class FilmDbStorage implements FilmStorage {
 			String sql = "SELECT * FROM films WHERE film_id = ?";
 			Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
 			film.setMpa(getMpaFromDataBase(id));
-			if (getGenresFromDataBase(id).isEmpty()) {
-				film.setGenres(null);
-			} else {
-				film.setGenres(getGenresFromDataBase(id));
-			}
+			film.setGenres(getGenresFromDataBase(id));
 			film.setDirectors(getDirectorsFromDataBase(id));
 			log.info("Film found: {} {}", id, film.getName());
 			return film;
@@ -104,11 +100,7 @@ public class FilmDbStorage implements FilmStorage {
 
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
-			if (getGenresFromDataBase(film.getId()).isEmpty()) {
-				film.setGenres(null);
-			} else {
-				film.setGenres(getGenresFromDataBase(film.getId()));
-			}
+			film.setGenres(getGenresFromDataBase(film.getId()));
 			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 
@@ -178,11 +170,7 @@ public class FilmDbStorage implements FilmStorage {
 
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));
-			if (getGenresFromDataBase(film.getId()).isEmpty()) {
-				film.setGenres(null);
-			} else {
-				film.setGenres(getGenresFromDataBase(film.getId()));
-			}
+			film.setGenres(getGenresFromDataBase(film.getId()));
 			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
 		return films;
@@ -258,12 +246,10 @@ public class FilmDbStorage implements FilmStorage {
 	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
 		String sql;
 		if (Objects.equals(sortBy, "likes")) {
-			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration " +
-					"FROM films f INNER JOIN likes l ON f.film_id = l.film_id " +
-					"INNER JOIN films_directors fd ON f.film_id = fd.film_id " +
-					"WHERE fd.director_id = ? " +
-					"GROUP BY f.name, f.description, f.release_date, f.duration " +
-					"ORDER BY COUNT(l.user_id) DESC";
+			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.user_id) " +
+					"FROM films f LEFT JOIN likes l ON f.film_id = l.film_id INNER JOIN films_directors fd ON " +
+					"f.film_id = fd.film_id WHERE fd.director_id = ? GROUP BY f.film_id, f.name, f.description, " +
+					"f.release_date, f.duration ORDER BY COUNT(l.user_id) DESC";
 		} else if (Objects.equals(sortBy, "year")) {
 			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration " +
 					"FROM films f JOIN films_directors fd ON f.film_id = fd.film_id " +
