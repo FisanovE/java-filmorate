@@ -22,20 +22,20 @@ genre_name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.films_directors (
-film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON DELETE SET NULL,
-director_id BIGINT NOT NULL REFERENCES public.directors (director_id) ON DELETE SET NULL,
+film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON UPDATE CASCADE ON DELETE CASCADE,
+director_id BIGINT NOT NULL REFERENCES public.directors (director_id) ON UPDATE CASCADE ON DELETE CASCADE,
 UNIQUE (film_id, director_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.films_genres (
-film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON DELETE SET NULL,
-genre_id BIGINT NOT NULL REFERENCES public.genres (genre_id) ON DELETE SET NULL,
+film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON UPDATE CASCADE ON DELETE CASCADE,
+genre_id BIGINT NOT NULL REFERENCES public.genres (genre_id) ON UPDATE CASCADE ON DELETE CASCADE,
 UNIQUE (film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS public.films_mpa (
-film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON DELETE SET NULL,
-mpa_id BIGINT NOT NULL REFERENCES public.mpa (mpa_id) ON DELETE SET NULL,
+film_id BIGINT NOT NULL REFERENCES public.films (film_id) ON UPDATE CASCADE ON DELETE CASCADE,
+mpa_id BIGINT NOT NULL REFERENCES public.mpa (mpa_id) ON UPDATE CASCADE ON DELETE CASCADE,
 UNIQUE (film_id, mpa_id)
 );
 
@@ -48,12 +48,12 @@ birthday DATE
 );
 
 CREATE TABLE IF NOT EXISTS public.friends (
-user_id BIGINT REFERENCES public.users (user_id) ON DELETE SET NULL,
-friend_id BIGINT REFERENCES public.users (user_id) ON DELETE SET NULL
+user_id BIGINT REFERENCES public.users (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+friend_id BIGINT REFERENCES public.users (user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS public.likes (
-film_id BIGINT REFERENCES public.films (film_id) ON DELETE SET NULL,
-user_id BIGINT REFERENCES public.users (user_id) ON DELETE SET NULL,
+film_id BIGINT REFERENCES public.films (film_id) ON UPDATE CASCADE ON DELETE CASCADE,
+user_id BIGINT REFERENCES public.users (user_id) ON UPDATE CASCADE ON DELETE CASCADE,
 UNIQUE (film_id, user_id)
 );
