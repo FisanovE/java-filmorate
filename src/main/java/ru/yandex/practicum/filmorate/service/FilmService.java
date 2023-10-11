@@ -38,7 +38,6 @@ public class FilmService {
     }
 
     public void addLike(Long id, Long userId) {
-        filmStorage.getFilmById(id);
         filmStorage.addLike(id, userId);
     }
 
