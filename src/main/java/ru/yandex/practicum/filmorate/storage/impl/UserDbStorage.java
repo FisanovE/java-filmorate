@@ -103,6 +103,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> getAllFriendsOfUser(Long idUser) {
+        getUserById(idUser);
         String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " + "ORDER BY USER_ID";
 
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser);
@@ -117,6 +118,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void deleteUser(Long id) {
+        getUserById(id);
         String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
     }

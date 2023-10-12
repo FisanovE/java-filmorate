@@ -42,7 +42,6 @@ public class FilmService {
     }
 
     public void deleteLike(Long id, Long userId) {
-        filmStorage.getFilmById(id);
         filmStorage.deleteLike(id, userId);
     }
 
@@ -55,7 +54,6 @@ public class FilmService {
     }
 
     public Genre getGenresById(Long id) {
-        filmStorage.getFilmById(id);
         return filmStorage.getGenresById(id);
     }
 
@@ -64,12 +62,10 @@ public class FilmService {
     }
 
     public Mpa getRatingsMpaById(Long id) {
-        filmStorage.getFilmById(id);
         return filmStorage.getRatingsMpaById(id);
     }
 
     public void deleteFilm(Long id) {
-        filmStorage.getFilmById(id);
         filmStorage.deleteFilm(id);
     }
 }
