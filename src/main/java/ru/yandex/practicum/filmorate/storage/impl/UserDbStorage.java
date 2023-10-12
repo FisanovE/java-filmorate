@@ -120,6 +120,6 @@ public class UserDbStorage implements UserStorage {
     public void deleteUser(Long id) {
         String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
-        log.info("ALG_6. User ID "+id+" deleted");
+        log.info("ALG_6. User ID " + id + " deleted");
     }
 }
