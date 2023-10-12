@@ -282,21 +282,24 @@ public class FilmDbStorage implements FilmStorage {
 	public Collection<Film> searchFilms(String query, String by) {
 		String sql;
 		if (Objects.equals(by, "director")) {
-			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) as likes_count " +
-					"FROM films f JOIN films_directors fd ON f.film_id=fd.film_id OIN directors d ON " +
-					"fd.director_id=d.director_id LEFT JOIN likes l ON f.film_id=l.film_id WHERE d.director_name " +
-					"LIKE '%?%' GROUP BY f.film_id, f.name ORDER BY likes_count";
+			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) as " +
+					"likes_count FROM films f JOIN films_directors fd ON f.film_id = fd.film_id JOIN " +
+					"directors d ON fd.director_id = d.director_id LEFT JOIN likes l ON f.film_id = l.film_id " +
+					"WHERE LOWER(d.director_name) LIKE LOWER('%" + query + "%') GROUP BY f.film_id, f.name, f.description, " +
+					"f.release_date, f.duration ORDER BY likes_count";
 		} else if (Objects.equals(by, "title")) {
 			sql = "SELECT films.film_id, films.name, films.description, films.release_date, films.duration, " +
-					"COUNT(likes.film_id) as likes_count FROM films LEFT JOIN likes ON films.film_id = likes.film_id " +
-					"WHERE films.name LIKE '%?% GROUP BY films.film_id ORDER BY likes_count";
-		} else if (Objects.equals(by, "director,title")) {
-			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) as " + "likes_count " +
-					"FROM films f JOIN films_directors fd ON f.film_id = fd.film_id JOIN directors d ON " +
-					"fd.director_id = d.director_id LEFT JOIN likes l ON f.film_id = l.film_id WHERE d.director_name " +
-					"LIKE '%query%' AND f.name LIKE '%query%' GROUP BY f.film_id ORDER BY likes_count";
+					"COUNT(likes.film_id) as likes_count FROM films LEFT JOIN likes ON films.film_id = " +
+					"likes.film_id WHERE LOWER(films.name) LIKE LOWER('%" + query + "%') GROUP BY films.film_id, films" +
+					".name, films.description, films.release_date, films.duration ORDER BY likes_count";
+		} else if (Objects.equals(by, "title,director") || Objects.equals(by, "director,title")) {
+			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) AS likes_count " +
+					"FROM films f LEFT JOIN films_directors fd ON f.film_id = fd.film_id LEFT JOIN directors d ON " +
+					"fd.director_id = d.director_id LEFT JOIN likes l ON f.film_id = l.film_id WHERE LOWER (d.director_name) " +
+					"LIKE LOWER ('%" + query + "%') OR LOWER (f.name) LIKE LOWER ('%" + query + "%') GROUP BY f.film_id, f.name, " +
+					"f.description, f.release_date, f.duration ORDER BY likes_count DESC";
 		} else {
-			throw new NotFoundException("Invalid RequestParam:  " + by);
+			throw new NotFoundException("ALG_2. Invalid RequestParam:  " + by);
 		}
 
 		List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
@@ -306,6 +309,7 @@ public class FilmDbStorage implements FilmStorage {
 			film.setGenres(getGenresFromDataBase(film.getId()));
 			film.setDirectors(getDirectorsFromDataBase(film.getId()));
 		}
+		log.info("ALG_2. searchFilms in work");
 		return films;
 	}
 

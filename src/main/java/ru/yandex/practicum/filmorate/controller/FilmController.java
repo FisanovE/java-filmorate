@@ -122,13 +122,13 @@ public class FilmController {
 	/** ALG_2 */
 	@GetMapping ("/films/search")
 	public Collection<Film> searchFilms(@RequestParam (required = false) String query, @RequestParam (required = false) String by) {
-		log.info("Endpoint ->  Get films/search {} by {} ", query, by);
-		if (Objects.equals(by, "director") || Objects.equals(by, "title") || Objects.equals(by, "director,title")) {
+		log.info("ALG_2. Endpoint ->  Get films/search {} by {} ", query, by);
+		if (Objects.equals(by, "director") || Objects.equals(by, "title") ||
+				Objects.equals(by, "title,director") || Objects.equals(by, "director,title")) {
 			return filmService.searchFilms(query, by);
 		} else {
-			throw new NotFoundException("Invalid search param:  " + by);
+			throw new NotFoundException("ALG_2. Invalid search param:  " + by);
 		}
 	}
-
 
 }
