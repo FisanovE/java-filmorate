@@ -64,10 +64,7 @@ public class FilmDbStorage implements FilmStorage {
 	public Film updateFilm(Film film) {
 		try {
 			String sqlRequest = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? " + "WHERE film_id = ?";
-			int rowsUpdated = jdbcTemplate.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
-			/*if (rowsUpdated == 0) {
-				throw new NotFoundException("Invalid Film ID:  " + film.getId());
-			}*/
+			jdbcTemplate.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
 			setMpaInDataBase(film);
 			setGenreInDataBase(film);
 			film.setGenres(getGenresFromDataBase(film.getId()));
@@ -245,13 +242,14 @@ public class FilmDbStorage implements FilmStorage {
 															.name(rs.getString("director_name")).build(), id);
 	}
 
+	/** ALG_7 */
 	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
 		SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
 		if (mpaRows.next()) {
-			log.info("Director found: {}", id);
+			log.info("ALG_7. Director found: {}", id);
 		} else {
-			log.info("Invalid Director ID: {}", id);
-			throw new NotFoundException("Invalid Director ID: " + id);
+			log.info("ALG_7. Invalid Director ID: {}", id);
+			throw new NotFoundException("ALG_7. Invalid Director ID: " + id);
 		}
 
 		String sql;
@@ -266,10 +264,42 @@ public class FilmDbStorage implements FilmStorage {
 					"WHERE fd.director_id = ? " +
 					"ORDER BY f.release_date";
 		} else {
-			throw new NotFoundException("Invalid RequestParam:  " + sortBy);
+			throw new NotFoundException("ALG_7. Invalid RequestParam:  " + sortBy);
 		}
 
 		List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), id);
+
+		for (Film film : films) {
+			film.setMpa(getMpaFromDataBase(film.getId()));
+			film.setGenres(getGenresFromDataBase(film.getId()));
+			film.setDirectors(getDirectorsFromDataBase(film.getId()));
+		}
+		return films;
+	}
+
+	/** ALG_2 */
+	@Override
+	public Collection<Film> searchFilms(String query, String by) {
+		String sql;
+		if (Objects.equals(by, "director")) {
+			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) as likes_count " +
+					"FROM films f JOIN films_directors fd ON f.film_id=fd.film_id OIN directors d ON " +
+					"fd.director_id=d.director_id LEFT JOIN likes l ON f.film_id=l.film_id WHERE d.director_name " +
+					"LIKE '%?%' GROUP BY f.film_id, f.name ORDER BY likes_count";
+		} else if (Objects.equals(by, "title")) {
+			sql = "SELECT films.film_id, films.name, films.description, films.release_date, films.duration, " +
+					"COUNT(likes.film_id) as likes_count FROM films LEFT JOIN likes ON films.film_id = likes.film_id " +
+					"WHERE films.name LIKE '%?% GROUP BY films.film_id ORDER BY likes_count";
+		} else if (Objects.equals(by, "director,title")) {
+			sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, COUNT(l.film_id) as " + "likes_count " +
+					"FROM films f JOIN films_directors fd ON f.film_id = fd.film_id JOIN directors d ON " +
+					"fd.director_id = d.director_id LEFT JOIN likes l ON f.film_id = l.film_id WHERE d.director_name " +
+					"LIKE '%query%' AND f.name LIKE '%query%' GROUP BY f.film_id ORDER BY likes_count";
+		} else {
+			throw new NotFoundException("Invalid RequestParam:  " + by);
+		}
+
+		List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
 
 		for (Film film : films) {
 			film.setMpa(getMpaFromDataBase(film.getId()));

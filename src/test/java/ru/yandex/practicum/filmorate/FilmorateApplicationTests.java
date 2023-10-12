@@ -30,6 +30,7 @@ class FilmorateApplicationTests {
 	@Qualifier ("filmDbStorage")
 	private final FilmStorage filmStorage;
 
+	/** ALG_7 */
 	@Qualifier ("directorDbStorage")
 	private final DirectorStorage directorStorage;
 	private User user;
@@ -327,6 +328,7 @@ class FilmorateApplicationTests {
 		return film;
 	}
 
+	/** ALG_7 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление нового режиссёра")
@@ -338,6 +340,7 @@ class FilmorateApplicationTests {
 		assertThat(genres.get(6)).hasFieldOrPropertyWithValue("id", 7L).hasFieldOrPropertyWithValue("name", "Name Director");
 	}
 
+	/** ALG_7 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Обновление режиссёра")
@@ -350,6 +353,7 @@ class FilmorateApplicationTests {
 		assertThat(director2).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Name Director");
 	}
 
+	/** ALG_7 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка всех режиссёров")
@@ -360,6 +364,7 @@ class FilmorateApplicationTests {
 		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Стивен Спилберг");
 	}
 
+	/** ALG_7 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение режиссёра по ID")
@@ -368,6 +373,7 @@ class FilmorateApplicationTests {
 		assertThat(director).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
 	}
 
+	/** ALG_7 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Удаление режиссёра по ID")
@@ -379,6 +385,7 @@ class FilmorateApplicationTests {
 		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
 	}
 
+	/** ALG_7 */
 	private Director createDirector() {
 		return Director.builder()
 					   .name("Name Director")

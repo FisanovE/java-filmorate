@@ -16,7 +16,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
-	private Film film;
 	private FilmController controller;
 
 	@BeforeEach

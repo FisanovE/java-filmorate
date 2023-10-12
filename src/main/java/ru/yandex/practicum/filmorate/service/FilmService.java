@@ -18,7 +18,6 @@ import java.util.Collection;
 public class FilmService {
 
 	@Qualifier ("filmDbStorage")
-	//@Qualifier ("inMemoryFilmStorage")
 	private final FilmStorage filmStorage;
 
 	public Film addNewFilm(Film film) {
@@ -65,7 +64,14 @@ public class FilmService {
 		return filmStorage.getRatingsMpaById(id);
 	}
 
+	/** ALG_7 */
 	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
 		return filmStorage.getAllFilmsByDirector(id, sortBy);
 	}
+
+	/** ALG_2 */
+	public Collection<Film> searchFilms(String query, String by) {
+		return filmStorage.searchFilms(query, by);
+	}
+
 }

@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.Collection;
 
+/** ALG_7 */
 public interface DirectorStorage {
 
 	Director addNewDirector(Director director);
