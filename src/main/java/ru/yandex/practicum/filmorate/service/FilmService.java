@@ -17,9 +17,9 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmService {
 
-    @Qualifier("filmDbStorage")
-    //@Qualifier ("inMemoryFilmStorage")
-    private final FilmStorage filmStorage;
+
+	@Qualifier ("filmDbStorage")
+	private final FilmStorage filmStorage;
 
     public Film addNewFilm(Film film) {
         return filmStorage.addNewFilm(film);
@@ -61,11 +61,21 @@ public class FilmService {
         return filmStorage.getAllRatingsMpa();
     }
 
-    public Mpa getRatingsMpaById(Long id) {
-        return filmStorage.getRatingsMpaById(id);
-    }
+	public Mpa getRatingsMpaById(Long id) {
+		return filmStorage.getRatingsMpaById(id);
+	}
 
-    public void deleteFilm(Long id) {
+	/** ALG_7 */
+	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+		return filmStorage.getAllFilmsByDirector(id, sortBy);
+	}
+
+	/** ALG_2 */
+	public Collection<Film> searchFilms(String query, String by) {
+		return filmStorage.searchFilms(query, by);
+	}
+  
+  public void deleteFilm(Long id) {
         filmStorage.deleteFilm(id);
     }
 }
