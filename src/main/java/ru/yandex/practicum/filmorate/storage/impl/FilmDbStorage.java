@@ -216,6 +216,6 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteFilm(Long filmId) {
         String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, filmId);
-
+        log.info("ALG_6. Film ID " + filmId + " deleted");
     }
 }
