@@ -144,4 +144,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 			throw new NotFoundException("Ratings Mpa ID is missing:  " + id);
 		}
 	}
+
+	@Override
+	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public Collection<Film> searchFilms(String query, String by) {
+		return new ArrayList<>();
+	}
 }

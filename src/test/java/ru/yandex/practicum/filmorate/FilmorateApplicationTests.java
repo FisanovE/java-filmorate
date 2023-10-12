@@ -9,10 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +29,10 @@ class FilmorateApplicationTests {
 	private final UserStorage userStorage;
 	@Qualifier ("filmDbStorage")
 	private final FilmStorage filmStorage;
+
+	/** ALG_7 */
+	@Qualifier ("directorDbStorage")
+	private final DirectorStorage directorStorage;
 	private User user;
 	private Film film;
 
@@ -324,6 +326,70 @@ class FilmorateApplicationTests {
 		film = Film.builder().id(1L).name("updateName Film").description("blah-blah-blah")
 				   .releaseDate(LocalDate.of(2022, 5, 12)).duration(60).build();
 		return film;
+	}
+
+	/** ALG_7 */
+	@Test
+	@Sql ({"/test-schema.sql", "/data.sql"})
+	@DisplayName ("Добавление нового режиссёра")
+	void shouldAddNewDirector() {
+		directorStorage.addNewDirector(createDirector());
+		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
+
+		assertThat(genres).isNotEmpty();
+		assertThat(genres.get(6)).hasFieldOrPropertyWithValue("id", 7L).hasFieldOrPropertyWithValue("name", "Name Director");
+	}
+
+	/** ALG_7 */
+	@Test
+	@Sql ({"/test-schema.sql", "/data.sql"})
+	@DisplayName ("Обновление режиссёра")
+	void shouldUpdateDirector() {
+		Director director = createDirector();
+		director.setId(1L);
+		directorStorage.updateDirector(director);
+
+		Director director2 = directorStorage.getDirectorById(1L);
+		assertThat(director2).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Name Director");
+	}
+
+	/** ALG_7 */
+	@Test
+	@Sql ({"/test-schema.sql", "/data.sql"})
+	@DisplayName ("Получение списка всех режиссёров")
+	void shouldReturnListAllDirectors() {
+		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
+
+		assertThat(genres).isNotEmpty();
+		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Стивен Спилберг");
+	}
+
+	/** ALG_7 */
+	@Test
+	@Sql ({"/test-schema.sql", "/data.sql"})
+	@DisplayName ("Получение режиссёра по ID")
+	void shouldReturnDirectorById() {
+		Director director = directorStorage.getDirectorById(2L);
+		assertThat(director).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
+	}
+
+	/** ALG_7 */
+	@Test
+	@Sql ({"/test-schema.sql", "/data.sql"})
+	@DisplayName ("Удаление режиссёра по ID")
+	void shouldDeleteDirectorById() {
+		directorStorage.deleteDirectorById(1L);
+		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
+
+		assertThat(genres).isNotEmpty();
+		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
+	}
+
+	/** ALG_7 */
+	private Director createDirector() {
+		return Director.builder()
+					   .name("Name Director")
+					   .build();
 	}
 }
 

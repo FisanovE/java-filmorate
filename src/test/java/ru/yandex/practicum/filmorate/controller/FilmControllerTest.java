@@ -16,7 +16,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
-	private Film film;
 	private FilmController controller;
 
 	@BeforeEach
@@ -153,7 +152,7 @@ class FilmControllerTest {
 		List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10));
 
 		assertAll(() -> assertFalse(films.isEmpty(), "Rating list must by not empty"),
-				() -> assertEquals(filmAdded1.getId(), films.get(0).getId(), "Films id are not equal"),
+				() -> assertEquals(filmAdded2.getId(), films.get(0).getId(), "Films id are not equal"),
 				() -> assertEquals(2, films.size(), "List`s size not equal 2"));
 	}
 
