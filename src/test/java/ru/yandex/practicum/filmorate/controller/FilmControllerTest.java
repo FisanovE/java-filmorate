@@ -139,6 +139,7 @@ class FilmControllerTest {
 		assertTrue(likes.isEmpty(), "Likes list must by empty");
 	}
 
+	/** ALG_8*/
 	@Test
 	@DisplayName ("Получение списка лучших фильмов")
 	void shouldReturnTopRatingFilms() {

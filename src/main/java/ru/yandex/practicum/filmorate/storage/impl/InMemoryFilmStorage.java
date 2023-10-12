@@ -117,6 +117,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 		return getAllFilms().stream().sorted(filmComparator).limit(count).collect(Collectors.toSet());
 	}
 
+	/** ALG_8*/
 	@Override
 	public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
 		return Collections.emptyList();

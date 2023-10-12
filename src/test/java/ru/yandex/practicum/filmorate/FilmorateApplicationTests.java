@@ -229,6 +229,7 @@ class FilmorateApplicationTests {
 		assertThat(films).isNotEmpty().hasSize(1).contains(filmStorage.getFilmById(filmAdded.getId()));
 	}
 
+	/** ALG_8*/
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка лучших фильмов")

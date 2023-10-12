@@ -48,9 +48,10 @@ public class FilmService {
 	public Collection<Film> getTopRatingFilms(int count) {
 		return filmStorage.getTopRatingFilms(count);
 	}
-	public  Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-		log.info("вошли в сервис");
 
+	/** ALG_8*/
+	public  Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
+		log.debug("ALG_8. вошли в сервис");
 		return filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
 	}
 

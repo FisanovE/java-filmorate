@@ -169,9 +169,10 @@ public class FilmDbStorage implements FilmStorage {
 		return films;
 	}
 
+	/** ALG_8*/
 	@Override
 	public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-		log.info("вошли в базу");
+		log.debug("ALG_8. вошли в базу");
 
 		List<Film> films;
 		StringJoiner joiner = new StringJoiner(" ");
