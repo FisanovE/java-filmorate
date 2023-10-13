@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +27,14 @@ import java.util.Optional;
 @RequiredArgsConstructor (onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
 
-	@Qualifier("userDbStorage")
+	@Qualifier ("userDbStorage")
 	private final UserStorage userStorage;
 	@Qualifier ("filmDbStorage")
 	private final FilmStorage filmStorage;
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Qualifier ("directorDbStorage")
 	private final DirectorStorage directorStorage;
 	private User user;
@@ -328,7 +332,9 @@ class FilmorateApplicationTests {
 		return film;
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Добавление нового режиссёра")
@@ -337,10 +343,13 @@ class FilmorateApplicationTests {
 		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
 
 		assertThat(genres).isNotEmpty();
-		assertThat(genres.get(6)).hasFieldOrPropertyWithValue("id", 7L).hasFieldOrPropertyWithValue("name", "Name Director");
+		assertThat(genres.get(6)).hasFieldOrPropertyWithValue("id", 7L)
+								 .hasFieldOrPropertyWithValue("name", "Name Director");
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Обновление режиссёра")
@@ -350,10 +359,13 @@ class FilmorateApplicationTests {
 		directorStorage.updateDirector(director);
 
 		Director director2 = directorStorage.getDirectorById(1L);
-		assertThat(director2).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Name Director");
+		assertThat(director2).hasFieldOrPropertyWithValue("id", 1L)
+							 .hasFieldOrPropertyWithValue("name", "Name Director");
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение списка всех режиссёров")
@@ -361,19 +373,25 @@ class FilmorateApplicationTests {
 		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
 
 		assertThat(genres).isNotEmpty();
-		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Стивен Спилберг");
+		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 1L)
+								 .hasFieldOrPropertyWithValue("name", "Стивен Спилберг");
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Получение режиссёра по ID")
 	void shouldReturnDirectorById() {
 		Director director = directorStorage.getDirectorById(2L);
-		assertThat(director).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
+		assertThat(director).hasFieldOrPropertyWithValue("id", 2L)
+							.hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@Test
 	@Sql ({"/test-schema.sql", "/data.sql"})
 	@DisplayName ("Удаление режиссёра по ID")
@@ -382,14 +400,15 @@ class FilmorateApplicationTests {
 		List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
 
 		assertThat(genres).isNotEmpty();
-		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
+		assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 2L)
+								 .hasFieldOrPropertyWithValue("name", "Мартин Скорсезе");
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	private Director createDirector() {
-		return Director.builder()
-					   .name("Name Director")
-					   .build();
+		return Director.builder().name("Name Director").build();
 	}
 }
 

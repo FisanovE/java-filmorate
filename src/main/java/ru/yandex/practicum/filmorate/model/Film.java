@@ -17,6 +17,8 @@ public class Film {
 	private List<Long> likedUsersIds;
 	private List<Genre> genres;
 	private Mpa mpa;
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	private List<Director> directors;
 }

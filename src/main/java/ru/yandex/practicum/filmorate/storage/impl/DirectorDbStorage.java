@@ -18,7 +18,9 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Objects;
 
-/** ALG_7 */
+/**
+ * ALG_7
+ */
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -64,10 +66,9 @@ public class DirectorDbStorage implements DirectorStorage {
 	@Override
 	public Collection<Director> getAllDirectors() {
 		log.info("ALG_7. getAllDirectors in work");
-		return jdbcTemplate.query(sqlGetAllDirectors, (rs, rowNum) -> Director.builder()
-																		  .id(rs.getLong("director_id"))
-																		  .name(rs.getString("director_name"))
-																		  .build());
+		return jdbcTemplate.query(sqlGetAllDirectors, (rs, rowNum) -> Director.builder().id(rs.getLong("director_id"))
+																			  .name(rs.getString("director_name"))
+																			  .build());
 	}
 
 	@Override
@@ -75,10 +76,8 @@ public class DirectorDbStorage implements DirectorStorage {
 		Director director;
 		SqlRowSet directorRows = jdbcTemplate.queryForRowSet(sqlGetDirectorById, id);
 		if (directorRows.first()) {
-			director = Director.builder()
-							   .id(directorRows.getLong("director_id"))
-							   .name(directorRows.getString("director_name"))
-							   .build();
+			director = Director.builder().id(directorRows.getLong("director_id"))
+							   .name(directorRows.getString("director_name")).build();
 			log.info("ALG_7. Director found: {} {}", id, directorRows.getString("director_name"));
 		} else {
 			log.info("ALG_7. Invalid Director ID: {}", id);
