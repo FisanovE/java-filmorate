@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -81,7 +83,7 @@ public class FilmController {
 		}
 		if (film.getDescription().length() > 200) {
 			throw new ValidationException("The maximum description length is 200 characters, you have: \"" + film.getDescription()
-					.length() + "\" characters");
+																												 .length() + "\" characters");
 		}
 		if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateUtils.formatter))) {
 			throw new ValidationException("Movie release date should not be earlier than 1895.12.28, you have: \"" + film.getReleaseDate() + "\"");
@@ -113,6 +115,49 @@ public class FilmController {
 	public Mpa getRatingsMpaById(@PathVariable (required = false) Long id) {
 		log.info("Endpoint -> Get mpa id {}", id);
 		return filmService.getRatingsMpaById(id);
+	}
+
+	/**
+	 * ALG_7
+	 */
+	@GetMapping ("/films/director/{directorId}")
+	public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+		log.info("ALG_7. Endpoint ->  Get films/directorId {} sortBy {} ", directorId, sortBy);
+		if (Objects.equals(sortBy, "year") || Objects.equals(sortBy, "likes")) {
+			return filmService.getAllFilmsByDirector(directorId, sortBy);
+		} else {
+			throw new NotFoundException("ALG_7. Invalid RequestParam:  " + sortBy);
+		}
+	}
+
+	/**
+	 * ALG_2
+	 */
+	@GetMapping ("/films/search")
+	public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+		log.info("ALG_2. Endpoint ->  Get films/search {} by {} ", query, by);
+		if (Objects.equals(by, "director") || Objects.equals(by, "title") || Objects.equals(by, "title,director") || Objects.equals(by, "director,title")) {
+			return filmService.searchFilms(query, by);
+		} else {
+			throw new NotFoundException("ALG_2. Invalid search param:  " + by);
+		}
+	}
+
+	/**
+	 * ALG_6
+	 */
+	@DeleteMapping ("/films/{id}")
+	public void deleteFilmById(@PathVariable Long id) {
+		filmService.deleteFilm(id);
+	}
+
+	/**
+	 * ALG_3
+	 */
+	@GetMapping ("/films/common")
+	public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+		log.info("ALG_3. Endpoint ->  Get films/common userId {} friendId {} ", userId, friendId);
+		return filmService.getCommonFilms(userId, friendId);
 	}
 
 }

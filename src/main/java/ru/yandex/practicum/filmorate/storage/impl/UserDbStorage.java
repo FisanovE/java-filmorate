@@ -102,15 +102,35 @@ public class UserDbStorage implements UserStorage {
 
 	@Override
 	public Collection<User> getAllFriendsOfUser(Long idUser) {
-		String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " + "ORDER BY USER_ID";
+		SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", idUser);
+		if (sqlRows.first()) {
+			log.info("ALG_6. User found: {}", idUser);
+		} else {
+			log.info("ALG_6. User not found: {}", idUser);
+			throw new NotFoundException("ALG_6. User not found: " + idUser);
+		}
+		String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " +
+				"ORDER BY USER_ID";
 
 		return jdbcTemplate.query(sql, new UserRowMapper(), idUser);
 	}
 
 	@Override
 	public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
-		String sql = "SELECT * FROM USERS WHERE user_ID IN (SELECT friend_id FROM (SELECT friend_id FROM friends " + "WHERE user_id IN (?, ?) AND friend_id NOT IN (?, ?) ORDER BY friend_id) AS ids GROUP BY " + "friend_id HAVING count(friend_id)>1) ORDER BY USER_ID";
+		String sql = "SELECT * FROM USERS WHERE user_ID IN (SELECT friend_id FROM (SELECT friend_id FROM friends " +
+				"WHERE user_id IN (?, ?) AND friend_id NOT IN (?, ?) " +
+				"ORDER BY friend_id) AS ids " +
+				"GROUP BY " + "friend_id HAVING count(friend_id)>1) " +
+				"ORDER BY USER_ID";
 
-		return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
-	}
+        return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
+    }
+
+    /** ALG_6 */
+	//@Override
+    public void deleteUser(Long id) {
+        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
+        log.info("ALG_6. User ID " + id + " deleted");
+    }
 }

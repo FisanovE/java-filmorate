@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -18,7 +19,6 @@ import java.util.Collection;
 public class FilmService {
 
 	@Qualifier ("filmDbStorage")
-	//@Qualifier ("inMemoryFilmStorage")
 	private final FilmStorage filmStorage;
 
 	public Film addNewFilm(Film film) {
@@ -69,5 +69,33 @@ public class FilmService {
 
 	public Mpa getRatingsMpaById(Long id) {
 		return filmStorage.getRatingsMpaById(id);
+	}
+
+	/**
+	 * ALG_7
+	 */
+	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+		return filmStorage.getAllFilmsByDirector(id, sortBy);
+	}
+
+	/**
+	 * ALG_2
+	 */
+	public Collection<Film> searchFilms(String query, String by) {
+		return filmStorage.searchFilms(query, by);
+	}
+
+	/**
+	 * ALG_6
+	 */
+	public void deleteFilm(Long id) {
+		filmStorage.deleteFilm(id);
+	}
+
+	/**
+	 * ALG_3
+	 */
+	public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+		return filmStorage.getCommonFilms(userId, friendId);
 	}
 }
