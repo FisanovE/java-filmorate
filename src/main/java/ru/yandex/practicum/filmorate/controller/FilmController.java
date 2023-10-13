@@ -128,9 +128,9 @@ public class FilmController {
 			throw new NotFoundException("Invalid search param:  " + by);
 		}
 	}
-
-  @DeleteMapping("/films/{id}")
-    public void deleteFilmById(@PathVariable Long id) {
+	/** ALG_6 */
+ 	 @DeleteMapping("/films/{id}")
+	 public void deleteFilmById(@PathVariable Long id) {
         filmService.deleteFilm(id);
     }
 }

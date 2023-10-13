@@ -43,6 +43,7 @@ public class UserService {
         }
     }
 
+    /** ALG_6 */
     public void deleteUser(Long id) {
         userStorage.deleteUser(id);
     }

@@ -28,14 +28,15 @@ public interface FilmStorage {
 
     Collection<Mpa> getAllRatingsMpa();
 
-	  Mpa getRatingsMpaById(Long id);
+    Mpa getRatingsMpaById(Long id);
 
-	  /** ALG_7 */
-	  Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
+    /** ALG_7 */
+    Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
 
-	  /** ALG_2 */
-	  Collection<Film> searchFilms(String query, String by);
-  
+    /** ALG_2 */
+    Collection<Film> searchFilms(String query, String by);
+
+    /** ALG_6 */
     void deleteFilm(Long filmId);
 }
 

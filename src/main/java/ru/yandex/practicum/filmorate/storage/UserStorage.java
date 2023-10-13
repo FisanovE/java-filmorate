@@ -23,5 +23,6 @@ public interface UserStorage {
 
     Collection<User> getMutualFriends(Long idUser, Long idOtherUser);
 
+    /** ALG_6 */
     void deleteUser(Long id);
 }

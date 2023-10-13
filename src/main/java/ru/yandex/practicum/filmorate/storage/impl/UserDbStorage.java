@@ -116,6 +116,7 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
     }
 
+    /** ALG_6 */
     @Override
     public void deleteUser(Long id) {
         String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";

@@ -74,8 +74,9 @@ public class FilmService {
 	public Collection<Film> searchFilms(String query, String by) {
 		return filmStorage.searchFilms(query, by);
 	}
-  
-  public void deleteFilm(Long id) {
+
+    /** ALG_6 */
+    public void deleteFilm(Long id) {
         filmStorage.deleteFilm(id);
     }
 }
