@@ -236,7 +236,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("Удаление пользователя")
-    void filmMustBeDeleted() {
+    void userMustBeDeleted() {
         controller.addNewUser(createUser());
         controller.deleteUser(1L);
         assertTrue(controller.getAllUsers().isEmpty(), "List of users must be empty");
