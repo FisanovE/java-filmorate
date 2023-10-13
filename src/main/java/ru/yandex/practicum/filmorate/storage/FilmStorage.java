@@ -30,10 +30,16 @@ public interface FilmStorage {
 
 	Mpa getRatingsMpaById(Long id);
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
 
-	/** ALG_2 */
+	/**
+	 * ALG_2
+	 */
 	Collection<Film> searchFilms(String query, String by);
+
+	Collection<Film> getCommonFilms(Long userId, Long friendId);
 }
 

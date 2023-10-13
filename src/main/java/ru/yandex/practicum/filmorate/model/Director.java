@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Data;
 
-/** ALG_7 */
+/**
+ * ALG_7
+ */
 @Data
 @Builder
 public class Director {

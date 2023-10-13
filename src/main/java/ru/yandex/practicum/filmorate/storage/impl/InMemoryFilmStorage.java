@@ -18,21 +18,21 @@ import java.util.stream.Stream;
 public class InMemoryFilmStorage implements FilmStorage {
 
 	private final Map<Long, Film> films = new HashMap<>();
-	private final Map<Long, Genre> genres = Map.of(
-			1L, Genre.builder().id(1L).name("Комедия").build(),
-			2L, Genre.builder().id(2L).name("Драма").build(),
-			3L, Genre.builder().id(3L).name("Мультфильм").build(),
-			4L, Genre.builder().id(4L).name("Триллер").build(),
-			5L, Genre.builder().id(5L).name("Документальный").build(),
-			6L, Genre.builder().id(6L).name("Боевик").build()
+	private final Map<Long, Genre> genres = Map.of(1L, Genre.builder().id(1L).name("Комедия").build(), 2L,
+			Genre.builder().id(2L).name("Драма").build(), 3L,
+			Genre.builder().id(3L).name("Мультфильм").build(), 4L,
+			Genre.builder().id(4L).name("Триллер").build(), 5L,
+			Genre.builder().id(5L).name("Документальный").build(), 6L,
+			Genre.builder().id(6L).name("Боевик").build()
 	);
-	private final Map<Long, Mpa> ratingsMpa = Map.of(
-			1L, Mpa.builder().id(1L).name("G").build(),
-			2L, Mpa.builder().id(2L).name("PG").build(),
-			3L, Mpa.builder().id(3L).name("PG-13").build(),
-			4L, Mpa.builder().id(4L).name("R").build(),
-			5L, Mpa.builder().id(5L).name("NC-17").build()
+
+	private final Map<Long, Mpa> ratingsMpa = Map.of(1L, Mpa.builder().id(1L).name("G").build(), 2L,
+			Mpa.builder().id(2L).name("PG").build(), 3L,
+			Mpa.builder().id(3L).name("PG-13").build(), 4L,
+			Mpa.builder().id(4L).name("R").build(), 5L,
+			Mpa.builder().id(5L).name("NC-17").build()
 	);
+
 	private Long counter = 1L;
 
 	@Override
@@ -71,7 +71,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	private void checkingRepeat(Map<Long, Film> films, Film film) {
 		for (Film currentFilm : films.values()) {
-			if (Objects.equals(currentFilm.getName(), film.getName()) && Objects.equals(currentFilm.getReleaseDate(), film.getReleaseDate()) && !Objects.equals(currentFilm.getId(), film.getId())) {
+			if (Objects.equals(currentFilm.getName(), film.getName()) && Objects.equals(currentFilm.getReleaseDate(),
+					film.getReleaseDate()) && !Objects.equals(currentFilm.getId(), film.getId())) {
 				throw new ValidationException("This information for the movie " + film.getName() + " is already available.");
 			}
 		}
@@ -152,6 +153,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 	@Override
 	public Collection<Film> searchFilms(String query, String by) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public Collection<Film> getCommonFilms(Long userId, Long friendId) {
 		return new ArrayList<>();
 	}
 }

@@ -108,7 +108,9 @@ public class FilmController {
 		return filmService.getRatingsMpaById(id);
 	}
 
-	/** ALG_7 */
+	/**
+	 * ALG_7
+	 */
 	@GetMapping ("/films/director/{directorId}")
 	public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
 		log.info("ALG_7. Endpoint ->  Get films/directorId {} sortBy {} ", directorId, sortBy);
@@ -119,16 +121,27 @@ public class FilmController {
 		}
 	}
 
-	/** ALG_2 */
+	/**
+	 * ALG_2
+	 */
 	@GetMapping ("/films/search")
-	public Collection<Film> searchFilms(@RequestParam (required = false) String query, @RequestParam (required = false) String by) {
+	public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
 		log.info("ALG_2. Endpoint ->  Get films/search {} by {} ", query, by);
-		if (Objects.equals(by, "director") || Objects.equals(by, "title") ||
-				Objects.equals(by, "title,director") || Objects.equals(by, "director,title")) {
+		if (Objects.equals(by, "director") || Objects.equals(by, "title") || Objects.equals(by, "title,director") ||
+				Objects.equals(by, "director,title")) {
 			return filmService.searchFilms(query, by);
 		} else {
 			throw new NotFoundException("ALG_2. Invalid search param:  " + by);
 		}
+	}
+
+	/**
+	 * ALG_3
+	 */
+	@GetMapping ("/films/common")
+	public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+		log.info("ALG_3. Endpoint ->  Get films/common userId {} friendId {} ", userId, friendId);
+		return filmService.getCommonFilms(userId, friendId);
 	}
 
 }

@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.util.Collection;
 
-/** ALG_7 */
+/**
+ * ALG_7
+ */
 @Slf4j
 @RestController
 @Component

@@ -49,15 +49,14 @@ class FilmControllerTest {
 	@DisplayName ("Валидация: Description больше 200 символов")
 	void shouldReturnExceptionWhenDescriptionNewFilmMoreThan200Char() {
 		Film filmNew = createFilm();
-		String notValidDescription = "This is a pretty famous film that no one has ever seen. That's exactly what he's "
-				+ "famous for. Critics do not respond to him in any way, because they have not seen him once. " +
+		String notValidDescription = "This is a pretty famous film that no one has ever seen. That's exactly what he's " +
+				"famous for. Critics do not respond to him in any way, because they have not seen him once. " +
 				"The audience is enthusiastically silent about him for the same reason.";
 		filmNew.setDescription(notValidDescription);
 		List<Film> list = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
 		assertAll(() -> assertEquals("The maximum description length is 200 characters, you have: \""
-				+ notValidDescription.length() + "\" characters", exception.getMessage()),
-				() -> assertTrue(list.isEmpty()));
+				+ notValidDescription.length() + "\" characters", exception.getMessage()), () -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -68,8 +67,8 @@ class FilmControllerTest {
 		filmNew.setReleaseDate(LocalDate.parse(notValidReleaseDate, DateUtils.formatter));
 		List<Film> list = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \""
-				+ notValidReleaseDate + "\"", exception.getMessage()), () -> assertTrue(list.isEmpty()));
+		assertAll(() -> assertEquals("Movie release date should not be earlier than 1895.12.28, you have: \"" +
+				notValidReleaseDate + "\"", exception.getMessage()), () -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -80,8 +79,8 @@ class FilmControllerTest {
 		filmNew.setDuration(notValidDuration);
 		List<Film> list = new ArrayList<>(controller.getAllFilms());
 		final ValidationException exception = assertThrows(ValidationException.class, () -> controller.addNewFilm(filmNew));
-		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \""
-				+ notValidDuration, exception.getMessage()), () -> assertTrue(list.isEmpty()));
+		assertAll(() -> assertEquals("The duration of the film should be positive, you have:  \"" +
+				notValidDuration, exception.getMessage()), () -> assertTrue(list.isEmpty()));
 	}
 
 	@Test
@@ -93,8 +92,8 @@ class FilmControllerTest {
 		controller.updateFilm(filmAdded);
 		List<Film> list = new ArrayList<>(controller.getAllFilms());
 
-		assertAll(() -> assertFalse(list.isEmpty(), "Film not added"), () -> assertEquals(filmAdded,
-				list.get(0), "Films are not equal"));
+		assertAll(() -> assertFalse(list.isEmpty(), "Film not added"),
+				() -> assertEquals(filmAdded, list.get(0), "Films are not equal"));
 	}
 
 	@Test
@@ -118,8 +117,8 @@ class FilmControllerTest {
 		List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10));
 		List<Long> likes = new ArrayList<>(films.get(0).getLikedUsersIds());
 
-		assertAll(() -> assertFalse(likes.isEmpty(), "Like not added"), () -> assertEquals(2,
-				likes.get(0), "Films id are not equal"));
+		assertAll(() -> assertFalse(likes.isEmpty(), "Like not added"),
+				() -> assertEquals(2, likes.get(0), "Films id are not equal"));
 	}
 
 	@Test
@@ -157,21 +156,13 @@ class FilmControllerTest {
 	}
 
 	private Film createFilm() {
-		return Film.builder()
-				   .name("Name Film")
-				   .description("blah-blah-blah")
-				   .releaseDate(LocalDate.of(2022, 8, 20))
-				   .duration(120)
-				   .build();
+		return Film.builder().name("Name Film").description("blah-blah-blah").releaseDate(LocalDate.of(2022, 8, 20))
+				   .duration(120).build();
 
 	}
 
 	private Film updateFilm() {
-		return Film.builder().id(1L)
-				   .name("updateName Film")
-				   .description("blah-blah-blah")
-				   .releaseDate(LocalDate.of(2022, 5, 12))
-				   .duration(60)
-				   .build();
+		return Film.builder().id(1L).name("updateName Film").description("blah-blah-blah")
+				   .releaseDate(LocalDate.of(2022, 5, 12)).duration(60).build();
 	}
 }
