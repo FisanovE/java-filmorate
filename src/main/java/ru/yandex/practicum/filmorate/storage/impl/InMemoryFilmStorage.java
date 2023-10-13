@@ -186,13 +186,4 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         return new ArrayList<>();
     }
-
-    /**
-     * ALG_4
-     */
-    @Override
-    public List<Film> getFilmsRecommendationsForUser(Long id) {
-        /*NOT IMPLEMENTED*/
-        return Collections.emptyList();
-    }
 }

@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface FilmStorage {
 
@@ -52,10 +51,5 @@ public interface FilmStorage {
     Collection<Film> searchFilms(String query, String by);
 
     Collection<Film> getCommonFilms(Long userId, Long friendId);
-
-	/**
-	 * ALG_4
-	 */
-	List<Film> getFilmsRecommendationsForUser(Long id);
 }
 
