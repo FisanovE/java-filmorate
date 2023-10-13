@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 @Slf4j
