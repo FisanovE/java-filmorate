@@ -123,7 +123,7 @@ class FilmControllerTest {
 
         controller.deleteLike(filmAdded.getId(), 2L);
 
-        List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10, -1l, -1));
+        List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10, -1L, -1));
         List<Long> likes = new ArrayList<>(films.get(0).getLikedUsersIds());
 
         assertTrue(likes.isEmpty(), "Likes list must by empty");
@@ -144,7 +144,7 @@ class FilmControllerTest {
         controller.addLike(filmAdded1.getId(), 3L);
         controller.addLike(filmAdded2.getId(), 2L);
 
-        List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10, -1l, -1));
+        List<Film> films = new ArrayList<>(controller.getTopRatingFilms(10, -1L, -1));
 
         assertAll(() -> assertFalse(films.isEmpty(), "Rating list must by not empty"), () -> assertEquals(filmAdded2.getId(), films.get(0)
                 .getId(), "Films id are not equal"), () -> assertEquals(2, films.size(), "List`s size not equal 2"));

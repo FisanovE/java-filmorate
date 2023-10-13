@@ -271,7 +271,7 @@ class FilmorateApplicationTests {
         filmNew4.setGenres(List.of(Genre.builder().id(1L).build()));
         Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
 
-        List<Film> filmsByGenre = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 1l, -1));
+        List<Film> filmsByGenre = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 1L, -1));
 
         assertThat(filmsByGenre).isNotEmpty().hasSize(1);
         assertThat(filmsByGenre.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded4.getId()));
