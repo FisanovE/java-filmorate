@@ -271,7 +271,8 @@ class FilmorateApplicationTests {
         filmNew4.setGenres(List.of(Genre.builder().id(1L).build()));
         Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
 
-        List<Film> filmsByGenre = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 1l, -1));
+        List<Film> filmsByGenre = new ArrayList<>(filmStorage
+                .getTopRatingFilmsByGenreAndYear(10, 1L, -1));
 
         assertThat(filmsByGenre).isNotEmpty().hasSize(1);
         assertThat(filmsByGenre.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded4.getId()));
@@ -281,7 +282,8 @@ class FilmorateApplicationTests {
         filmNew5.setReleaseDate(LocalDate.of(2020, 01, 01));
         Film filmAdded5 = filmStorage.addNewFilm(filmNew5);
 
-        List<Film> filmsByYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, -1, 2020));
+        List<Film> filmsByYear = new ArrayList<>(filmStorage
+                .getTopRatingFilmsByGenreAndYear(10, -1, 2020));
 
         assertThat(filmsByYear).isNotEmpty().hasSize(1);
         assertThat(filmsByYear.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded5.getId()));
@@ -292,7 +294,8 @@ class FilmorateApplicationTests {
         filmNew6.setGenres(List.of(Genre.builder().id(2L).build()));
         Film filmAdded6 = filmStorage.addNewFilm(filmNew6);
 
-        List<Film> filmsByGenreAndYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
+        List<Film> filmsByGenreAndYear = new ArrayList<>(filmStorage
+                .getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
 
         assertThat(filmsByGenreAndYear).isNotEmpty().hasSize(1);
         assertThat(filmsByGenreAndYear.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded6.getId()));
