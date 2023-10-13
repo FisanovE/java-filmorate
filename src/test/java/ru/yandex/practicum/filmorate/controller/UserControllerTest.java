@@ -225,13 +225,29 @@ class UserControllerTest {
 				() -> assertEquals(userAded3, list.get(0), "Users are not equal"));
 	}
 
-	private User createUser() {
-		return User.builder().email("mail@mail.ru").login("Login").name("Name").birthday(LocalDate.of(2022, 8, 20))
-				   .build();
-	}
+    @Test
+    @DisplayName("Удаление пользователя")
+    void userMustBeDeleted() {
+        controller.addNewUser(createUser());
+        controller.deleteUser(1L);
+        assertTrue(controller.getAllUsers().isEmpty(), "List of users must be empty");
+    }
 
-	private User updateUser() {
-		return User.builder().id(1L).email("mail@yandex.ru").login("LoginUpdate").name("NameUpdate")
-				   .birthday(LocalDate.of(1946, 8, 20)).build();
-	}
+    private User createUser() {
+        return User.builder()
+                .email("mail@mail.ru")
+                .login("Login")
+                .name("Name")
+                .birthday(LocalDate.of(2022, 8, 20))
+                .build();
+    }
+
+    private User updateUser() {
+        return User.builder()
+                .id(1L)
+                .email("mail@yandex.ru")
+                .login("LoginUpdate")
+                .name("NameUpdate")
+                .birthday(LocalDate.of(1946, 8, 20)).build();
+    }
 }

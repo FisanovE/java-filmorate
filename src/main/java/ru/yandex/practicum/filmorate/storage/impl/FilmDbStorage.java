@@ -223,6 +223,13 @@ public class FilmDbStorage implements FilmStorage {
 		return mpa;
 	}
 
+	/** ALG_6 */
+	@Override
+	public void deleteFilm(Long filmId) {
+        String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+        log.info("ALG_6. Film ID " + filmId + " deleted");
+	}
 
 	private void setDirectorInDataBase(Film film) {
 		String sqlDeleteDirector = "DELETE FROM films_directors WHERE film_id = ?";
