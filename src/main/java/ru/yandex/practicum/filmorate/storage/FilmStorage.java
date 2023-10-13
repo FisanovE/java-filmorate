@@ -35,8 +35,11 @@ public interface FilmStorage {
 	 */
 	Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
 
-    /** ALG_6 */
-    void deleteFilm(Long filmId);
+	/**
+	 * ALG_6
+	 */
+	void deleteFilm(Long filmId);
+
 	/**
 	 * ALG_2
 	 */

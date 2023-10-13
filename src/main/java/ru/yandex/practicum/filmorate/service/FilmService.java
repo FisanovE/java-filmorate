@@ -79,10 +79,13 @@ public class FilmService {
 		return filmStorage.searchFilms(query, by);
 	}
 
-    /** ALG_6 */
-    public void deleteFilm(Long id) {
-        filmStorage.deleteFilm(id);
-    }
+	/**
+	 * ALG_6
+	 */
+	public void deleteFilm(Long id) {
+		filmStorage.deleteFilm(id);
+	}
+
 	/**
 	 * ALG_3
 	 */

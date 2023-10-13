@@ -102,6 +102,13 @@ public class UserDbStorage implements UserStorage {
 
 	@Override
 	public Collection<User> getAllFriendsOfUser(Long idUser) {
+		SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", idUser);
+		if (sqlRows.first()) {
+			log.info("ALG_6. User found: {}", idUser);
+		} else {
+			log.info("ALG_6. User not found: {}", idUser);
+			throw new NotFoundException("ALG_6. User not found: " + idUser);
+		}
 		String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " +
 				"ORDER BY USER_ID";
 
