@@ -87,7 +87,9 @@ public class UserController {
         }
     }
 
-    /** ALG_6 */
+    /**
+     * ALG_6
+     */
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);

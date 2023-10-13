@@ -9,16 +9,16 @@ import java.util.List;
 @Data
 @Builder
 public class Film {
-	private Long id;
-	private String name;
-	private String description;
-	private LocalDate releaseDate;
-	private int duration;
-	private List<Long> likedUsersIds;
-	private List<Genre> genres;
-	private Mpa mpa;
-	/**
-	 * ALG_7
-	 */
-	private List<Director> directors;
+    private Long id;
+    private String name;
+    private String description;
+    private LocalDate releaseDate;
+    private int duration;
+    private List<Long> likedUsersIds;
+    private List<Genre> genres;
+    private Mpa mpa;
+    /**
+     * ALG_7
+     */
+    private List<Director> directors;
 }

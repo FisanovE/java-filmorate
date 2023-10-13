@@ -9,14 +9,14 @@ import java.util.Collection;
  */
 public interface DirectorStorage {
 
-	Director addNewDirector(Director director);
+    Director addNewDirector(Director director);
 
-	Director updateDirector(Director director);
+    Director updateDirector(Director director);
 
-	Collection<Director> getAllDirectors();
+    Collection<Director> getAllDirectors();
 
-	Director getDirectorById(Long id);
+    Director getDirectorById(Long id);
 
-	void deleteDirectorById(Long id);
+    void deleteDirectorById(Long id);
 }
 
