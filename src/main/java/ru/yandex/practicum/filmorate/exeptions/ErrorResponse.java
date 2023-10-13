@@ -4,13 +4,13 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
-@Accessors (chain = true)
+@Accessors(chain = true)
 public class ErrorResponse {
-	private String error;
-	private String description;
+    private String error;
+    private String description;
 
-	public ErrorResponse(String error, String description) {
-		this.error = error;
-		this.description = description;
-	}
+    public ErrorResponse(String error, String description) {
+        this.error = error;
+        this.description = description;
+    }
 }

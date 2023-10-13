@@ -16,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
+
 	private FilmController controller;
 
 	@BeforeEach
@@ -155,6 +156,14 @@ class FilmControllerTest {
 				() -> assertEquals(filmAdded2.getId(), films.get(0).getId(), "Films id are not equal"),
 				() -> assertEquals(2, films.size(), "List`s size not equal 2"));
 	}
+
+	@Test
+	@DisplayName("Удаление фильма")
+	void filmMustBeDeleted() {
+        controller.addNewFilm(createFilm());
+        controller.deleteFilmById(1L);
+        assertTrue(controller.getAllFilms().isEmpty(), "List of films must be empty");
+    }
 
 	private Film createFilm() {
 		return Film.builder()
