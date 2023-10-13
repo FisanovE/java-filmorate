@@ -131,4 +131,9 @@ public class FilmController {
 		}
 	}
 
+	/** ALG_6 */
+ 	 @DeleteMapping("/films/{id}")
+	 public void deleteFilmById(@PathVariable Long id) {
+        filmService.deleteFilm(id);
+    }
 }

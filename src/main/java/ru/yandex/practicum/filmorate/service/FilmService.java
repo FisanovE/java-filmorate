@@ -17,48 +17,49 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmService {
 
+
 	@Qualifier ("filmDbStorage")
 	private final FilmStorage filmStorage;
 
-	public Film addNewFilm(Film film) {
-		return filmStorage.addNewFilm(film);
-	}
+    public Film addNewFilm(Film film) {
+        return filmStorage.addNewFilm(film);
+    }
 
-	public Film updateFilm(Film film) {
-		return filmStorage.updateFilm(film);
-	}
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
 
-	public Film getFilmById(Long filmId) {
-		return filmStorage.getFilmById(filmId);
-	}
+    public Film getFilmById(Long filmId) {
+        return filmStorage.getFilmById(filmId);
+    }
 
-	public Collection<Film> getAllFilms() {
-		return filmStorage.getAllFilms();
-	}
+    public Collection<Film> getAllFilms() {
+        return filmStorage.getAllFilms();
+    }
 
-	public void addLike(Long id, Long userId) {
-		filmStorage.addLike(id, userId);
-	}
+    public void addLike(Long id, Long userId) {
+        filmStorage.addLike(id, userId);
+    }
 
-	public void deleteLike(Long id, Long userId) {
-		filmStorage.deleteLike(id, userId);
-	}
+    public void deleteLike(Long id, Long userId) {
+        filmStorage.deleteLike(id, userId);
+    }
 
-	public Collection<Film> getTopRatingFilms(int count) {
-		return filmStorage.getTopRatingFilms(count);
-	}
+    public Collection<Film> getTopRatingFilms(int count) {
+        return filmStorage.getTopRatingFilms(count);
+    }
 
-	public Collection<Genre> getAllGenres() {
-		return filmStorage.getAllGenres();
-	}
+    public Collection<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
 
-	public Genre getGenresById(Long id) {
-		return filmStorage.getGenresById(id);
-	}
+    public Genre getGenresById(Long id) {
+        return filmStorage.getGenresById(id);
+    }
 
-	public Collection<Mpa> getAllRatingsMpa() {
-		return filmStorage.getAllRatingsMpa();
-	}
+    public Collection<Mpa> getAllRatingsMpa() {
+        return filmStorage.getAllRatingsMpa();
+    }
 
 	public Mpa getRatingsMpaById(Long id) {
 		return filmStorage.getRatingsMpaById(id);
@@ -74,4 +75,8 @@ public class FilmService {
 		return filmStorage.searchFilms(query, by);
 	}
 
+    /** ALG_6 */
+    public void deleteFilm(Long id) {
+        filmStorage.deleteFilm(id);
+    }
 }
