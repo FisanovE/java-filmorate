@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 
 @Slf4j
@@ -100,4 +101,11 @@ public class FilmService {
     public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
         return filmStorage.getCommonFilms(userId, friendId);
     }
+
+	/**
+	 * ALG_4
+	 */
+	public List<Film> getFilmsRecommendationsForUser(Long id) {
+		return filmStorage.getFilmsRecommendationsForUser(id);
+	}
 }

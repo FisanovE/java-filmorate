@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -159,4 +160,12 @@ public class FilmController {
         return filmService.getCommonFilms(userId, friendId);
     }
 
+	/**
+	 * ALG_4
+	 */
+	@GetMapping ("/users/{id}/recommendations")
+	public List<Film> getFilmsRecommendationsForUser(@PathVariable Long id) {
+		log.info("ALG_4. Endpoint -> Get films recommendations for user {}", id);
+		return filmService.getFilmsRecommendationsForUser(id);
+	}
 }

@@ -444,5 +444,53 @@ class FilmorateApplicationTests {
     private Director createDirector() {
         return Director.builder().name("Name Director").build();
     }
+
+    /**
+     * ALG_4
+     */
+    @Test
+    @Sql ({"/test-schema.sql", "/data.sql"})
+    @DisplayName ("Тестирование рекомендаций фильмов")
+    void testRecommendations() {
+        //        Яков(ищем рекомендации)   Айзек        Платон      Смит
+        //Лайки             1,2             (2),3     (1,2),4,5,6     7
+        //
+        //Искомый результат рекомендации по наиб. перечисл.: 4,5,6,3
+
+        List<String> filmTitles = List.of("Матрица", "Аватар", "Властелин Колец", "Фауст", "Берсерк", "Зубастики",
+                "Горизонт событий");
+        List<String> userNames = List.of("Яков",  "Айзек", "Платон", "Смит");
+
+        List<Film> films = new ArrayList<>();
+        Film film;
+        User user;
+        for (long i = 1; i <= filmTitles.size(); i++) {
+            film = createFilm();
+            film.setName(filmTitles.get((int) i - 1));
+            filmStorage.addNewFilm(film);
+
+            film.setId(i);
+            film.setGenres(new ArrayList<>());
+            film.setDirectors(new ArrayList<>());
+            films.add(film);
+        }
+        for (String name : userNames) {
+            user = createUser();
+            user.setName(name);
+            userStorage.addNewUser(user);
+        }
+        filmStorage.addLike(1L, 1L);
+        filmStorage.addLike(2L, 1L);
+        filmStorage.addLike(2L, 2L);
+        filmStorage.addLike(3L, 2L);
+        filmStorage.addLike(1L, 3L);
+        filmStorage.addLike(2L, 3L);
+        filmStorage.addLike(4L, 3L);
+        filmStorage.addLike(5L, 3L);
+        filmStorage.addLike(6L, 3L);
+        filmStorage.addLike(7L, 4L);
+        assertThat(filmStorage.getFilmsRecommendationsForUser(1L)).isEqualTo(List.of(
+                films.get(3), films.get(4), films.get(5), films.get(2)));
+    }
 }
 

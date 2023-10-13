@@ -213,11 +213,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Genre> getAllGenres() {
         String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
-
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
-        });
-    }
+		return jdbcTemplate.query(sql, (rs, rowNum) -> {
+			return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
+		});
+	}
 
     @Override
     public Genre getGenresById(Long id) {
@@ -388,4 +387,34 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    /**
+     * ALG_4
+     */
+    @Override
+    public List<Film> getFilmsRecommendationsForUser(Long id) {
+        int filmsToRecommend = 15;
+        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
+
+        String userLikesSet = String.format("(%s)", String.join(",",
+                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
+
+        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
+                "(SELECT film_ID FROM likes WHERE user_ID IN " +
+                "(SELECT user_ID FROM likes " +
+                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
+                "GROUP BY user_ID " +
+                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
+                "LIMIT ?) AS fi ON f.film_ID = fi.film_ID";
+
+        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
+
+        for (Film film : recommendations) {
+            film.setMpa(getMpaFromDataBase(film.getId()));
+            film.setGenres(getGenresFromDataBase(film.getId()));
+            film.setDirectors(getDirectorsFromDataBase(film.getId()));
+        }
+
+        log.info("ALG_4. Films were recommended for User with ID: " + id);
+        return recommendations;
+    }
 }
