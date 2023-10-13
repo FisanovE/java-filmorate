@@ -150,7 +150,7 @@ public class UserDbStorage implements UserStorage {
         String userLikesSet = String.format("(%s)", String.join(",",
                 jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
 
-        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
+        String queryForFilms = "SELECT * FROM films AS f JOIN " +
                 "(SELECT film_ID FROM likes WHERE user_ID IN " +
                 "(SELECT user_ID FROM likes " +
                 "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
