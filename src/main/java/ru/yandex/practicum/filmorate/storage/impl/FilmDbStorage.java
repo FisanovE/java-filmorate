@@ -219,7 +219,7 @@ public class FilmDbStorage implements FilmStorage {
 		}
 		return mpa;
 	}
-	
+
 	/** ALG_6 */
 	@Override
 	public void deleteFilm(Long filmId) {
