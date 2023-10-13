@@ -181,7 +181,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-        log.debug("ALG_8. вошли в базу");
+        log.debug("ALG_8.FilmDbStorage -> entered into DataBaseStorage");
 
         List<Film> films;
         StringJoiner joiner = new StringJoiner(" ");
