@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -144,4 +145,12 @@ public class InMemoryUserStorage implements UserStorage {
         users.remove(id);
     }
 
+    /**
+     * ALG_4
+     */
+    @Override
+    public List<Film> getFilmsRecommendationsForUser(Long id) {
+        /*NOT IMPLEMENTED*/
+        return Collections.emptyList();
+    }
 }

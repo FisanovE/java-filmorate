@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+
+import static ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage.*;
 
 @Slf4j
 @Repository
@@ -134,5 +137,36 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
         log.info("ALG_6. User ID " + id + " deleted");
+    }
+
+    /**
+     * ALG_4
+     */
+    @Override
+    public List<Film> getFilmsRecommendationsForUser(Long id) {
+        int filmsToRecommend = 15;
+        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
+
+        String userLikesSet = String.format("(%s)", String.join(",",
+                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
+
+        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
+                "(SELECT film_ID FROM likes WHERE user_ID IN " +
+                "(SELECT user_ID FROM likes " +
+                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
+                "GROUP BY user_ID " +
+                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
+                "LIMIT ?) AS fi ON f.film_ID = fi.film_ID";
+
+        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
+
+        for (Film film : recommendations) {
+            film.setMpa(getMpaFromDataBase(film.getId()));
+            film.setGenres(getGenresFromDataBase(film.getId()));
+            film.setDirectors(getDirectorsFromDataBase(film.getId()));
+        }
+
+        log.info("ALG_4. Films were recommended for User with ID: " + id);
+        return recommendations;
     }
 }

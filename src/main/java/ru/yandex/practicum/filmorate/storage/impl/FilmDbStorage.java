@@ -26,13 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class FilmDbStorage implements FilmStorage {
-
-    private final JdbcTemplate jdbcTemplate;
+    private static JdbcTemplate jdbcTemplate;
     DirectorStorage directorStorage;
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        FilmDbStorage.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -129,7 +128,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Mpa getMpaFromDataBase(Long id) {
+    static Mpa getMpaFromDataBase(Long id) {
         Mpa mpa = null;
         String sqlMpa = "SELECT mpa_id, mpa_name FROM mpa WHERE mpa_id IN (SELECT mpa_id FROM films_mpa " + "WHERE film_id = ?)";
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet(sqlMpa, id);
@@ -139,7 +138,7 @@ public class FilmDbStorage implements FilmStorage {
         return mpa;
     }
 
-    private List<Genre> getGenresFromDataBase(Long id) {
+    static List<Genre> getGenresFromDataBase(Long id) {
         String sql = "SELECT genre_id, genre_name FROM genres WHERE genre_id IN (SELECT genre_id " + "FROM films_genres WHERE film_id = ?)";
         List<Genre> list = jdbcTemplate.query(sql, (rs, rowNum) -> Genre.builder().id(rs.getLong("genre_id"))
                 .name(rs.getString("genre_name")).build(), id);
@@ -278,7 +277,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private List<Director> getDirectorsFromDataBase(Long id) {
+    static List<Director> getDirectorsFromDataBase(Long id) {
         String sql = "SELECT * FROM directors WHERE director_id IN (SELECT director_id FROM films_directors WHERE " + "film_id = ?)";
         return jdbcTemplate.query(sql, (rs, rowNum) -> Director.builder().id(rs.getLong("director_id"))
                 .name(rs.getString("director_name")).build(), id);
@@ -385,36 +384,5 @@ public class FilmDbStorage implements FilmStorage {
             film.setDirectors(getDirectorsFromDataBase(film.getId()));
         }
         return films;
-    }
-
-    /**
-     * ALG_4
-     */
-    @Override
-    public List<Film> getFilmsRecommendationsForUser(Long id) {
-        int filmsToRecommend = 15;
-        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
-
-        String userLikesSet = String.format("(%s)", String.join(",",
-                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
-
-        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
-                "(SELECT film_ID FROM likes WHERE user_ID IN " +
-                "(SELECT user_ID FROM likes " +
-                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
-                "GROUP BY user_ID " +
-                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
-                "LIMIT ?) AS fi ON f.film_ID = fi.film_ID";
-
-        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
-
-        for (Film film : recommendations) {
-            film.setMpa(getMpaFromDataBase(film.getId()));
-            film.setGenres(getGenresFromDataBase(film.getId()));
-            film.setDirectors(getDirectorsFromDataBase(film.getId()));
-        }
-
-        log.info("ALG_4. Films were recommended for User with ID: " + id);
-        return recommendations;
     }
 }

@@ -452,11 +452,6 @@ class FilmorateApplicationTests {
     @Sql ({"/test-schema.sql", "/data.sql"})
     @DisplayName ("Тестирование рекомендаций фильмов")
     void testRecommendations() {
-        //        Яков(ищем рекомендации)   Айзек        Платон      Смит
-        //Лайки             1,2             (2),3     (1,2),4,5,6     7
-        //
-        //Искомый результат рекомендации по наиб. перечисл.: 4,5,6,3
-
         List<String> filmTitles = List.of("Матрица", "Аватар", "Властелин Колец", "Фауст", "Берсерк", "Зубастики",
                 "Горизонт событий");
         List<String> userNames = List.of("Яков",  "Айзек", "Платон", "Смит");
@@ -489,7 +484,7 @@ class FilmorateApplicationTests {
         filmStorage.addLike(5L, 3L);
         filmStorage.addLike(6L, 3L);
         filmStorage.addLike(7L, 4L);
-        assertThat(filmStorage.getFilmsRecommendationsForUser(1L)).isEqualTo(List.of(
+        assertThat(userStorage.getFilmsRecommendationsForUser(1L)).isEqualTo(List.of(
                 films.get(3), films.get(4), films.get(5), films.get(2)));
     }
 }
