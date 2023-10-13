@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 @Builder
 public class Director {
-	private Long id;
-	private String name;
+    private Long id;
+    private String name;
 }

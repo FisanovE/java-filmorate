@@ -18,78 +18,86 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmService {
 
-	@Qualifier ("filmDbStorage")
-	private final FilmStorage filmStorage;
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
 
-	public Film addNewFilm(Film film) {
-		return filmStorage.addNewFilm(film);
-	}
+    public Film addNewFilm(Film film) {
+        return filmStorage.addNewFilm(film);
+    }
 
-	public Film updateFilm(Film film) {
-		return filmStorage.updateFilm(film);
-	}
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
 
-	public Film getFilmById(Long filmId) {
-		return filmStorage.getFilmById(filmId);
-	}
+    public Film getFilmById(Long filmId) {
+        return filmStorage.getFilmById(filmId);
+    }
 
-	public Collection<Film> getAllFilms() {
-		return filmStorage.getAllFilms();
-	}
+    public Collection<Film> getAllFilms() {
+        return filmStorage.getAllFilms();
+    }
 
-	public void addLike(Long id, Long userId) {
-		filmStorage.addLike(id, userId);
-	}
+    public void addLike(Long id, Long userId) {
+        filmStorage.addLike(id, userId);
+    }
 
-	public void deleteLike(Long id, Long userId) {
-		filmStorage.deleteLike(id, userId);
-	}
+    public void deleteLike(Long id, Long userId) {
+        filmStorage.deleteLike(id, userId);
+    }
 
-	public Collection<Film> getTopRatingFilms(int count) {
-		return filmStorage.getTopRatingFilms(count);
-	}
+    public Collection<Film> getTopRatingFilms(int count) {
+        return filmStorage.getTopRatingFilms(count);
+    }
 
-	public Collection<Genre> getAllGenres() {
-		return filmStorage.getAllGenres();
-	}
+    /**
+     * ALG_8
+     */
+    public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
+        log.debug("ALG_8.FilmService -> entered into service");
+        return filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
+    }
 
-	public Genre getGenresById(Long id) {
-		return filmStorage.getGenresById(id);
-	}
+    public Collection<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
 
-	public Collection<Mpa> getAllRatingsMpa() {
-		return filmStorage.getAllRatingsMpa();
-	}
+    public Genre getGenresById(Long id) {
+        return filmStorage.getGenresById(id);
+    }
 
-	public Mpa getRatingsMpaById(Long id) {
-		return filmStorage.getRatingsMpaById(id);
-	}
+    public Collection<Mpa> getAllRatingsMpa() {
+        return filmStorage.getAllRatingsMpa();
+    }
 
-	/**
-	 * ALG_7
-	 */
-	public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
-		return filmStorage.getAllFilmsByDirector(id, sortBy);
-	}
+    public Mpa getRatingsMpaById(Long id) {
+        return filmStorage.getRatingsMpaById(id);
+    }
 
-	/**
-	 * ALG_2
-	 */
-	public Collection<Film> searchFilms(String query, String by) {
-		return filmStorage.searchFilms(query, by);
-	}
+    /**
+     * ALG_7
+     */
+    public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+        return filmStorage.getAllFilmsByDirector(id, sortBy);
+    }
 
-	/**
-	 * ALG_6
-	 */
-	public void deleteFilm(Long id) {
-		filmStorage.deleteFilm(id);
-	}
+    /**
+     * ALG_2
+     */
+    public Collection<Film> searchFilms(String query, String by) {
+        return filmStorage.searchFilms(query, by);
+    }
 
-	/**
-	 * ALG_3
-	 */
-	public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
-		return filmStorage.getCommonFilms(userId, friendId);
-	}
+    /**
+     * ALG_6
+     */
+    public void deleteFilm(Long id) {
+        filmStorage.deleteFilm(id);
+    }
+
+    /**
+     * ALG_3
+     */
+    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 }

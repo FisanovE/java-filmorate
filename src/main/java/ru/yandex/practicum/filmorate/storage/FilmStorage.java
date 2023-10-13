@@ -8,43 +8,48 @@ import java.util.Collection;
 
 public interface FilmStorage {
 
-	Film addNewFilm(Film film);
+    Film addNewFilm(Film film);
 
-	Film updateFilm(Film film);
+    Film updateFilm(Film film);
 
-	Collection<Film> getAllFilms();
+    Collection<Film> getAllFilms();
 
-	Film getFilmById(Long id);
+    Film getFilmById(Long id);
 
-	void addLike(Long id, Long userId);
+    void addLike(Long id, Long userId);
 
-	void deleteLike(Long id, Long userId);
+    void deleteLike(Long id, Long userId);
 
-	Collection<Film> getTopRatingFilms(int count);
+    Collection<Film> getTopRatingFilms(int count);
 
-	Collection<Genre> getAllGenres();
+    /**
+     * ALG_8
+     */
+    Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year);
 
-	Genre getGenresById(Long id);
+    Collection<Genre> getAllGenres();
 
-	Collection<Mpa> getAllRatingsMpa();
+    Genre getGenresById(Long id);
 
-	Mpa getRatingsMpaById(Long id);
+    Collection<Mpa> getAllRatingsMpa();
 
-	/**
-	 * ALG_7
-	 */
-	Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
+    Mpa getRatingsMpaById(Long id);
 
-	/**
-	 * ALG_6
-	 */
-	void deleteFilm(Long filmId);
+    /**
+     * ALG_7
+     */
+    Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
 
-	/**
-	 * ALG_2
-	 */
-	Collection<Film> searchFilms(String query, String by);
+    /**
+     * ALG_6
+     */
+    void deleteFilm(Long filmId);
 
-	Collection<Film> getCommonFilms(Long userId, Long friendId);
+    /**
+     * ALG_2
+     */
+    Collection<Film> searchFilms(String query, String by);
+
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
 }
 

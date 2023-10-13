@@ -16,26 +16,26 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class DirectorService {
 
-	private final DirectorStorage directorStorage;
+    private final DirectorStorage directorStorage;
 
-	public Director addNewDirector(Director director) {
-		return directorStorage.addNewDirector(director);
-	}
+    public Director addNewDirector(Director director) {
+        return directorStorage.addNewDirector(director);
+    }
 
-	public Director updateDirector(Director director) {
-		return directorStorage.updateDirector(director);
-	}
+    public Director updateDirector(Director director) {
+        return directorStorage.updateDirector(director);
+    }
 
-	public Director getDirectorById(Long directorId) {
-		return directorStorage.getDirectorById(directorId);
-	}
+    public Director getDirectorById(Long directorId) {
+        return directorStorage.getDirectorById(directorId);
+    }
 
-	public Collection<Director> getAllDirectors() {
-		return directorStorage.getAllDirectors();
-	}
+    public Collection<Director> getAllDirectors() {
+        return directorStorage.getAllDirectors();
+    }
 
-	public void deleteDirectorById(Long directorId) {
-		directorStorage.deleteDirectorById(directorId);
-	}
+    public void deleteDirectorById(Long directorId) {
+        directorStorage.deleteDirectorById(directorId);
+    }
 
 }
