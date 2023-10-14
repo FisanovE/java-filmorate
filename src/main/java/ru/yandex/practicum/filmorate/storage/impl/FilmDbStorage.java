@@ -26,13 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class FilmDbStorage implements FilmStorage {
-
-    private final JdbcTemplate jdbcTemplate;
+    private static JdbcTemplate jdbcTemplate;
     DirectorStorage directorStorage;
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        FilmDbStorage.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -129,7 +128,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Mpa getMpaFromDataBase(Long id) {
+    static Mpa getMpaFromDataBase(Long id) {
         Mpa mpa = null;
         String sqlMpa = "SELECT mpa_id, mpa_name FROM mpa WHERE mpa_id IN (SELECT mpa_id FROM films_mpa " + "WHERE film_id = ?)";
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet(sqlMpa, id);
@@ -139,7 +138,7 @@ public class FilmDbStorage implements FilmStorage {
         return mpa;
     }
 
-    private List<Genre> getGenresFromDataBase(Long id) {
+    static List<Genre> getGenresFromDataBase(Long id) {
         String sql = "SELECT genre_id, genre_name FROM genres WHERE genre_id IN (SELECT genre_id " + "FROM films_genres WHERE film_id = ?)";
         List<Genre> list = jdbcTemplate.query(sql, (rs, rowNum) -> Genre.builder().id(rs.getLong("genre_id"))
                 .name(rs.getString("genre_name")).build(), id);
@@ -213,11 +212,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Genre> getAllGenres() {
         String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
-
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
-        });
-    }
+		return jdbcTemplate.query(sql, (rs, rowNum) -> {
+			return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
+		});
+	}
 
     @Override
     public Genre getGenresById(Long id) {
@@ -279,7 +277,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private List<Director> getDirectorsFromDataBase(Long id) {
+    static List<Director> getDirectorsFromDataBase(Long id) {
         String sql = "SELECT * FROM directors WHERE director_id IN (SELECT director_id FROM films_directors WHERE " + "film_id = ?)";
         return jdbcTemplate.query(sql, (rs, rowNum) -> Director.builder().id(rs.getLong("director_id"))
                 .name(rs.getString("director_name")).build(), id);
@@ -387,5 +385,4 @@ public class FilmDbStorage implements FilmStorage {
         }
         return films;
     }
-
 }

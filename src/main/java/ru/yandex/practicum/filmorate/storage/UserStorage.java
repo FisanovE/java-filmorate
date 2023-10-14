@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.List;
 
 
 public interface UserStorage {
@@ -27,4 +29,9 @@ public interface UserStorage {
      * ALG_6
      */
     void deleteUser(Long id);
+
+    /**
+     * ALG_4
+     */
+    List<Film> getFilmsRecommendationsForUser(Long id);
 }

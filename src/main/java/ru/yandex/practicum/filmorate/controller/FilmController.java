@@ -158,5 +158,4 @@ public class FilmController {
         log.info("ALG_3. Endpoint ->  Get films/common userId {} friendId {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }
-
 }
