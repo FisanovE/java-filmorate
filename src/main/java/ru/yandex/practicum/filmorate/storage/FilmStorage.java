@@ -50,6 +50,9 @@ public interface FilmStorage {
      */
     Collection<Film> searchFilms(String query, String by);
 
+	/**
+	 * ALG_3
+	 */
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 }
 
