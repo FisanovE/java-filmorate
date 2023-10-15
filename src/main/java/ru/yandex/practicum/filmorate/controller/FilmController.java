@@ -9,11 +9,13 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -158,4 +160,48 @@ public class FilmController {
         log.info("ALG_3. Endpoint ->  Get films/common userId {} friendId {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }
+	@PostMapping("/reviews")
+	public Review addNewReview(@RequestBody Review review) {
+		return filmService.addNewReviews(review);
+	}
+
+	@PutMapping("/reviews")
+	public Review updateReviews(@RequestBody Review review) {
+		return filmService.updateReviews(review);
+	}
+
+	@DeleteMapping("/reviews/{id}")
+	public void deleteReview(@PathVariable Long id) {
+		filmService.deleteReview(id);
+	}
+
+	@GetMapping("/reviews/{id}")
+	public Review getReviewById(@PathVariable Long id) {
+		return filmService.getReviewById(id);
+	}
+
+	@GetMapping("/reviews")
+	public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
+		return filmService.getReviewsByFilmId(filmId, count);
+	}
+
+	@PutMapping("/reviews/{id}/like/{userId}")
+	public void addLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+		filmService.addLikeByReview(id, userId);
+	}
+
+	@PutMapping("/reviews/{id}/dislike/{userId}")
+	public void addDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+		filmService.addDislikeByReview(id, userId);
+	}
+
+	@DeleteMapping("/reviews/{id}/like/{userId}")
+	public void deleteLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+		filmService.deleteLikeByReview(id, userId);
+	}
+
+	@DeleteMapping("/reviews/{id}/dislike/{userId}")
+	public void deleteDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+		filmService.deleteDislikeByReview(id, userId);
+	}
 }

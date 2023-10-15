@@ -15,6 +15,8 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import java.time.LocalDate;
 import java.util.*;
@@ -350,6 +352,41 @@ class FilmorateApplicationTests {
     void shouldReturnRatingsMpaById() {
         Mpa mpa = filmStorage.getRatingsMpaById(2L);
         assertThat(mpa).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "PG");
+    }
+    @Test
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Тестирование Отзывов")
+    void reviewDbStorageTest() {
+        User user = createUser();
+        User user2 = createUser();
+        userStorage.addNewUser(user);
+        userStorage.addNewUser(user2);
+        Film film = createFilm();
+        Review reviewMain = Review.builder()
+                .content("True")
+                .isPositive(true)
+                .userId(user.getId())
+                .filmId(film.getId())
+                .build();
+
+        Review addedReview = filmStorage.addNewReview(reviewMain);
+        reviewMain.setContent("False");
+        reviewMain.setIsPositive(false);
+        filmStorage.updateReview(reviewMain);
+        Review reviewInDb = filmStorage.getReviewById(1L);
+        List<Review> reviews = filmStorage.getAllReviews();
+        filmStorage.addLikeByReview(1L, 1L);
+        filmStorage.addDislikeByReview(1L, 2L);
+        filmStorage.deleteLikeByReview(1L, 1L);
+        filmStorage.deleteDislikeByReview(1L, 2L);
+
+        assertAll("Отзывы работают не правильно: ",
+                () -> assertEquals(addedReview.getReviewId(), 1L, "addNewReview работает не правильно"),
+                () -> assertNotNull(reviewInDb, "getReviewById работает не правильно"),
+                () -> assertEquals(reviewInDb.getContent(), "False", "updateReview работает не правильно"),
+                () -> assertEquals(reviews.size(), 1, "getAllReview работает не правильно"),
+                () -> assertEquals(reviewInDb.getUseful(), 0, "Оценка отзыва работает не правильно")
+        );
     }
 
     private Film createFilm() {

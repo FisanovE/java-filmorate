@@ -5,21 +5,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private static JdbcTemplate jdbcTemplate;
     DirectorStorage directorStorage;
+    private final ReviewRowMapper reviewRowMapper = new ReviewRowMapper();
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
@@ -410,5 +413,86 @@ public class FilmDbStorage implements FilmStorage {
         }
         log.info("ALG_3. getCommonFilms in work");
         return films;
+    }
+
+    @Override
+    public Review addNewReview(Review review) {
+        if (review.getReviewId() != null) throw new ValidationException("Поле id у отзыва не пустое");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        simpleJdbcInsert.withTableName("reviews").usingGeneratedKeyColumns("review_id");
+        Map<String, Object> reviewInMap = new HashMap<>();
+        reviewInMap.put("content", review.getContent());
+        reviewInMap.put("is_positive", review.getIsPositive());
+        reviewInMap.put("user_id", review.getUserId());
+        reviewInMap.put("film_id", review.getFilmId());
+        review.setReviewId(simpleJdbcInsert.executeAndReturnKey(reviewInMap).longValue());
+        return review;
+    }
+
+    @Override
+    public Review updateReview(Review review) {
+        Review updatedReview = getReviewById(review.getReviewId());
+        String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
+        jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
+        updatedReview.setContent(review.getContent());
+        updatedReview.setIsPositive(review.getIsPositive());
+        return updatedReview;
+    }
+
+    @Override
+    public void deleteReview(Long reviewId) {
+        getReviewById(reviewId);
+        jdbcTemplate.update("DELETE FROM reviews WHERE review_id = ?", reviewId);
+        jdbcTemplate.update("DELETE FROM reviews_like WHERE review_id = ?", reviewId);
+    }
+
+    @Override
+    public Review getReviewById(Long reviewId) {
+        String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id," +
+                "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                "FROM reviews r " +
+                "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                "WHERE r.review_id = ? " +
+                "GROUP BY r.review_id";
+        Review review = jdbcTemplate
+                .query(sql, rs -> rs.setLong(1, reviewId), reviewRowMapper)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Отзыв с id = " + reviewId + " не найден"));
+        return review;
+    }
+
+    @Override
+    public List<Review> getAllReviews() {
+        String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
+                "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                "FROM reviews r " +
+                "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                "GROUP BY r.review_id";
+        return jdbcTemplate.query(sql, reviewRowMapper);
+    }
+
+    @Override
+    public void addLikeByReview(Long reviewId, Long userId) {
+        String sql = "INSERT INTO reviews_like (review_id, user_id, is_useful) VALUES(?, ?, true)";
+        jdbcTemplate.update(sql, reviewId, userId);
+    }
+
+    @Override
+    public void addDislikeByReview(Long reviewId, Long userId) {
+        String sql = "INSERT INTO reviews_like (review_id, user_id, is_useful) VALUES(?, ?, false)";
+        jdbcTemplate.update(sql, reviewId, userId);
+    }
+
+    @Override
+    public void deleteLikeByReview(Long reviewId, Long userId) {
+        String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = true";
+        jdbcTemplate.update(sql, reviewId, userId);
+    }
+
+    @Override
+    public void deleteDislikeByReview(Long reviewId, Long userId) {
+        String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = false";
+        jdbcTemplate.update(sql, reviewId, userId);
     }
 }
