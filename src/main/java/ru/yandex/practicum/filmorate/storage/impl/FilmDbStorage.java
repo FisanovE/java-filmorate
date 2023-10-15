@@ -215,10 +215,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Genre> getAllGenres() {
         String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
-		return jdbcTemplate.query(sql, (rs, rowNum) -> {
-			return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
-		});
-	}
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
+        });
+    }
 
     @Override
     public Genre getGenresById(Long id) {

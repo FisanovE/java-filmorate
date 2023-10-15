@@ -353,6 +353,7 @@ class FilmorateApplicationTests {
         Mpa mpa = filmStorage.getRatingsMpaById(2L);
         assertThat(mpa).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "PG");
     }
+
     @Test
     @Sql({"/test-schema.sql", "/data.sql"})
     @DisplayName("Тестирование Отзывов")
@@ -484,12 +485,12 @@ class FilmorateApplicationTests {
      * ALG_4
      */
     @Test
-    @Sql ({"/test-schema.sql", "/data.sql"})
-    @DisplayName ("Тестирование рекомендаций фильмов")
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Тестирование рекомендаций фильмов")
     void testRecommendations() {
         List<String> filmTitles = List.of("Матрица", "Аватар", "Властелин Колец", "Фауст", "Берсерк", "Зубастики",
                 "Горизонт событий");
-        List<String> userNames = List.of("Яков",  "Айзек", "Платон", "Смит");
+        List<String> userNames = List.of("Яков", "Айзек", "Платон", "Смит");
 
         List<Film> films = new ArrayList<>();
         Film film;
@@ -692,4 +693,3 @@ class FilmorateApplicationTests {
     }
 
 }
-
