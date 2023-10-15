@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
@@ -185,5 +186,50 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         return new ArrayList<>();
+    }
+
+    @Override
+    public Review addNewReview(Review review) {
+        return null;
+    }
+
+    @Override
+    public Review updateReview(Review review) {
+        return null;
+    }
+
+    @Override
+    public void deleteReview(Long reviewId) {
+
+    }
+
+    @Override
+    public Review getReviewById(Long reviewId) {
+        return null;
+    }
+
+    @Override
+    public List<Review> getAllReviews() {
+        return null;
+    }
+
+    @Override
+    public void addLikeByReview(Long reviewId, Long userId) {
+
+    }
+
+    @Override
+    public void addDislikeByReview(Long reviewId, Long userId) {
+
+    }
+
+    @Override
+    public void deleteLikeByReview(Long reviewId, Long userId) {
+
+    }
+
+    @Override
+    public void deleteDislikeByReview(Long reviewId, Long userId) {
+
     }
 }
