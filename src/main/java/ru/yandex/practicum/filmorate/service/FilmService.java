@@ -114,7 +114,7 @@ public class FilmService {
         return filmStorage.addNewReview(review);
     }
 
-    public Review updateReviews(Review review) {
+    public Review updateReview(Review review) {
         checkReview(review);
         return filmStorage.updateReview(review);
     }

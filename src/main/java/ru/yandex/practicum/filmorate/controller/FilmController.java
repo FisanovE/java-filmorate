@@ -161,48 +161,84 @@ public class FilmController {
         return filmService.getCommonFilms(userId, friendId);
     }
 
+    /**
+     * ALG_1
+     */
     @PostMapping("/reviews")
     public Review addNewReview(@RequestBody Review review) {
+        log.info("ALG_1. Endpoint -> Create review");
         return filmService.addNewReviews(review);
     }
 
+    /**
+     * ALG_1
+     */
     @PutMapping("/reviews")
-    public Review updateReviews(@RequestBody Review review) {
-        return filmService.updateReviews(review);
+    public Review updateReview(@RequestBody Review review) {
+        log.info("ALG_1. Endpoint -> Update review {}", review.getReviewId());
+        return filmService.updateReview(review);
     }
 
+    /**
+     * ALG_1
+     */
     @DeleteMapping("/reviews/{id}")
     public void deleteReview(@PathVariable Long id) {
+        log.info("ALG_1. Endpoint -> Delete review {}", id);
         filmService.deleteReview(id);
     }
 
+    /**
+     * ALG_1
+     */
     @GetMapping("/reviews/{id}")
     public Review getReviewById(@PathVariable Long id) {
+        log.info("ALG_1. Endpoint -> Get review {}", id);
         return filmService.getReviewById(id);
     }
 
+    /**
+     * ALG_1
+     */
     @GetMapping("/reviews")
     public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
+        log.info("ALG_1. Endpoint -> Get reviews by filmId {}", filmId);
         return filmService.getReviewsByFilmId(filmId, count);
     }
 
+    /**
+     * ALG_1
+     */
     @PutMapping("/reviews/{id}/like/{userId}")
     public void addLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("ALG_1. Endpoint -> User {} added Like by Review {}", userId, id);
         filmService.addLikeByReview(id, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @PutMapping("/reviews/{id}/dislike/{userId}")
     public void addDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("ALG_1. Endpoint -> User {} added Dislike by Review {}", userId, id);
         filmService.addDislikeByReview(id, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @DeleteMapping("/reviews/{id}/like/{userId}")
     public void deleteLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("ALG_1. Endpoint -> User {} delete Like by Review {}", userId, id);
         filmService.deleteLikeByReview(id, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @DeleteMapping("/reviews/{id}/dislike/{userId}")
     public void deleteDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("ALG_1. Endpoint -> User {} delete Dislike by Review {}", userId, id);
         filmService.deleteDislikeByReview(id, userId);
     }
 }
