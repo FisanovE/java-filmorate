@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+/*package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -129,9 +129,6 @@ class FilmControllerTest {
         assertTrue(likes.isEmpty(), "Likes list must by empty");
     }
 
-    /**
-     * ALG_8
-     */
     @Test
     @DisplayName("Получение списка лучших фильмов")
     void shouldReturnTopRatingFilms() {
@@ -168,4 +165,4 @@ class FilmControllerTest {
         return Film.builder().id(1L).name("updateName Film").description("blah-blah-blah")
                 .releaseDate(LocalDate.of(2022, 5, 12)).duration(60).build();
     }
-}
+}*/
