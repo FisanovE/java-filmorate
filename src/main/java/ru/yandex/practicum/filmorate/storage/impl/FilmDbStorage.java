@@ -415,6 +415,9 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public Review addNewReview(Review review) {
         if (review.getReviewId() != null) throw new ValidationException("Поле id у отзыва не пустое");
@@ -425,27 +428,40 @@ public class FilmDbStorage implements FilmStorage {
         reviewInMap.put("is_positive", review.getIsPositive());
         reviewInMap.put("user_id", review.getUserId());
         reviewInMap.put("film_id", review.getFilmId());
+        log.info("ALG_1. Create review");
         review.setReviewId(simpleJdbcInsert.executeAndReturnKey(reviewInMap).longValue());
         return review;
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public Review updateReview(Review review) {
         Review updatedReview = getReviewById(review.getReviewId());
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
+        log.info("ALG_1. Update review {}", review.getReviewId());
         jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         updatedReview.setContent(review.getContent());
         updatedReview.setIsPositive(review.getIsPositive());
         return updatedReview;
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public void deleteReview(Long reviewId) {
         getReviewById(reviewId);
+        log.info("ALG_1. Delete review {}", reviewId);
         jdbcTemplate.update("DELETE FROM reviews WHERE review_id = ?", reviewId);
+        log.info("ALG_1. Delete likes by review {}", reviewId);
         jdbcTemplate.update("DELETE FROM reviews_like WHERE review_id = ?", reviewId);
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public Review getReviewById(Long reviewId) {
         String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id," +
@@ -454,16 +470,21 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
                 "WHERE r.review_id = ? " +
                 "GROUP BY r.review_id";
+        log.info("ALG_1. Get review by id {}", reviewId);
         Review review = jdbcTemplate
-                .query(sql, rs -> rs.setLong(1, reviewId), reviewRowMapper)
+                .query(sql, reviewRowMapper, reviewId)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Отзыв с id = " + reviewId + " не найден"));
         return review;
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public List<Review> getAllReviews() {
+        log.info("ALG_1. Get all reviews");
         String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
                 "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
                 "FROM reviews r " +
@@ -472,27 +493,43 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, reviewRowMapper);
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public void addLikeByReview(Long reviewId, Long userId) {
         String sql = "INSERT INTO reviews_like (review_id, user_id, is_useful) VALUES(?, ?, true)";
+        log.info("ALG_1. User {} added Like by Review {}", userId, reviewId);
         jdbcTemplate.update(sql, reviewId, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public void addDislikeByReview(Long reviewId, Long userId) {
         String sql = "INSERT INTO reviews_like (review_id, user_id, is_useful) VALUES(?, ?, false)";
+        log.info("ALG_1. User {} added Dislike by Review {}", userId, reviewId);
         jdbcTemplate.update(sql, reviewId, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public void deleteLikeByReview(Long reviewId, Long userId) {
         String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = true";
+        log.info("ALG_1. User {} Delete Like by Review {}", userId, reviewId);
         jdbcTemplate.update(sql, reviewId, userId);
     }
 
+    /**
+     * ALG_1
+     */
     @Override
     public void deleteDislikeByReview(Long reviewId, Long userId) {
         String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = false";
+        log.info("ALG_1. User {} Delete Dislike by Review {}", userId, reviewId);
         jdbcTemplate.update(sql, reviewId, userId);
     }
 }
