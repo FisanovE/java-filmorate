@@ -8,6 +8,21 @@
 
 Java 11, REST Spring Boot, Maven, Lombock, SLF4J, JUnit, AssertJ, H2 database
 
+### Задачи:
+
+* ALG_1. Функциональность «Отзывы». - [Владимир](https://github.com/v-s-ganeev)
+* ALG_2. Функциональность «Поиск». - Евгений
+* ALG_3. Функциональность «Общие фильмы». - Евгений
+* ALG_4. Функциональность «Рекомендации». - [Алексей](https://github.com/AlexeiEgorov)
+* ALG_5. Функциональность «Лента событий»: 
+  - Контроллер - [Игорь](https://github.com/IgorVasilievV)
+  - База данных - [Павел](https://github.com/NazarovPV)
+* ALG_6. Удаление фильмов и пользователей. - [Павел](https://github.com/NazarovPV)
+* ALG_7. Добавление режиссёров в фильмы. - Евгений
+* ALG_8. Вывод самых популярных фильмов по жанру и годам. - [Игорь](https://github.com/IgorVasilievV)
+* ALG_9. *** Рефакторинг: лайки → оценки.
+
+
 ### Схема базы данных
 
 ![Схема базы данных.](Filmorate_data_base.jpg)

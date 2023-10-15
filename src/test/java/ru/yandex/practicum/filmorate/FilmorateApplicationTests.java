@@ -17,9 +17,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @SpringBootTest
@@ -487,5 +485,174 @@ class FilmorateApplicationTests {
         assertThat(userStorage.getFilmsRecommendationsForUser(1L)).isEqualTo(List.of(
                 films.get(3), films.get(4), films.get(5), films.get(2)));
     }
+
+    /**
+     * ALG_7
+     */
+    @Test
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Получение списка фильмов режиссёра по лайкам или годам")
+    public void shouldReturnAllFilmsByDirector() {
+        User userNew1 = createUser();
+        User userNew2 = createUser();
+        User userNew3 = createUser();
+        Film filmNew1 = createFilm();
+        Film filmNew2 = createFilm();
+        Film filmNew3 = createFilm();
+        Director director = createDirector();
+        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded3 = userStorage.addNewUser(userNew3);
+        Director directorAdded = directorStorage.addNewDirector(director);
+        filmNew2.setName("Name Film2");
+        filmNew3.setName("Name Film3");
+        filmNew2.setReleaseDate(LocalDate.parse("2021-08-20"));
+        filmNew3.setReleaseDate(LocalDate.parse("2020-08-20"));
+        filmNew1.setDirectors(Collections.singletonList(directorAdded));
+        filmNew2.setDirectors(Collections.singletonList(directorAdded));
+        filmNew3.setDirectors(Collections.singletonList(directorAdded));
+        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
+        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
+        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
+        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded1.getId(), userAdded3.getId());
+        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded2.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
+
+        List<Film> filmsSortByLikes = new ArrayList<>(filmStorage.getAllFilmsByDirector(directorAdded.getId(), "likes"));
+        List<Film> filmsSortByYear = new ArrayList<>(filmStorage.getAllFilmsByDirector(directorAdded.getId(), "year"));
+
+        assertThat(filmsSortByLikes).isNotEmpty().hasSize(3);
+        assertThat(filmsSortByLikes.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded1.getId()));
+        assertThat(filmsSortByLikes.get(1)).isEqualTo(filmStorage.getFilmById(filmAdded2.getId()));
+        assertThat(filmsSortByLikes.get(2)).isEqualTo(filmStorage.getFilmById(filmAdded3.getId()));
+
+        assertThat(filmsSortByYear).isNotEmpty().hasSize(3);
+        assertThat(filmsSortByYear.get(0)).isEqualTo(filmStorage.getFilmById(filmAdded3.getId()));
+        assertThat(filmsSortByYear.get(1)).isEqualTo(filmStorage.getFilmById(filmAdded2.getId()));
+        assertThat(filmsSortByYear.get(2)).isEqualTo(filmStorage.getFilmById(filmAdded1.getId()));
+    }
+
+
+    /**
+     * ALG_7
+     */
+    @Test
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Поиск фильмов по режиссёру и/или названию")
+    public void shouldSearchFilmsByDirectorAndName() {
+        User userNew1 = createUser();
+        User userNew2 = createUser();
+        User userNew3 = createUser();
+        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded3 = userStorage.addNewUser(userNew3);
+        Film filmNew1 = createFilm();
+        Film filmNew2 = createFilm();
+        Film filmNew3 = createFilm();
+        Director director1 = createDirector();
+        Director director2 = createDirector();
+        director1.setName("David Lynch");
+        director2.setName("John Cassavetes");
+        Director directorAdded1 = directorStorage.addNewDirector(director1);
+        Director directorAdded2 = directorStorage.addNewDirector(director2);
+        filmNew1.setGenres(new ArrayList<>());
+        filmNew2.setGenres(new ArrayList<>());
+        filmNew3.setGenres(new ArrayList<>());
+        filmNew2.setName("Avatar");
+        filmNew3.setName("Avangard");
+        filmNew1.setDirectors(Collections.singletonList(directorAdded1));
+        filmNew3.setDirectors(Collections.singletonList(directorAdded2));
+        filmNew2.setDirectors(new ArrayList<>());
+        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
+        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
+        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
+        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded1.getId(), userAdded3.getId());
+        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded3.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
+
+        List<Film> filmsSearchByDirector = new ArrayList<>(filmStorage.searchFilms("aV", "director"));
+        List<Film> filmsSearchByTitle = new ArrayList<>(filmStorage.searchFilms("aV", "title"));
+        List<Film> filmsSearchByTitleAndDirector = new ArrayList<>(filmStorage.searchFilms("aV", "title,director"));
+        List<Film> filmsSearchByDirectorAndTitle = new ArrayList<>(filmStorage.searchFilms("aV", "director,title"));
+
+        assertThat(filmsSearchByDirector).isNotEmpty().hasSize(2);
+        assertThat(filmsSearchByDirector.get(0)).isEqualTo(filmAdded3);
+        assertThat(filmsSearchByDirector.get(1)).isEqualTo(filmAdded1);
+
+        assertThat(filmsSearchByTitle).isNotEmpty().hasSize(2);
+        assertThat(filmsSearchByTitle.get(0)).isEqualTo(filmAdded2);
+        assertThat(filmsSearchByTitle.get(1)).isEqualTo(filmAdded3);
+
+        assertThat(filmsSearchByTitleAndDirector).isEqualTo(filmsSearchByDirectorAndTitle);
+        assertThat(filmsSearchByTitleAndDirector).isNotEmpty().hasSize(3);
+        assertThat(filmsSearchByTitleAndDirector.get(0)).isEqualTo(filmAdded1);
+        assertThat(filmsSearchByTitleAndDirector.get(1)).isEqualTo(filmAdded3);
+        assertThat(filmsSearchByTitleAndDirector.get(2)).isEqualTo(filmAdded2);
+
+    }
+
+
+    /**
+     * ALG_3
+     */
+    @Test
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Получение списка общих фильмов")
+    public void shouldReturnCommonFilms() {
+        User userNew1 = createUser();
+        User userNew2 = createUser();
+        User userNew3 = createUser();
+        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded3 = userStorage.addNewUser(userNew3);
+        Film filmNew1 = createFilm();
+        Film filmNew2 = createFilm();
+        Film filmNew3 = createFilm();
+        Film filmNew4 = createFilm();
+        Film filmNew5 = createFilm();
+        filmNew2.setName("Name Film2");
+        filmNew3.setName("Name Film3");
+        filmNew4.setName("Name Film4");
+        filmNew5.setName("Name Film5");
+        filmNew1.setGenres(new ArrayList<>());
+        filmNew2.setGenres(new ArrayList<>());
+        filmNew3.setGenres(new ArrayList<>());
+        filmNew4.setGenres(new ArrayList<>());
+        filmNew5.setGenres(new ArrayList<>());
+        filmNew1.setDirectors(new ArrayList<>());
+        filmNew2.setDirectors(new ArrayList<>());
+        filmNew3.setDirectors(new ArrayList<>());
+        filmNew4.setDirectors(new ArrayList<>());
+        filmNew5.setDirectors(new ArrayList<>());
+        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
+        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
+        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
+        Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
+        Film filmAdded5 = filmStorage.addNewFilm(filmNew5);
+        filmStorage.addLike(filmAdded4.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded4.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded4.getId(), userAdded3.getId());
+        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded3.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
+        filmStorage.addLike(filmAdded2.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmStorage.addLike(filmAdded5.getId(), userAdded3.getId());
+        userStorage.addFriend(1L, 2L);
+
+        List<Film> films = new ArrayList<>(filmStorage.getCommonFilms(1L, 2L));
+
+        assertThat(films).isNotEmpty().hasSize(3);
+        assertThat(films.get(0)).isEqualTo(filmAdded4);
+        assertThat(films.get(1)).isEqualTo(filmAdded2);
+        assertThat(films.get(2)).isEqualTo(filmAdded3);
+    }
+
 }
 
