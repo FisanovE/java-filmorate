@@ -39,6 +39,82 @@ class FilmorateApplicationTests {
     private final DirectorStorage directorStorage;
     private User user;
     private Film film;
+    private Review review;
+    private Event event;
+
+    private Film createFilm() {
+        film = Film.builder()
+                .name("Name Film")
+                .description("blah-blah-blah")
+                .releaseDate(LocalDate.of(2022, 8, 20))
+                .duration(120)
+                .build();
+        return film;
+    }
+
+    private Film updateFilm() {
+        film = Film.builder().id(1L)
+                .name("updateName Film")
+                .description("blah-blah-blah")
+                .releaseDate(LocalDate.of(2022, 5, 12))
+                .duration(60)
+                .build();
+        return film;
+    }
+
+    private User createUser() {
+        user = User.builder()
+                .email("mail@mail.ru")
+                .login("Login")
+                .name("Name")
+                .birthday(LocalDate.of(2022, 8, 20))
+                .build();
+        return user;
+    }
+
+    private User updateUser() {
+        user = User.builder()
+                .id(1L)
+                .email("mail@yandex.ru")
+                .login("LoginUpdate")
+                .name("NameUpdate")
+                .birthday(LocalDate.of(1946, 8, 20))
+                .build();
+        return user;
+    }
+
+    private Review createReview(Long userId, Long filmId) {
+        review = Review.builder()
+                .content("everything is very bad")
+                .isPositive(false)
+                .userId(userId)
+                .filmId(filmId)
+                .useful(10L)
+                .build();
+        return review;
+    }
+
+    private Review updateReview(Long userId, Long filmId) {
+        review = Review.builder()
+                .content("everything is very good")
+                .isPositive(true)
+                .userId(userId)
+                .filmId(filmId)
+                .useful(20L)
+                .build();
+        return review;
+    }
+
+    /*private Event createEvent(Long userId, Long filmId) {
+        event = Event.builder()
+                .eventId("everything is very bad")
+                .userId(false)
+                .eventType(userId)
+                .operation(filmId)
+                .entityId(10L)
+                .build();
+        return event;
+    }*/
 
     @Test
     @Sql({"/test-schema.sql", "/data.sql"})
@@ -169,18 +245,6 @@ class FilmorateApplicationTests {
         List<User> list2AfterDeleteFriend = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded3.getId()));
         assertThat(list1AfterDeleteFriend).isEmpty();
         assertThat(list2AfterDeleteFriend).isEmpty();
-    }
-
-    private User createUser() {
-        user = User.builder().email("mail@mail.ru").login("Login").name("Name").birthday(LocalDate.of(2022, 8, 20))
-                .build();
-        return user;
-    }
-
-    private User updateUser() {
-        user = User.builder().id(1L).email("mail@yandex.ru").login("LoginUpdate").name("NameUpdate")
-                .birthday(LocalDate.of(1946, 8, 20)).build();
-        return user;
     }
 
     @Test
@@ -390,17 +454,7 @@ class FilmorateApplicationTests {
         );
     }
 
-    private Film createFilm() {
-        film = Film.builder().name("Name Film").description("blah-blah-blah").releaseDate(LocalDate.of(2022, 8, 20))
-                .duration(120).build();
-        return film;
-    }
 
-    private Film updateFilm() {
-        film = Film.builder().id(1L).name("updateName Film").description("blah-blah-blah")
-                .releaseDate(LocalDate.of(2022, 5, 12)).duration(60).build();
-        return film;
-    }
 
     /**
      * ALG_7
@@ -690,6 +744,80 @@ class FilmorateApplicationTests {
         assertThat(films.get(0)).isEqualTo(filmAdded4);
         assertThat(films.get(1)).isEqualTo(filmAdded2);
         assertThat(films.get(2)).isEqualTo(filmAdded3);
+    }
+
+    @Test
+    @Sql({"/test-schema.sql", "/data.sql"})
+    @DisplayName("Получение списка событий")
+    public void shoulReturnListEvents() {
+        User userNew1 = createUser();
+        User userNew2 = createUser();
+        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded2 = userStorage.addNewUser(userNew2);
+        Film filmNew1 = createFilm();
+        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
+        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmStorage.deleteLike(filmAdded1.getId(), userAdded1.getId());
+        userStorage.addFriend(userAdded1.getId(), userAdded2.getId());
+        userStorage.deleteFriend(userAdded1.getId(), userAdded2.getId());
+        Review reviewNew = createReview(userAdded1.getId(), filmAdded1.getId());
+        Review reviewUpdate = updateReview(userAdded1.getId(), filmAdded1.getId());
+        Review reviewAdded1 = filmStorage.addNewReview(reviewNew);
+        reviewUpdate.setReviewId(reviewAdded1.getReviewId());
+        filmStorage.updateReview(reviewUpdate);
+        filmStorage.deleteReview(reviewUpdate.getReviewId());
+
+        List<Event> events = new ArrayList<>(userStorage.getEvents(userNew1.getId()));
+
+        assertThat(events).isNotEmpty().hasSize(7);
+        assertThat(events.get(0).getEventId()).isEqualTo(1L);
+        assertThat(events.get(0).getUserId()).isEqualTo(1L);
+        assertThat(events.get(0).getEventType()).isEqualTo("LIKE");
+        assertThat(events.get(0).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(0).getEntityId()).isEqualTo(1L);
+        assertTrue(events.get(0).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(1).getEventId()).isEqualTo(2L);
+        assertThat(events.get(1).getUserId()).isEqualTo(1L);
+        assertThat(events.get(1).getEventType()).isEqualTo("LIKE");
+        assertThat(events.get(1).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(1).getEntityId()).isEqualTo(1L);
+        assertTrue(events.get(1).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(2).getEventId()).isEqualTo(3L);
+        assertThat(events.get(2).getUserId()).isEqualTo(1L);
+        assertThat(events.get(2).getEventType()).isEqualTo("FRIEND");
+        assertThat(events.get(2).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(2).getEntityId()).isEqualTo(2L);
+        assertTrue(events.get(2).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(3).getEventId()).isEqualTo(4L);
+        assertThat(events.get(3).getUserId()).isEqualTo(1L);
+        assertThat(events.get(3).getEventType()).isEqualTo("FRIEND");
+        assertThat(events.get(3).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(3).getEntityId()).isEqualTo(2L);
+        assertTrue(events.get(3).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(4).getEventId()).isEqualTo(5L);
+        assertThat(events.get(4).getUserId()).isEqualTo(1L);
+        assertThat(events.get(4).getEventType()).isEqualTo("REVIEW");
+        assertThat(events.get(4).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(4).getEntityId()).isEqualTo(1L);
+        assertTrue(events.get(4).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(5).getEventId()).isEqualTo(6L);
+        assertThat(events.get(5).getUserId()).isEqualTo(1L);
+        assertThat(events.get(5).getEventType()).isEqualTo("REVIEW");
+        assertThat(events.get(5).getOperation()).isEqualTo("UPDATE");
+        assertThat(events.get(5).getEntityId()).isEqualTo(1L);
+        assertTrue(events.get(5).getTimestamp() > 1670590017281L);
+
+        assertThat(events.get(6).getEventId()).isEqualTo(7L);
+        assertThat(events.get(6).getUserId()).isEqualTo(1L);
+        assertThat(events.get(6).getEventType()).isEqualTo("REVIEW");
+        assertThat(events.get(6).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(6).getEntityId()).isEqualTo(1L);
+        assertTrue(events.get(6).getTimestamp() > 1670590017281L);
     }
 
 }

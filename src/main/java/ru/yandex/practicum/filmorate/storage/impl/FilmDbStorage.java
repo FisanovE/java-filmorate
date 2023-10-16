@@ -22,6 +22,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.*;
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,18 +152,20 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void addLike(Long id, Long userId) {
+    public void addLike(Long filmId, Long userId) {
         String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, id, userId);
+        jdbcTemplate.update(sql, filmId, userId);
+        addEvent(userId, "LIKE", "ADD", filmId);
     }
 
     @Override
-    public void deleteLike(Long id, Long userId) {
+    public void deleteLike(Long filmId, Long userId) {
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-        int rowsUpdated = jdbcTemplate.update(sql, id, userId);
+        int rowsUpdated = jdbcTemplate.update(sql, filmId, userId);
         if (rowsUpdated == 0) {
             throw new NotFoundException("Invalid User ID:  " + userId);
         }
+        addEvent(userId, "LIKE", "REMOVE", filmId);
     }
 
     @Override
@@ -322,7 +327,7 @@ public class FilmDbStorage implements FilmStorage {
             film.setGenres(getGenresFromDataBase(film.getId()));
             film.setDirectors(getDirectorsFromDataBase(film.getId()));
         }
-        log.info("ALG_3. getCommonFilms in work");
+        log.info("ALG_7. getAllFilmsByDirector in work");
         return films;
     }
 
@@ -395,9 +400,9 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM FILMS f LEFT JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
                 "WHERE F.FILM_ID IN (SELECT FILM_ID " +
                 "FROM LIKES " +
-                "WHERE FILM_ID IN ((SELECT FILM_ID " +
+                "WHERE FILM_ID IN (SELECT FILM_ID " +
                 "FROM LIKES " +
-                "WHERE USER_ID = ? )) " +
+                "WHERE USER_ID = ? ) " +
                 "AND USER_ID = ? " +
                 "GROUP BY FILM_ID) " +
                 "GROUP BY F.FILM_ID " +
@@ -430,6 +435,7 @@ public class FilmDbStorage implements FilmStorage {
         reviewInMap.put("film_id", review.getFilmId());
         log.info("ALG_1. Create review");
         review.setReviewId(simpleJdbcInsert.executeAndReturnKey(reviewInMap).longValue());
+        addEvent(review.getUserId(), "REVIEW", "ADD", review.getReviewId());
         return review;
     }
 
@@ -444,6 +450,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         updatedReview.setContent(review.getContent());
         updatedReview.setIsPositive(review.getIsPositive());
+        addEvent(updatedReview.getUserId(), "REVIEW", "UPDATE", updatedReview.getFilmId());
         return updatedReview;
     }
 
@@ -452,11 +459,13 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public void deleteReview(Long reviewId) {
-        getReviewById(reviewId);
+        Review review = getReviewById(reviewId);
         log.info("ALG_1. Delete review {}", reviewId);
         jdbcTemplate.update("DELETE FROM reviews WHERE review_id = ?", reviewId);
         log.info("ALG_1. Delete likes by review {}", reviewId);
         jdbcTemplate.update("DELETE FROM reviews_like WHERE review_id = ?", reviewId);
+        addEvent(review.getUserId(), "REVIEW", "REMOVE",
+                review.getFilmId());
     }
 
     /**
@@ -475,7 +484,7 @@ public class FilmDbStorage implements FilmStorage {
                 .query(sql, reviewRowMapper, reviewId)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Отзыв с id = " + reviewId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Review with id = " + reviewId + " not found"));
         return review;
     }
 
@@ -531,5 +540,18 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = false";
         log.info("ALG_1. User {} Delete Dislike by Review {}", userId, reviewId);
         jdbcTemplate.update(sql, reviewId, userId);
+    }
+
+    /**
+     * ALG5
+     */
+    private void addEvent(Long userId, String eventType, String operation, Long entityId) {
+        String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        LocalDateTime now = LocalDateTime.now();
+        Instant instant = now.atZone(ZoneId.systemDefault()).toInstant();
+        Long timeStamp = instant.toEpochMilli();
+        jdbcTemplate.update(sql, userId, eventType, operation, entityId, timeStamp);
+        log.info("ALG_5. Added event: User_{} {} {}_{} in time_{}", userId, operation, eventType, entityId, timeStamp);
     }
 }

@@ -190,12 +190,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Review addNewReview(Review review) {
-        return null;
+        return new Review();
     }
 
     @Override
     public Review updateReview(Review review) {
-        return null;
+        return new Review();
     }
 
     @Override
@@ -205,12 +205,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Review getReviewById(Long reviewId) {
-        return null;
+        return new Review();
     }
 
     @Override
     public List<Review> getAllReviews() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
