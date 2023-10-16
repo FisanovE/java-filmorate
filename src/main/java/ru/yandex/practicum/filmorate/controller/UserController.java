@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -104,4 +105,14 @@ public class UserController {
         log.info("ALG_4. Endpoint -> Get films recommendations for user {}", id);
         return userService.getFilmsRecommendationsForUser(id);
     }
+
+    /**
+     * ALG_5
+     */
+    @GetMapping("/{id}/feed")
+    public Collection<Event> getEvent(@PathVariable("id") Long userId) {
+        log.info("ALG_5. Endpoint -> Get feed of user with id = {}", userId);
+        return userService.getEvent(userId);
+    }
+
 }

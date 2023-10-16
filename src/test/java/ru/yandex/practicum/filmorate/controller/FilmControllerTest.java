@@ -1,4 +1,4 @@
-/*package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void init() {
-        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
     }
 
     @Test
@@ -165,4 +166,4 @@ class FilmControllerTest {
         return Film.builder().id(1L).name("updateName Film").description("blah-blah-blah")
                 .releaseDate(LocalDate.of(2022, 5, 12)).duration(60).build();
     }
-}*/
+}

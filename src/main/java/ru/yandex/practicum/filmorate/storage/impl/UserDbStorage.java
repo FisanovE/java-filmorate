@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -14,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import static ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage.*;
@@ -93,6 +97,7 @@ public class UserDbStorage implements UserStorage {
         if (rowsUpdated == 0) {
             throw new NotFoundException("User ID is missing in friends:  " + idFriend);
         }
+        addEvent(idUser, "FRIEND", "ADD", idFriend);
         log.info("Added friends ID: {}", idFriend);
     }
 
@@ -101,6 +106,7 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(Long idUser, Long idFriend) {
         String sql = "DELETE FROM friends WHERE USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sql, idUser, idFriend);
+        addEvent(idUser, "FRIEND", "REMOVE", idFriend);
     }
 
     @Override
@@ -169,4 +175,32 @@ public class UserDbStorage implements UserStorage {
         log.info("ALG_4. Films were recommended for User with ID: " + id);
         return recommendations;
     }
+
+    /**
+     * ALG5
+     */
+    private void addEvent(Long userId, String eventType, String operation, Long entityId) {
+        String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, userId, eventType, operation, entityId, System.currentTimeMillis());
+        log.info("ALG_5. Added event: User_{} {} {}_{} in time_{}", userId, operation, eventType, entityId, System.currentTimeMillis());
+    }
+
+    /**
+     * ALG5
+     */
+    @Override
+    public List<Event> getEvents(Long userId) {
+        SqlRowSet checkUser = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", userId);
+        if (!checkUser.next()) {
+            log.info("ALG_5. Invalid User ID: {}", userId);
+            throw new NotFoundException("ALG_5. Invalid User ID:  " + userId);
+        }
+
+        String sql = "SELECT * FROM events WHERE user_id = ?";
+
+        log.info("ALG_5. Event was given for User with ID: " + userId);
+        return jdbcTemplate.query(sql, new EventRowMapper(), userId);
+    }
+
 }

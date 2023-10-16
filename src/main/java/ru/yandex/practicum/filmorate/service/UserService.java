@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -76,4 +77,12 @@ public class UserService {
     public List<Film> getFilmsRecommendationsForUser(Long id) {
         return userStorage.getFilmsRecommendationsForUser(id);
     }
+
+    /**
+     * ALG_5
+     */
+    public Collection<Event> getEvent(Long userId) {
+        return userStorage.getEvents(userId);
+    }
+
 }
