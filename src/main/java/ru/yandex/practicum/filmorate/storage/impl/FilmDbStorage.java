@@ -548,10 +548,7 @@ public class FilmDbStorage implements FilmStorage {
     private void addEvent(Long userId, String eventType, String operation, Long entityId) {
         String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
                 "VALUES (?, ?, ?, ?, ?)";
-        LocalDateTime now = LocalDateTime.now();
-        Instant instant = now.atZone(ZoneId.systemDefault()).toInstant();
-        Long timeStamp = instant.toEpochMilli();
-        jdbcTemplate.update(sql, userId, eventType, operation, entityId, timeStamp);
-        log.info("ALG_5. Added event: User_{} {} {}_{} in time_{}", userId, operation, eventType, entityId, timeStamp);
+        jdbcTemplate.update(sql, userId, eventType, operation, entityId, System.currentTimeMillis());
+        log.info("ALG_5. Added event: User_{} {} {}_{} in time_{}", userId, operation, eventType, entityId, System.currentTimeMillis());
     }
 }
