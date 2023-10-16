@@ -16,9 +16,9 @@ Java 11, REST Spring Boot, Maven, Lombock, SLF4J, JUnit, AssertJ, H2 database
 * ALG_4. Функциональность «Рекомендации». - [Алексей](https://github.com/AlexeiEgorov)
 * ALG_5. Функциональность «Лента событий»: 
   - Контроллер - [Игорь](https://github.com/IgorVasilievV)  
-  - Модель, мапер, хранилище, SQL-запросы, тесты - [Алексей](https://github.com/AlexeiEgorov)
+  - Модель, мапер, хранилище, SQL-запросы - [Алексей](https://github.com/AlexeiEgorov)
   - База данных - [Павел](https://github.com/NazarovPV)
-  - Сборка, интеграция - Евгений
+  - Сборка, интеграция, тесты - Евгений
 * ALG_6. Удаление фильмов и пользователей. - [Павел](https://github.com/NazarovPV)
 * ALG_7. Добавление режиссёров в фильмы. - Евгений
 * ALG_8. Вывод самых популярных фильмов по жанру и годам. - [Игорь](https://github.com/IgorVasilievV)
