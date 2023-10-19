@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,9 +14,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
-    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    private final ValidateService validateService;
 
     public User addNewUser(User user) {
         setLoginAsNameIfNameIsEmpty(user);
@@ -25,6 +23,8 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+        validateService.checkContainsUserInDatabase(user.getId());
+        validateService.checkingUserForValid(user);
         setLoginAsNameIfNameIsEmpty(user);
         return userStorage.updateUser(user);
     }
@@ -38,11 +38,10 @@ public class UserService {
     }
 
     public void addFriend(Long idUser, Long idFriend) {
-        if (idUser.equals(idFriend)) {
-            throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
-        } else {
-            userStorage.addFriend(idUser, idFriend);
-        }
+        validateService.checkMatchingIdUsers(idUser, idFriend);
+        validateService.checkContainsUserInDatabase(idUser);
+        validateService.checkContainsUserInDatabase(idFriend);
+        userStorage.addFriend(idUser, idFriend);
     }
 
     /**
@@ -53,6 +52,7 @@ public class UserService {
     }
 
     public void deleteFriend(Long idUser, Long idFriend) {
+        validateService.checkContainsUserInDatabase(idUser);
         userStorage.deleteFriend(idUser, idFriend);
     }
 
@@ -62,6 +62,9 @@ public class UserService {
 
 
     public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
+        validateService.checkMatchingIdUsers(idUser, idOtherUser);
+        validateService.checkContainsUserInDatabase(idUser);
+        validateService.checkContainsUserInDatabase(idOtherUser);
         return userStorage.getMutualFriends(idUser, idOtherUser);
     }
 

@@ -9,7 +9,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
@@ -27,18 +26,10 @@ import java.util.Objects;
 public class DirectorDbStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private static final String sqlAddNewDirector = "INSERT INTO directors (director_name) VALUES (?)";
-    private static final String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
-    private static final String sqlGetDirectorById = "SELECT * FROM directors WHERE director_id = ?";
-    private static final String sqlGetAllDirectors = "SELECT * FROM directors ORDER BY director_id";
-    private static final String sqlDeleteDirectorById = "DELETE FROM directors WHERE director_id = ?";
-
 
     @Override
     public Director addNewDirector(Director director) {
-        if (director.getName().isBlank()) {
-            throw new ValidationException("ALG_7. Invalid name format: \"" + director.getName() + "\"");
-        }
+        String sqlAddNewDirector = "INSERT INTO directors (director_name) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlAddNewDirector, Statement.RETURN_GENERATED_KEYS);
@@ -55,24 +46,23 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director updateDirector(Director director) {
+        String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
         int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
         log.info("ALG_7. Director update: {} {}", director.getId(), director.getName());
-        if (rowsUpdated != 1) {
-            throw new NotFoundException("ALG_7. Invalid Director ID:  " + director.getId());
-        }
+
         return director;
     }
 
     @Override
     public Collection<Director> getAllDirectors() {
+        String sqlGetAllDirectors = "SELECT * FROM directors ORDER BY director_id";
         log.info("ALG_7. getAllDirectors in work");
-        return jdbcTemplate.query(sqlGetAllDirectors, (rs, rowNum) -> Director.builder().id(rs.getLong("director_id"))
-                .name(rs.getString("director_name"))
-                .build());
+        return jdbcTemplate.query(sqlGetAllDirectors, new DirectorRowMapper());
     }
 
     @Override
     public Director getDirectorById(Long id) {
+        String sqlGetDirectorById = "SELECT * FROM directors WHERE director_id = ?";
         Director director;
         SqlRowSet directorRows = jdbcTemplate.queryForRowSet(sqlGetDirectorById, id);
         if (directorRows.first()) {
@@ -88,10 +78,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public void deleteDirectorById(Long id) {
+        String sqlDeleteDirectorById = "DELETE FROM directors WHERE director_id = ?";
         int rowsUpdated = jdbcTemplate.update(sqlDeleteDirectorById, id);
         log.info("ALG_7. Director deleted: {}", id);
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("ALG_7. Invalid Director ID:  " + id);
-        }
     }
 }

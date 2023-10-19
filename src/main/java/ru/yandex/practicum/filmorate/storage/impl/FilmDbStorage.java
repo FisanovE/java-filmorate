@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -23,7 +22,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -31,6 +29,8 @@ public class FilmDbStorage implements FilmStorage {
     private static JdbcTemplate jdbcTemplate;
     DirectorStorage directorStorage;
     private final ReviewRowMapper reviewRowMapper = new ReviewRowMapper();
+    private final GenreRowMapper genreRowMapper = new GenreRowMapper();
+    DirectorRowMapper directorRowMapper = new DirectorRowMapper();
 
     @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
@@ -64,18 +64,14 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        try {
-            String sqlRequest = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? " + "WHERE film_id = ?";
-            jdbcTemplate.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
-            setMpaInDataBase(film);
-            setGenreInDataBase(film);
-            film.setGenres(getGenresFromDataBase(film.getId()));
-            setDirectorInDataBase(film);
-            log.info("Film update: {} {}", film.getId(), film.getName());
-            return film;
-        } catch (DataIntegrityViolationException e) {
-            throw new NotFoundException("Invalid Film ID:  " + film.getId());
-        }
+        String sqlRequest = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? " + "WHERE film_id = ?";
+        jdbcTemplate.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
+        setMpaInDataBase(film);
+        setGenreInDataBase(film);
+        film.setGenres(getGenresFromDataBase(film.getId()));
+        setDirectorInDataBase(film);
+        log.info("Film update: {} {}", film.getId(), film.getName());
+        return film;
     }
 
     @Override
@@ -122,9 +118,9 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlDeleteGenre, film.getId());
 
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            List<Genre> list = film.getGenres().stream().distinct().collect(Collectors.toList());
-            film.setGenres(list);
-            for (Genre genre : list) {
+            LinkedHashSet<Genre> set = film.getGenres();
+            film.setGenres(set);
+            for (Genre genre : set) {
                 String sqlGenres = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
                 jdbcTemplate.update(sqlGenres, film.getId(), genre.getId());
             }
@@ -141,15 +137,13 @@ public class FilmDbStorage implements FilmStorage {
         return mpa;
     }
 
-    static List<Genre> getGenresFromDataBase(Long id) {
+    static LinkedHashSet<Genre> getGenresFromDataBase(Long id) {
         String sql = "SELECT genre_id, genre_name FROM genres WHERE genre_id IN (SELECT genre_id " + "FROM films_genres WHERE film_id = ?)";
-        List<Genre> list = jdbcTemplate.query(sql, (rs, rowNum) -> Genre.builder().id(rs.getLong("genre_id"))
-                .name(rs.getString("genre_name")).build(), id);
-        return list;
+        return new LinkedHashSet<>(jdbcTemplate.query(sql, new GenreRowMapper(), id));
     }
 
     @Override
-    public void addLike(Long filmId, Long userId) {
+    public void addLike(Long filmId, Long userId) { // проверка не перенесена в service для обход ошибки тестов
         SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM likes WHERE film_id = ? AND user_id = ?", filmId, userId);
         if (!sqlRows.first()) {
             String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
@@ -162,9 +156,6 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteLike(Long filmId, Long userId) {
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         int rowsUpdated = jdbcTemplate.update(sql, filmId, userId);
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("Invalid User ID:  " + userId);
-        }
         addEvent(userId, "LIKE", "REMOVE", filmId);
     }
 
@@ -220,23 +211,17 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Genre> getAllGenres() {
         String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return Genre.builder().id(rs.getLong("genre_id")).name(rs.getString("genre_name")).build();
-        });
+        return jdbcTemplate.query(sql, new GenreRowMapper());
     }
 
     @Override
     public Genre getGenresById(Long id) {
-        Genre genre;
-        SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT * FROM genres WHERE genre_id = ?", id);
-        if (genreRows.next()) {
-            genre = Genre.builder().id(genreRows.getLong("genre_id")).name(genreRows.getString("genre_name")).build();
-            log.info("Genre found: {} {}", id, genreRows.getString("genre_name"));
-        } else {
-            log.info("Invalid Genre ID: {}", id);
-            throw new NotFoundException("Invalid Genre ID:  " + id);
-        }
-        return genre;
+        String sql = "SELECT * FROM genres WHERE genre_id = ?";
+        return jdbcTemplate
+                .query(sql, new GenreRowMapper(), id)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Genre with id = " + id + " not found"));
     }
 
     @Override
@@ -276,20 +261,19 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlDeleteDirector, film.getId());
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            List<Director> list = film.getDirectors().stream().distinct().collect(Collectors.toList());
-            film.setDirectors(list);
-            for (Director director : list) {
+            LinkedHashSet<Director> set = film.getDirectors();
+            film.setDirectors(set);
+            for (Director director : set) {
                 String sqlDirectors = "INSERT INTO films_directors (film_id, director_id) VALUES (?, ?)";
                 jdbcTemplate.update(sqlDirectors, film.getId(), director.getId());
             }
         }
     }
 
-    static List<Director> getDirectorsFromDataBase(Long id) {
+    static LinkedHashSet<Director> getDirectorsFromDataBase(Long id) {
         String sql = "SELECT * FROM directors WHERE director_id IN (SELECT director_id FROM films_directors WHERE " +
                 "film_id = ?)";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> Director.builder().id(rs.getLong("director_id"))
-                .name(rs.getString("director_name")).build(), id);
+        return new LinkedHashSet<>(jdbcTemplate.query(sql, new DirectorRowMapper(), id));
     }
 
     /**
@@ -376,26 +360,8 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * ALG_3
      */
-    private void checkContainsUserInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("ALG_3. User found: {}", id);
-        } else {
-            log.info("ALG_3. User not found: {}", id);
-            throw new NotFoundException("ALG_3. User not found: " + id);
-        }
-    }
-
-    /**
-     * ALG_3
-     */
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        if (Objects.equals(userId, friendId)) {
-            throw new IllegalArgumentException("ALG_3. UserId and friendId must not be the same: " + userId + "=" + friendId);
-        }
-        checkContainsUserInDatabase(userId);
-
         String sql = "SELECT F.FILM_ID, F.name, F.description, F.release_date, F.duration, COUNT(user_id) " +
                 "FROM FILMS f LEFT JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
                 "WHERE F.FILM_ID IN (SELECT FILM_ID " +
@@ -407,7 +373,6 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY FILM_ID) " +
                 "GROUP BY F.FILM_ID " +
                 "ORDER BY COUNT(user_id) DESC";
-
 
         List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), userId, friendId);
 
