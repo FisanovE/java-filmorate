@@ -20,15 +20,15 @@ public class GenreController {
     private final GenreService filmService;
 
     @GetMapping
-    public Collection<Genre> getAllGenres() {
+    public Collection<Genre> getAll() {
         log.info("Get genres");
-        return filmService.getAllGenres();
+        return filmService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Genre getGenresById(@PathVariable(required = false) Long id) {
+    public Genre getById(@PathVariable(required = false) Long id) {
         log.info("Get genre {}", id);
-        return filmService.getGenresById(id);
+        return filmService.getById(id);
     }
 
 }

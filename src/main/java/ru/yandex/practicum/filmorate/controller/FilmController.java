@@ -24,30 +24,30 @@ public class FilmController {
     private final ValidateService validateService;
 
     @PostMapping
-    public Film addNewFilm(@RequestBody Film film) {
+    public Film create(@RequestBody Film film) {
         validateService.checkingFilmForValid(film);
         log.info("Create film");
-        return filmService.addNewFilm(film);
+        return filmService.create(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film update(@RequestBody Film film) {
         validateService.checkIdNotNull(film.getId());
         validateService.checkingFilmForValid(film);
         log.info("Update film {}", film.getId());
-        return filmService.updateFilm(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable(required = false) Long id) {
+    public Film getById(@PathVariable(required = false) Long id) {
         log.info("Get film {}", id);
-        return filmService.getFilmById(id);
+        return filmService.getById(id);
     }
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAll() {
         log.info("Get films");
-        return filmService.getAllFilms();
+        return filmService.getAll();
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -121,8 +121,8 @@ public class FilmController {
      * ALG_6
      */
     @DeleteMapping("/{id}")
-    public void deleteFilmById(@PathVariable Long id) {
-        filmService.deleteFilm(id);
+    public void delete(@PathVariable Long id) {
+        filmService.delete(id);
         log.info("Delete film {}", id);
     }
 

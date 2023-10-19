@@ -18,7 +18,7 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
 
-    public Film addNewFilm(Film film) {
+    public Film create(Film film) {
         if (film.getMpa() != null) {
             validateService.checkContainsMpaInDatabase(film.getMpa().getId());
         }
@@ -35,10 +35,10 @@ public class FilmService {
             }
         }
 
-        return filmStorage.addNewFilm(film);
+        return filmStorage.create(film);
     }
 
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         validateService.checkContainsFilmInDatabase(film.getId());
         if (film.getMpa() != null) {
             validateService.checkContainsMpaInDatabase(film.getMpa().getId());
@@ -55,16 +55,25 @@ public class FilmService {
                 validateService.checkContainsDirectorInDatabase(director.getId());
             }
         }
-        return filmStorage.updateFilm(film);
+        filmStorage.update(film);
+        return film;
     }
 
-    public Film getFilmById(Long filmId) {
+    public Film getById(Long filmId) {
         validateService.checkContainsFilmInDatabase(filmId);
-        return filmStorage.getFilmById(filmId);
+        return filmStorage.getById(filmId);
     }
 
-    public Collection<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+    public Collection<Film> getAll() {
+        return filmStorage.getAll();
+    }
+
+    /**
+     * ALG_6
+     */
+    public void delete(Long id) {
+        validateService.checkContainsFilmInDatabase(id);
+        filmStorage.delete(id);
     }
 
     public void addLike(Long id, Long userId) {
@@ -103,14 +112,6 @@ public class FilmService {
      */
     public Collection<Film> searchFilms(String query, String by) {
         return filmStorage.searchFilms(query, by);
-    }
-
-    /**
-     * ALG_6
-     */
-    public void deleteFilm(Long id) {
-        validateService.checkContainsFilmInDatabase(id);
-        filmStorage.deleteFilm(id);
     }
 
     /**

@@ -15,11 +15,11 @@ public class MpaService {
     private final FilmStorage filmStorage;
     private final ValidateService validateService;
 
-    public Collection<Mpa> getAllRatingsMpa() {
+    public Collection<Mpa> getAll() {
         return filmStorage.getAllRatingsMpa();
     }
 
-    public Mpa getRatingsMpaById(Long id) {
+    public Mpa getById(Long id) {
         validateService.checkContainsMpaInDatabase(id);
         return filmStorage.getRatingsMpaById(id);
     }

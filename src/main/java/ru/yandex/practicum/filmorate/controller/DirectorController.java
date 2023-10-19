@@ -22,33 +22,33 @@ public class DirectorController {
     private final DirectorService directorService;
 
     @PostMapping
-    public Director addNewDirector(@RequestBody Director director) {
+    public Director create(@RequestBody Director director) {
         log.info("Create director");
-        return directorService.addNewDirector(director);
+        return directorService.create(director);
     }
 
     @PutMapping
-    public Director updateDirector(@RequestBody Director director) {
+    public Director update(@RequestBody Director director) {
         log.info("Update director {}", director.getId());
-        return directorService.updateDirector(director);
+        return directorService.update(director);
     }
 
     @GetMapping("/{id}")
-    public Director getDirectorById(@PathVariable Long id) {
+    public Director getById(@PathVariable Long id) {
         log.info("Get directors {}", id);
-        return directorService.getDirectorById(id);
+        return directorService.getById(id);
     }
 
     @GetMapping
-    public Collection<Director> getAllDirectors() {
+    public Collection<Director> getAll() {
         log.info("Get directors");
-        return directorService.getAllDirectors();
+        return directorService.getAll();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDirectorById(@PathVariable Long id) {
+    public void deleteById(@PathVariable Long id) {
         log.info("Delete directors {}", id);
-        directorService.deleteDirectorById(id);
+        directorService.delete(id);
     }
 
 }

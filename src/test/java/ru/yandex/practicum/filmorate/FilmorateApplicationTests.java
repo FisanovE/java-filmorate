@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.service.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,21 +24,16 @@ import java.util.*;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
-
-    @Qualifier("userDbStorage")
-    private final UserStorage userStorage;
-    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
-
-    /**
-     * ALG_7
-     */
-    @Qualifier("directorDbStorage")
-    private final DirectorStorage directorStorage;
+    private final UserService userService;
+    private final FilmService filmService;
+    private final DirectorService directorService;
+    private final GenreService genreService;
+    private final MpaService mpaService;
+    private final ReviewService reviewService;
     private User user;
     private Film film;
     private Review review;
-    private Event event;
 
     private Film createFilm() {
         film = Film.builder()
@@ -109,26 +102,15 @@ class FilmorateApplicationTests {
         return review;
     }
 
-    /*private Event createEvent(Long userId, Long filmId) {
-        event = Event.builder()
-                .eventId("everything is very bad")
-                .userId(false)
-                .eventType(userId)
-                .operation(filmId)
-                .entityId(10L)
-                .build();
-        return event;
-    }*/
-
     @Test
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового пользователя")
     void shouldAddNewUser() {
         User userNew = createUser();
 
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
 
-        List<User> list = new ArrayList<>(userStorage.getAllUsers());
+        List<User> list = new ArrayList<>(userService.getAll());
         assertThat(list).isNotEmpty().hasSize(1);
         assertThat(list.get(0).getId()).isEqualTo(userAdded.getId());
         assertThat(list.get(0).getLogin()).isEqualTo(userAdded.getLogin());
@@ -142,9 +124,9 @@ class FilmorateApplicationTests {
     @DisplayName("Получеие пользователя по ID")
     void shouldReturnUserById() {
         User userNew = createUser();
-        userStorage.addNewUser(userNew);
+        userService.create(userNew);
 
-        Optional<User> userOptional = Optional.ofNullable(userStorage.getUserById(1L));
+        Optional<User> userOptional = Optional.ofNullable(userService.getById(1L));
 
         assertThat(userOptional).isPresent()
                 .hasValueSatisfying(user -> assertThat(user).hasFieldOrPropertyWithValue("id", 1L));
@@ -155,12 +137,12 @@ class FilmorateApplicationTests {
     @DisplayName("Обновление пользователя")
     void shouldUpdateUser() {
         User userNew = createUser();
-        userStorage.addNewUser(userNew);
+        userService.create(userNew);
 
         User userUpdate = updateUser();
 
-        userStorage.updateUser(userUpdate);
-        List<User> listUpdate = new ArrayList<>(userStorage.getAllUsers());
+        userService.update(userUpdate);
+        List<User> listUpdate = new ArrayList<>(userService.getAll());
         assertThat(listUpdate).isNotEmpty().hasSize(1);
         assertThat(listUpdate.get(0).getId()).isEqualTo(userUpdate.getId());
         assertThat(listUpdate.get(0).getLogin()).isEqualTo(userUpdate.getLogin());
@@ -174,9 +156,9 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка пользователей")
     void shouldReturnListUsers() {
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
 
-        List<User> listAllUsers = new ArrayList<>(userStorage.getAllUsers());
+        List<User> listAllUsers = new ArrayList<>(userService.getAll());
 
         assertThat(listAllUsers).isNotEmpty().hasSize(1);
         assertThat(listAllUsers.get(0).getId()).isEqualTo(userAdded.getId());
@@ -191,16 +173,16 @@ class FilmorateApplicationTests {
     @DisplayName("Добавление друга")
     void shouldAddFriend() throws ValidationException {
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
         User userNew2 = createUser();
         userNew2.setLogin("Login2");
         userNew2.setEmail("mail@mail.com");
-        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded2 = userService.create(userNew2);
 
-        userStorage.addFriend(1L, 2L);
+        userService.addFriend(1L, 2L);
 
-        List<User> listUserFriends = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded.getId()));
-        List<User> listFriendFriends = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded2.getId()));
+        List<User> listUserFriends = new ArrayList<>(userService.getAllFriends(userAdded.getId()));
+        List<User> listFriendFriends = new ArrayList<>(userService.getAllFriends(userAdded2.getId()));
         assertThat(listUserFriends).isNotEmpty().hasSize(1);
         assertThat(listUserFriends.get(0).getId()).isEqualTo(userAdded2.getId());
         assertThat(listUserFriends.get(0).getLogin()).isEqualTo(userAdded2.getLogin());
@@ -216,12 +198,12 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка друзей пользователя")
     void shouldAllFriendsByUser() throws ValidationException {
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
         User userNew2 = createUser();
-        userStorage.addNewUser(userNew2);
-        userStorage.addFriend(1L, 2L);
+        userService.create(userNew2);
+        userService.addFriend(1L, 2L);
 
-        List<User> listAllFriendsOfUser = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded.getId()));
+        List<User> listAllFriendsOfUser = new ArrayList<>(userService.getAllFriends(userAdded.getId()));
 
         assertThat(listAllFriendsOfUser).isNotEmpty().hasSize(1);
     }
@@ -231,18 +213,18 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка общих друзей")
     void shouldMutualFriends() throws ValidationException {
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
         User userNew2 = createUser();
-        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded2 = userService.create(userNew2);
         User userNew3 = createUser();
         userNew3.setEmail("mail3@yandex.ru");
         userNew3.setName("NameUpdate3");
         userNew3.setLogin("LoginUpdate3");
-        User userAdded3 = userStorage.addNewUser(userNew3);
-        userStorage.addFriend(userAdded.getId(), userAdded3.getId());
-        userStorage.addFriend(userAdded2.getId(), userAdded3.getId());
+        User userAdded3 = userService.create(userNew3);
+        userService.addFriend(userAdded.getId(), userAdded3.getId());
+        userService.addFriend(userAdded2.getId(), userAdded3.getId());
 
-        List<User> listMutualFriends = new ArrayList<>(userStorage.getMutualFriends(userAdded.getId(), userAdded2.getId()));
+        List<User> listMutualFriends = new ArrayList<>(userService.getMutualFriends(userAdded.getId(), userAdded2.getId()));
 
         assertThat(listMutualFriends).isNotEmpty().hasSize(1);
         assertThat(listMutualFriends.get(0).getId()).isEqualTo(userAdded3.getId());
@@ -258,23 +240,23 @@ class FilmorateApplicationTests {
     void shouldDeleteFriend() throws ValidationException {
         log.info("Тест: {}", "Удаление друга");
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
         User userNew2 = createUser();
-        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded2 = userService.create(userNew2);
         User userNew3 = createUser();
         userNew3.setEmail("mail3@yandex.ru");
         userNew3.setName("NameUpdate3");
         userNew3.setLogin("LoginUpdate3");
-        User userAdded3 = userStorage.addNewUser(userNew3);
-        userStorage.addFriend(userAdded.getId(), userAdded3.getId());
-        userStorage.addFriend(userAdded2.getId(), userAdded3.getId());
+        User userAdded3 = userService.create(userNew3);
+        userService.addFriend(userAdded.getId(), userAdded3.getId());
+        userService.addFriend(userAdded2.getId(), userAdded3.getId());
 
-        userStorage.deleteFriend(userAdded.getId(), userAdded2.getId());
-        userStorage.deleteFriend(userAdded.getId(), userAdded3.getId());
+        userService.deleteFriend(userAdded.getId(), userAdded2.getId());
+        userService.deleteFriend(userAdded.getId(), userAdded3.getId());
 
 
-        List<User> list1AfterDeleteFriend = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded.getId()));
-        List<User> list2AfterDeleteFriend = new ArrayList<>(userStorage.getAllFriendsOfUser(userAdded3.getId()));
+        List<User> list1AfterDeleteFriend = new ArrayList<>(userService.getAllFriends(userAdded.getId()));
+        List<User> list2AfterDeleteFriend = new ArrayList<>(userService.getAllFriends(userAdded3.getId()));
         assertThat(list1AfterDeleteFriend).isEmpty();
         assertThat(list2AfterDeleteFriend).isEmpty();
     }
@@ -284,8 +266,8 @@ class FilmorateApplicationTests {
     @DisplayName("Добавление нового фильма")
     void shouldAddNewFilm() {
         Film filmNew = createFilm();
-        Film filmAdded = filmStorage.addNewFilm(filmNew);
-        List<Film> films = new ArrayList<>(filmStorage.getAllFilms());
+        Film filmAdded = filmService.create(filmNew);
+        List<Film> films = new ArrayList<>(filmService.getAll());
         assertThat(films).isNotEmpty().hasSize(1);
         assertThat(films.get(0).getId()).isEqualTo(filmAdded.getId());
         assertThat(films.get(0).getName()).isEqualTo(filmAdded.getName());
@@ -302,12 +284,12 @@ class FilmorateApplicationTests {
     @DisplayName("Обновление фильма ")
     void shouldUpdateFilm() {
         Film filmNew = createFilm();
-        Film filmAdded = filmStorage.addNewFilm(filmNew);
+        Film filmAdded = filmService.create(filmNew);
         Film filmUpdate = updateFilm();
 
-        Film filmUpdate2 = filmStorage.updateFilm(filmUpdate);
+        Film filmUpdate2 = filmService.update(filmUpdate);
 
-        List<Film> listUpdate = new ArrayList<>(filmStorage.getAllFilms());
+        List<Film> listUpdate = new ArrayList<>(filmService.getAll());
 
         assertThat(listUpdate).isNotEmpty().hasSize(1);
         assertThat(listUpdate.get(0).getId()).isEqualTo(filmUpdate2.getId());
@@ -325,8 +307,8 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка всех фильмов")
     void shouldReturnListAllFilms() {
         Film filmNew = createFilm();
-        Film filmAdded = filmStorage.addNewFilm(filmNew);
-        List<Film> listAllFilms = new ArrayList<>(filmStorage.getAllFilms());
+        Film filmAdded = filmService.create(filmNew);
+        List<Film> listAllFilms = new ArrayList<>(filmService.getAll());
         assertThat(listAllFilms).isNotEmpty().hasSize(1);
         assertThat(listAllFilms.get(0).getId()).isEqualTo(filmAdded.getId());
         assertThat(listAllFilms.get(0).getName()).isEqualTo(filmAdded.getName());
@@ -343,12 +325,12 @@ class FilmorateApplicationTests {
     @DisplayName("Добавление лайка")
     void shouldAddLike() {
         User userNew = createUser();
-        User userAdded = userStorage.addNewUser(userNew);
+        User userAdded = userService.create(userNew);
         Film filmNew = createFilm();
-        Film filmAdded = filmStorage.addNewFilm(filmNew);
-        filmStorage.addLike(filmAdded.getId(), userAdded.getId());
+        Film filmAdded = filmService.create(filmNew);
+        filmService.addLike(filmAdded.getId(), userAdded.getId());
 
-        List<Film> films = new ArrayList<>(filmStorage.getTopRatingFilms(10));
+        List<Film> films = new ArrayList<>(filmService.getTopRatingFilms(10));
 
         assertThat(films).isNotEmpty().hasSize(1);
         assertThat(films.get(0).getId()).isEqualTo(filmAdded.getId());
@@ -369,26 +351,26 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка лучших фильмов")
     void shouldReturnTopRatingFilms() {
         User userNew1 = createUser();
-        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded1 = userService.create(userNew1);
         User userNew2 = createUser();
-        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded2 = userService.create(userNew2);
         User userNew3 = createUser();
-        User userAdded3 = userStorage.addNewUser(userNew3);
+        User userAdded3 = userService.create(userNew3);
         Film filmNew1 = createFilm();
         Film filmNew2 = createFilm();
         Film filmNew3 = createFilm();
         filmNew2.setName("Name Film2");
         filmNew3.setName("Name Film3");
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
-        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
-        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
-        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded3.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded3.getId());
+        Film filmAdded1 = filmService.create(filmNew1);
+        Film filmAdded2 = filmService.create(filmNew2);
+        Film filmAdded3 = filmService.create(filmNew3);
+        filmService.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded3.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded3.getId());
 
-        List<Film> films = new ArrayList<>(filmStorage.getTopRatingFilms(10));
+        List<Film> films = new ArrayList<>(filmService.getTopRatingFilms(10));
 
         assertThat(films).isNotEmpty().hasSize(3);
 
@@ -422,9 +404,9 @@ class FilmorateApplicationTests {
         Film filmNew4 = createFilm();
         filmNew4.setName("Name Film4");
         filmNew4.setGenres(new LinkedHashSet<>(List.of(Genre.builder().id(1L).name("Комедия").build())));
-        Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
+        Film filmAdded4 = filmService.create(filmNew4);
 
-        List<Film> filmsByGenre = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 1L, -1));
+        List<Film> filmsByGenre = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, 1L, -1));
 
         assertThat(filmsByGenre).isNotEmpty().hasSize(1);
         assertThat(filmsByGenre.get(0).getId()).isEqualTo(filmAdded4.getId());
@@ -439,9 +421,9 @@ class FilmorateApplicationTests {
         Film filmNew5 = createFilm();
         filmNew5.setName("Name Film5");
         filmNew5.setReleaseDate(LocalDate.of(2020, 01, 01));
-        Film filmAdded5 = filmStorage.addNewFilm(filmNew5);
+        Film filmAdded5 = filmService.create(filmNew5);
 
-        List<Film> filmsByYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, -1, 2020));
+        List<Film> filmsByYear = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, -1, 2020));
 
         assertThat(filmsByYear).isNotEmpty().hasSize(1);
         assertThat(filmsByYear.get(0).getId()).isEqualTo(filmAdded5.getId());
@@ -457,9 +439,9 @@ class FilmorateApplicationTests {
         filmNew6.setName("Name Film5");
         filmNew6.setReleaseDate(LocalDate.of(2021, 01, 01));
         filmNew6.setGenres(new LinkedHashSet<>(List.of(Genre.builder().id(2L).name("Драма").build())));
-        Film filmAdded6 = filmStorage.addNewFilm(filmNew6);
+        Film filmAdded6 = filmService.create(filmNew6);
 
-        List<Film> filmsByGenreAndYear = new ArrayList<>(filmStorage.getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
+        List<Film> filmsByGenreAndYear = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
 
         assertThat(filmsByGenreAndYear).isNotEmpty().hasSize(1);
         assertThat(filmsByGenreAndYear.get(0).getId()).isEqualTo(filmAdded6.getId());
@@ -477,17 +459,17 @@ class FilmorateApplicationTests {
     @DisplayName("Удаление лайка")
     void shouldDeleteLike() {
         User userNew1 = createUser();
-        User userAdded1 = userStorage.addNewUser(userNew1);
+        User userAdded1 = userService.create(userNew1);
         Film filmNew1 = createFilm();
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
+        Film filmAdded1 = filmService.create(filmNew1);
         Film filmNew2 = createFilm();
-        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
-        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
+        Film filmAdded2 = filmService.create(filmNew2);
+        filmService.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded1.getId());
 
-        filmStorage.deleteLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.deleteLike(filmAdded1.getId(), userAdded1.getId());
 
-        List<Film> films = new ArrayList<>(filmStorage.getTopRatingFilms(10));
+        List<Film> films = new ArrayList<>(filmService.getTopRatingFilms(10));
         assertThat(films.get(0).getId()).isEqualTo(filmAdded2.getId());
         assertThat(films.get(1).getId()).isEqualTo(filmAdded1.getId());
     }
@@ -496,7 +478,7 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех жанров")
     void shouldReturnListAllGenres() {
-        List<Genre> genres = new ArrayList<>(filmStorage.getAllGenres());
+        List<Genre> genres = new ArrayList<>(genreService.getAll());
 
         assertThat(genres).isNotEmpty();
         assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "Комедия");
@@ -506,7 +488,7 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Получение жанра по ID")
     void shouldReturnGenresById() {
-        Genre genre = filmStorage.getGenresById(2L);
+        Genre genre = genreService.getById(2L);
         assertThat(genre).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "Драма");
     }
 
@@ -514,7 +496,7 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех рейтингов МРА")
     void shouldReturnListAllRatingsMpa() {
-        List<Mpa> ratings = new ArrayList<>(filmStorage.getAllRatingsMpa());
+        List<Mpa> ratings = new ArrayList<>(mpaService.getAll());
 
         assertThat(ratings).isNotEmpty();
         assertThat(ratings.get(0)).hasFieldOrPropertyWithValue("id", 1L).hasFieldOrPropertyWithValue("name", "G");
@@ -524,7 +506,7 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Получение рейтинга МРА по ID")
     void shouldReturnRatingsMpaById() {
-        Mpa mpa = filmStorage.getRatingsMpaById(2L);
+        Mpa mpa = mpaService.getById(2L);
         assertThat(mpa).hasFieldOrPropertyWithValue("id", 2L).hasFieldOrPropertyWithValue("name", "PG");
     }
 
@@ -534,8 +516,8 @@ class FilmorateApplicationTests {
     void reviewDbStorageTest() {
         User user = createUser();
         User user2 = createUser();
-        userStorage.addNewUser(user);
-        userStorage.addNewUser(user2);
+        userService.create(user);
+        userService.create(user2);
         Film film = createFilm();
         Review reviewMain = Review.builder()
                 .content("True")
@@ -544,16 +526,16 @@ class FilmorateApplicationTests {
                 .filmId(film.getId())
                 .build();
 
-        Review addedReview = filmStorage.addNewReview(reviewMain);
+        Review addedReview = filmStorage.createReview(reviewMain);
         reviewMain.setContent("False");
         reviewMain.setIsPositive(false);
         filmStorage.updateReview(reviewMain);
-        Review reviewInDb = filmStorage.getReviewById(1L);
+        Review reviewInDb = reviewService.getById(1L);
         List<Review> reviews = filmStorage.getAllReviews();
-        filmStorage.addLikeByReview(1L, 1L);
-        filmStorage.addDislikeByReview(1L, 2L);
-        filmStorage.deleteLikeByReview(1L, 1L);
-        filmStorage.deleteDislikeByReview(1L, 2L);
+        reviewService.addLike(1L, 1L);
+        reviewService.addDislike(1L, 2L);
+        reviewService.deleteLike(1L, 1L);
+        reviewService.deleteDislike(1L, 2L);
 
         assertAll("Отзывы работают не правильно: ",
                 () -> assertEquals(addedReview.getReviewId(), 1L, "addNewReview работает не правильно"),
@@ -572,8 +554,8 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового режиссёра")
     void shouldAddNewDirector() {
-        Director director = directorStorage.addNewDirector(createDirector());
-        List<Director> genres = new ArrayList<>(directorStorage.getAllDirectors());
+        Director director = directorService.create(createDirector());
+        List<Director> genres = new ArrayList<>(directorService.getAll());
 
         assertThat(genres).isNotEmpty();
         assertThat(genres.get(0)).hasFieldOrPropertyWithValue("id", director.getId())
@@ -588,11 +570,11 @@ class FilmorateApplicationTests {
     @DisplayName("Обновление режиссёра")
     void shouldUpdateDirector() {
         Director director = createDirector();
-        Director addedDirector = directorStorage.addNewDirector(director);
+        Director addedDirector = directorService.create(director);
         addedDirector.setName("UpdateDirector");
-        directorStorage.updateDirector(addedDirector);
+        directorService.update(addedDirector);
 
-        Director director2 = directorStorage.getDirectorById(addedDirector.getId());
+        Director director2 = directorService.getById(addedDirector.getId());
         assertThat(director2).hasFieldOrPropertyWithValue("id", addedDirector.getId())
                 .hasFieldOrPropertyWithValue("name", addedDirector.getName());
     }
@@ -604,9 +586,9 @@ class FilmorateApplicationTests {
     @Sql({"/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех режиссёров")
     void shouldReturnListAllDirectors() {
-        Director director = directorStorage.addNewDirector(Director.builder().id(1L).name("NewDirector").build());
+        Director director = directorService.create(Director.builder().id(1L).name("NewDirector").build());
 
-        List<Director> allDirectors = new ArrayList<>(directorStorage.getAllDirectors());
+        List<Director> allDirectors = new ArrayList<>(directorService.getAll());
 
         assertThat(allDirectors).isNotEmpty();
         assertThat(allDirectors.get(0)).hasFieldOrPropertyWithValue("id", director.getId())
@@ -621,8 +603,8 @@ class FilmorateApplicationTests {
     @DisplayName("Получение режиссёра по ID")
     void shouldReturnDirectorById() {
         Director director = createDirector();
-        Director directorAdded = directorStorage.addNewDirector(director);
-        Director directorReturn = directorStorage.getDirectorById(directorAdded.getId());
+        Director directorAdded = directorService.create(director);
+        Director directorReturn = directorService.getById(directorAdded.getId());
         assertThat(directorReturn).hasFieldOrPropertyWithValue("id", directorAdded.getId())
                 .hasFieldOrPropertyWithValue("name", directorAdded.getName());
     }
@@ -635,9 +617,9 @@ class FilmorateApplicationTests {
     @DisplayName("Удаление режиссёра по ID")
     void shouldDeleteDirectorById() {
         Director director = createDirector();
-        Director directorAdded = directorStorage.addNewDirector(director);
-        directorStorage.deleteDirectorById(directorAdded.getId());
-        List<Director> directors = new ArrayList<>(directorStorage.getAllDirectors());
+        Director directorAdded = directorService.create(director);
+        directorService.delete(directorAdded.getId());
+        List<Director> directors = new ArrayList<>(directorService.getAll());
 
         assertThat(directors).isEmpty();
     }
@@ -666,7 +648,7 @@ class FilmorateApplicationTests {
         for (long i = 1; i <= filmTitles.size(); i++) {
             film = createFilm();
             film.setName(filmTitles.get((int) i - 1));
-            filmStorage.addNewFilm(film);
+            filmService.create(film);
 
             film.setId(i);
             film.setGenres(new LinkedHashSet<>());
@@ -676,20 +658,20 @@ class FilmorateApplicationTests {
         for (String name : userNames) {
             user = createUser();
             user.setName(name);
-            userStorage.addNewUser(user);
+            userService.create(user);
         }
-        filmStorage.addLike(1L, 1L);
-        filmStorage.addLike(2L, 1L);
-        filmStorage.addLike(2L, 2L);
-        filmStorage.addLike(3L, 2L);
-        filmStorage.addLike(1L, 3L);
-        filmStorage.addLike(2L, 3L);
-        filmStorage.addLike(4L, 3L);
-        filmStorage.addLike(5L, 3L);
-        filmStorage.addLike(6L, 3L);
-        filmStorage.addLike(7L, 4L);
+        filmService.addLike(1L, 1L);
+        filmService.addLike(2L, 1L);
+        filmService.addLike(2L, 2L);
+        filmService.addLike(3L, 2L);
+        filmService.addLike(1L, 3L);
+        filmService.addLike(2L, 3L);
+        filmService.addLike(4L, 3L);
+        filmService.addLike(5L, 3L);
+        filmService.addLike(6L, 3L);
+        filmService.addLike(7L, 4L);
 
-        List<Film> filmsRecommendations = new ArrayList<>(userStorage.getFilmsRecommendationsForUser(1L));
+        List<Film> filmsRecommendations = new ArrayList<>(userService.getFilmsRecommendationsForUser(1L));
         films = List.of(films.get(3), films.get(4), films.get(5), films.get(2));
         assertThat(filmsRecommendations.get(0).getId()).isEqualTo(films.get(0).getId());
         assertThat(filmsRecommendations.get(1).getId()).isEqualTo(films.get(1).getId());
@@ -711,10 +693,10 @@ class FilmorateApplicationTests {
         Film filmNew2 = createFilm();
         Film filmNew3 = createFilm();
         Director director = createDirector();
-        User userAdded1 = userStorage.addNewUser(userNew1);
-        User userAdded2 = userStorage.addNewUser(userNew2);
-        User userAdded3 = userStorage.addNewUser(userNew3);
-        Director directorAdded = directorStorage.addNewDirector(director);
+        User userAdded1 = userService.create(userNew1);
+        User userAdded2 = userService.create(userNew2);
+        User userAdded3 = userService.create(userNew3);
+        Director directorAdded = directorService.create(director);
         filmNew2.setName("Name Film2");
         filmNew3.setName("Name Film3");
         filmNew2.setReleaseDate(LocalDate.parse("2021-08-20"));
@@ -727,18 +709,18 @@ class FilmorateApplicationTests {
         filmNew1.setGenres(new LinkedHashSet<>());
         filmNew2.setGenres(new LinkedHashSet<>());
         filmNew3.setGenres(new LinkedHashSet<>());
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
-        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
-        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
-        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded3.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
+        Film filmAdded1 = filmService.create(filmNew1);
+        Film filmAdded2 = filmService.create(filmNew2);
+        Film filmAdded3 = filmService.create(filmNew3);
+        filmService.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded3.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded3.getId(), userAdded1.getId());
 
-        List<Film> filmsSortByLikes = new ArrayList<>(filmStorage.getAllFilmsByDirector(directorAdded.getId(), "likes"));
-        List<Film> filmsSortByYear = new ArrayList<>(filmStorage.getAllFilmsByDirector(directorAdded.getId(), "year"));
+        List<Film> filmsSortByLikes = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), "likes"));
+        List<Film> filmsSortByYear = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), "year"));
 
         assertThat(filmsSortByLikes).isNotEmpty().hasSize(3);
         assertThat(filmsSortByLikes.get(0).getId()).isEqualTo(filmAdded1.getId());
@@ -762,9 +744,9 @@ class FilmorateApplicationTests {
         User userNew1 = createUser();
         User userNew2 = createUser();
         User userNew3 = createUser();
-        User userAdded1 = userStorage.addNewUser(userNew1);
-        User userAdded2 = userStorage.addNewUser(userNew2);
-        User userAdded3 = userStorage.addNewUser(userNew3);
+        User userAdded1 = userService.create(userNew1);
+        User userAdded2 = userService.create(userNew2);
+        User userAdded3 = userService.create(userNew3);
         Film filmNew1 = createFilm();
         Film filmNew2 = createFilm();
         Film filmNew3 = createFilm();
@@ -772,8 +754,8 @@ class FilmorateApplicationTests {
         Director director2 = createDirector();
         director1.setName("David Lynch");
         director2.setName("John Cassavetes");
-        Director directorAdded1 = directorStorage.addNewDirector(director1);
-        Director directorAdded2 = directorStorage.addNewDirector(director2);
+        Director directorAdded1 = directorService.create(director1);
+        Director directorAdded2 = directorService.create(director2);
         filmNew1.setGenres(new LinkedHashSet<>());
         filmNew2.setGenres(new LinkedHashSet<>());
         filmNew3.setGenres(new LinkedHashSet<>());
@@ -786,20 +768,20 @@ class FilmorateApplicationTests {
         set2.add(directorAdded2);
         filmNew3.setDirectors(set2);
         filmNew2.setDirectors(new LinkedHashSet<>());
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
-        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
-        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
-        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded3.getId());
-        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded3.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
+        Film filmAdded1 = filmService.create(filmNew1);
+        Film filmAdded2 = filmService.create(filmNew2);
+        Film filmAdded3 = filmService.create(filmNew3);
+        filmService.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded3.getId());
+        filmService.addLike(filmAdded3.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded3.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded1.getId());
 
-        List<Film> filmsSearchByDirector = new ArrayList<>(filmStorage.searchFilms("aV", "director"));
-        List<Film> filmsSearchByTitle = new ArrayList<>(filmStorage.searchFilms("aV", "title"));
-        List<Film> filmsSearchByTitleAndDirector = new ArrayList<>(filmStorage.searchFilms("aV", "title,director"));
-        List<Film> filmsSearchByDirectorAndTitle = new ArrayList<>(filmStorage.searchFilms("aV", "director,title"));
+        List<Film> filmsSearchByDirector = new ArrayList<>(filmService.searchFilms("aV", "director"));
+        List<Film> filmsSearchByTitle = new ArrayList<>(filmService.searchFilms("aV", "title"));
+        List<Film> filmsSearchByTitleAndDirector = new ArrayList<>(filmService.searchFilms("aV", "title,director"));
+        List<Film> filmsSearchByDirectorAndTitle = new ArrayList<>(filmService.searchFilms("aV", "director,title"));
 
         assertThat(filmsSearchByDirector).isNotEmpty().hasSize(2);
         assertThat(filmsSearchByDirector.get(0).getId()).isEqualTo(filmAdded3.getId());
@@ -831,9 +813,9 @@ class FilmorateApplicationTests {
         User userNew1 = createUser();
         User userNew2 = createUser();
         User userNew3 = createUser();
-        User userAdded1 = userStorage.addNewUser(userNew1);
-        User userAdded2 = userStorage.addNewUser(userNew2);
-        User userAdded3 = userStorage.addNewUser(userNew3);
+        User userAdded1 = userService.create(userNew1);
+        User userAdded2 = userService.create(userNew2);
+        User userAdded3 = userService.create(userNew3);
         Film filmNew1 = createFilm();
         Film filmNew2 = createFilm();
         Film filmNew3 = createFilm();
@@ -853,23 +835,23 @@ class FilmorateApplicationTests {
         filmNew3.setDirectors(new LinkedHashSet<>());
         filmNew4.setDirectors(new LinkedHashSet<>());
         filmNew5.setDirectors(new LinkedHashSet<>());
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
-        Film filmAdded2 = filmStorage.addNewFilm(filmNew2);
-        Film filmAdded3 = filmStorage.addNewFilm(filmNew3);
-        Film filmAdded4 = filmStorage.addNewFilm(filmNew4);
-        Film filmAdded5 = filmStorage.addNewFilm(filmNew5);
-        filmStorage.addLike(filmAdded4.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded4.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded4.getId(), userAdded3.getId());
-        filmStorage.addLike(filmAdded3.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded3.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded1.getId());
-        filmStorage.addLike(filmAdded2.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded1.getId(), userAdded2.getId());
-        filmStorage.addLike(filmAdded5.getId(), userAdded3.getId());
-        userStorage.addFriend(1L, 2L);
+        Film filmAdded1 = filmService.create(filmNew1);
+        Film filmAdded2 = filmService.create(filmNew2);
+        Film filmAdded3 = filmService.create(filmNew3);
+        Film filmAdded4 = filmService.create(filmNew4);
+        Film filmAdded5 = filmService.create(filmNew5);
+        filmService.addLike(filmAdded4.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded4.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded4.getId(), userAdded3.getId());
+        filmService.addLike(filmAdded3.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded3.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded1.getId());
+        filmService.addLike(filmAdded2.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded1.getId(), userAdded2.getId());
+        filmService.addLike(filmAdded5.getId(), userAdded3.getId());
+        userService.addFriend(1L, 2L);
 
-        List<Film> films = new ArrayList<>(filmStorage.getCommonFilms(1L, 2L));
+        List<Film> films = new ArrayList<>(filmService.getCommonFilms(1L, 2L));
 
         assertThat(films).isNotEmpty().hasSize(3);
         assertThat(films.get(0).getId()).isEqualTo(filmAdded4.getId());
@@ -906,22 +888,22 @@ class FilmorateApplicationTests {
     public void shoulReturnListEvents() {
         User userNew1 = createUser();
         User userNew2 = createUser();
-        User userAdded1 = userStorage.addNewUser(userNew1);
-        User userAdded2 = userStorage.addNewUser(userNew2);
+        User userAdded1 = userService.create(userNew1);
+        User userAdded2 = userService.create(userNew2);
         Film filmNew1 = createFilm();
-        Film filmAdded1 = filmStorage.addNewFilm(filmNew1);
-        filmStorage.addLike(filmAdded1.getId(), userAdded1.getId());
-        filmStorage.deleteLike(filmAdded1.getId(), userAdded1.getId());
-        userStorage.addFriend(userAdded1.getId(), userAdded2.getId());
-        userStorage.deleteFriend(userAdded1.getId(), userAdded2.getId());
+        Film filmAdded1 = filmService.create(filmNew1);
+        filmService.addLike(filmAdded1.getId(), userAdded1.getId());
+        filmService.deleteLike(filmAdded1.getId(), userAdded1.getId());
+        userService.addFriend(userAdded1.getId(), userAdded2.getId());
+        userService.deleteFriend(userAdded1.getId(), userAdded2.getId());
         Review reviewNew = createReview(userAdded1.getId(), filmAdded1.getId());
         Review reviewUpdate = updateReview(userAdded1.getId(), filmAdded1.getId());
-        Review reviewAdded1 = filmStorage.addNewReview(reviewNew);
+        Review reviewAdded1 = reviewService.create(reviewNew);
         reviewUpdate.setReviewId(reviewAdded1.getReviewId());
-        filmStorage.updateReview(reviewUpdate);
-        filmStorage.deleteReview(reviewUpdate.getReviewId());
+        reviewService.update(reviewUpdate);
+        reviewService.delete(reviewUpdate.getReviewId());
 
-        List<Event> events = new ArrayList<>(userStorage.getEvents(userNew1.getId()));
+        List<Event> events = new ArrayList<>(userService.getEvents(userNew1.getId()));
 
         assertThat(events).isNotEmpty().hasSize(7);
         assertThat(events.get(0).getEventId()).isEqualTo(1L);

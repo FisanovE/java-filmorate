@@ -36,7 +36,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film addNewFilm(Film film) {
+    public Film create(Film film) {
         String sqlRequest = "INSERT INTO films (name, description, release_date, duration) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -59,18 +59,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public void update(Film film) {
         String sqlRequest = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ? " + "WHERE film_id = ?";
         jdbcTemplate.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getId());
         setMpaInDataBase(film);
         setGenreInDataBase(film);
         film.setGenres(getGenresFromDataBase(film.getId()));
         setDirectorInDataBase(film);
-        return film;
     }
 
     @Override
-    public Film getFilmById(Long id) {
+    public Film getById(Long id) {
         String sql = "SELECT * FROM films WHERE film_id = ?";
         Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
         film.setMpa(getMpaFromDataBase(id));
@@ -80,7 +79,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAll() {
         String sql = "SELECT * FROM films ORDER BY film_id";
         List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
         for (Film film : films) {
@@ -89,6 +88,15 @@ public class FilmDbStorage implements FilmStorage {
             film.setDirectors(getDirectorsFromDataBase(film.getId()));
         }
         return films;
+    }
+
+    /**
+     * ALG_6
+     */
+    @Override
+    public void delete(Long filmId) {
+        String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
     }
 
     private void setMpaInDataBase(Film film) {
@@ -221,15 +229,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.queryForObject(sql, new MpaRowMapper(), id);
     }
 
-    /**
-     * ALG_6
-     */
-    @Override
-    public void deleteFilm(Long filmId) {
-        String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
-        jdbcTemplate.update(sqlQuery, filmId);
-    }
-
     private void setDirectorInDataBase(Film film) {
         String sqlDeleteDirector = "DELETE FROM films_directors WHERE film_id = ?";
         jdbcTemplate.update(sqlDeleteDirector, film.getId());
@@ -352,7 +351,7 @@ public class FilmDbStorage implements FilmStorage {
      * ALG_1
      */
     @Override
-    public Review addNewReview(Review review) {
+    public Review createReview(Review review) {
         if (review.getReviewId() != null) throw new ValidationException("Поле id у отзыва не пустое");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         simpleJdbcInsert.withTableName("reviews").usingGeneratedKeyColumns("review_id");

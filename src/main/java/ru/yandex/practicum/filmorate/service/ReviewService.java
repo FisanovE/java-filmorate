@@ -20,14 +20,14 @@ public class ReviewService {
     private final FilmStorage filmStorage;
     private final ValidateService validateService;
 
-    public Review addNewReviews(Review review) {
+    public Review create(Review review) {
         validateService.checkReview(review);
         validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsUserInDatabase(review.getFilmId());
-        return filmStorage.addNewReview(review);
+        return filmStorage.createReview(review);
     }
 
-    public Review updateReview(Review review) {
+    public Review update(Review review) {
         validateService.checkContainsReviewInDatabase(review.getReviewId());
         validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsUserInDatabase(review.getFilmId());
@@ -35,17 +35,17 @@ public class ReviewService {
         return filmStorage.updateReview(review);
     }
 
-    public void deleteReview(Long reviewId) {
+    public void delete(Long reviewId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         filmStorage.deleteReview(reviewId);
     }
 
-    public Review getReviewById(Long reviewId) {
+    public Review getById(Long reviewId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         return filmStorage.getReviewById(reviewId);
     }
 
-    public List<Review> getReviewsByFilmId(Long filmId, Integer count) {
+    public List<Review> getByFilmId(Long filmId, Integer count) {
         return filmStorage.getAllReviews()
                 .stream()
                 .filter(review -> (filmId == 0 || Objects.equals(review.getFilmId(), filmId)))
@@ -54,25 +54,25 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public void addLikeByReview(Long reviewId, Long userId) {
+    public void addLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
         filmStorage.addLikeByReview(reviewId, userId);
     }
 
-    public void addDislikeByReview(Long reviewId, Long userId) {
+    public void addDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
         filmStorage.addDislikeByReview(reviewId, userId);
     }
 
-    public void deleteLikeByReview(Long reviewId, Long userId) {
+    public void deleteLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
         filmStorage.deleteLikeByReview(reviewId, userId);
     }
 
-    public void deleteDislikeByReview(Long reviewId, Long userId) {
+    public void deleteDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
         filmStorage.deleteDislikeByReview(reviewId, userId);
