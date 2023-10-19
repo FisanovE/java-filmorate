@@ -30,6 +30,7 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
+        validateService.checkContainsUserInDatabase(userId);
         return userStorage.getUserById(userId);
     }
 
@@ -48,6 +49,7 @@ public class UserService {
      * ALG_6
      */
     public void deleteUser(Long id) {
+        validateService.checkContainsUserInDatabase(id);
         userStorage.deleteUser(id);
     }
 
@@ -57,6 +59,7 @@ public class UserService {
     }
 
     public Collection<User> getAllFriendsOfUser(Long idUser) {
+        validateService.checkContainsUserInDatabase(idUser);
         return userStorage.getAllFriendsOfUser(idUser);
     }
 
@@ -78,6 +81,7 @@ public class UserService {
      * ALG_4
      */
     public List<Film> getFilmsRecommendationsForUser(Long id) {
+        validateService.checkContainsUserInDatabase(id);
         return userStorage.getFilmsRecommendationsForUser(id);
     }
 
@@ -85,7 +89,7 @@ public class UserService {
      * ALG_5
      */
     public Collection<Event> getEvent(Long userId) {
+        validateService.checkContainsUserInDatabase(userId);
         return userStorage.getEvents(userId);
     }
-
 }

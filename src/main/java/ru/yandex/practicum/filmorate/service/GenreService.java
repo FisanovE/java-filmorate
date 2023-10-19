@@ -13,12 +13,14 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class GenreService {
     private final FilmStorage filmStorage;
+    private final ValidateService validateService;
 
     public Collection<Genre> getAllGenres() {
         return filmStorage.getAllGenres();
     }
 
     public Genre getGenresById(Long id) {
+        validateService.checkContainsGenreInDatabase(id);
         return filmStorage.getGenresById(id);
     }
 

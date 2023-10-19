@@ -25,6 +25,7 @@ public class ReviewController {
      */
     @PostMapping
     public Review addNewReview(@RequestBody Review review) {
+        log.info("Create review");
         return reviewService.addNewReviews(review);
     }
 
@@ -34,6 +35,7 @@ public class ReviewController {
     @PutMapping
     public Review updateReview(@RequestBody Review review) {
         validateService.checkIdNotNull(review.getReviewId());
+        log.info("Update review {}", review.getReviewId());
         return reviewService.updateReview(review);
     }
 
@@ -42,6 +44,7 @@ public class ReviewController {
      */
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable Long id) {
+        log.info("Delete review {}", id);
         reviewService.deleteReview(id);
     }
 
@@ -50,6 +53,7 @@ public class ReviewController {
      */
     @GetMapping("/{id}")
     public Review getReviewById(@PathVariable Long id) {
+        log.info("Get review {}", id);
         return reviewService.getReviewById(id);
     }
 
@@ -58,6 +62,7 @@ public class ReviewController {
      */
     @GetMapping
     public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
+        log.info("Get reviews by filmId {}", filmId);
         return reviewService.getReviewsByFilmId(filmId, count);
     }
 
@@ -66,6 +71,7 @@ public class ReviewController {
      */
     @PutMapping("/{id}/like/{userId}")
     public void addLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("User {} added Like by Review {}", userId, id);
         reviewService.addLikeByReview(id, userId);
     }
 
@@ -74,6 +80,7 @@ public class ReviewController {
      */
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("User {} added Dislike by Review {}", userId, id);
         reviewService.addDislikeByReview(id, userId);
     }
 
@@ -82,6 +89,7 @@ public class ReviewController {
      */
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("User {} delete Like by Review {}", userId, id);
         reviewService.deleteLikeByReview(id, userId);
     }
 
@@ -90,6 +98,7 @@ public class ReviewController {
      */
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("User {} delete Dislike by Review {}", userId, id);
         reviewService.deleteDislikeByReview(id, userId);
     }
 }

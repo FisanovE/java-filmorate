@@ -59,6 +59,7 @@ public class FilmService {
     }
 
     public Film getFilmById(Long filmId) {
+        validateService.checkContainsFilmInDatabase(filmId);
         return filmStorage.getFilmById(filmId);
     }
 
@@ -86,7 +87,6 @@ public class FilmService {
      * ALG_8
      */
     public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-        log.debug("ALG_8.FilmService -> entered into service");
         return filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
     }
 
@@ -94,6 +94,7 @@ public class FilmService {
      * ALG_7
      */
     public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+        validateService.checkContainsDirectorInDatabase(id);
         return filmStorage.getAllFilmsByDirector(id, sortBy);
     }
 
@@ -108,6 +109,7 @@ public class FilmService {
      * ALG_6
      */
     public void deleteFilm(Long id) {
+        validateService.checkContainsFilmInDatabase(id);
         filmStorage.deleteFilm(id);
     }
 

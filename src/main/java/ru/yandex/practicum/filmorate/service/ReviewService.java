@@ -41,6 +41,7 @@ public class ReviewService {
     }
 
     public Review getReviewById(Long reviewId) {
+        validateService.checkContainsReviewInDatabase(reviewId);
         return filmStorage.getReviewById(reviewId);
     }
 

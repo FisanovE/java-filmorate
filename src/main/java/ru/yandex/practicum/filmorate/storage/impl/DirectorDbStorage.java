@@ -6,16 +6,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.function.UnaryOperator.identity;
 
 /**
  * ALG_7
@@ -39,8 +40,6 @@ public class DirectorDbStorage implements DirectorStorage {
 
         Long generatedId = Objects.requireNonNull(keyHolder.getKey()).longValue();
         director.setId(generatedId);
-
-        log.info("ALG_7. Director added: {} {}", director.getId(), director.getName());
         return director;
     }
 
@@ -48,38 +47,35 @@ public class DirectorDbStorage implements DirectorStorage {
     public Director updateDirector(Director director) {
         String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
         int rowsUpdated = jdbcTemplate.update(sqlUpdateDirector, director.getName(), director.getId());
-        log.info("ALG_7. Director update: {} {}", director.getId(), director.getName());
-
         return director;
     }
 
     @Override
     public Collection<Director> getAllDirectors() {
         String sqlGetAllDirectors = "SELECT * FROM directors ORDER BY director_id";
-        log.info("ALG_7. getAllDirectors in work");
         return jdbcTemplate.query(sqlGetAllDirectors, new DirectorRowMapper());
     }
 
     @Override
     public Director getDirectorById(Long id) {
-        String sqlGetDirectorById = "SELECT * FROM directors WHERE director_id = ?";
-        Director director;
-        SqlRowSet directorRows = jdbcTemplate.queryForRowSet(sqlGetDirectorById, id);
-        if (directorRows.first()) {
-            director = Director.builder().id(directorRows.getLong("director_id"))
-                    .name(directorRows.getString("director_name")).build();
-            log.info("ALG_7. Director found: {} {}", id, directorRows.getString("director_name"));
-        } else {
-            log.info("ALG_7. Invalid Director ID: {}", id);
-            throw new NotFoundException("ALG_7. Invalid Director ID:  " + id);
-        }
-        return director;
+        String sql = "SELECT * FROM directors WHERE director_id = ?";
+        return jdbcTemplate.queryForObject(sql, new DirectorRowMapper(), id);
     }
 
     @Override
     public void deleteDirectorById(Long id) {
         String sqlDeleteDirectorById = "DELETE FROM directors WHERE director_id = ?";
         int rowsUpdated = jdbcTemplate.update(sqlDeleteDirectorById, id);
-        log.info("ALG_7. Director deleted: {}", id);
+    }
+
+    public void loadDirectors(List<Film> films) {
+        final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
+        String sqlQuery = "select * from DIRECTORS d, FILMS_DIRECTORS fd " +
+                "where fd.DIRECTOR_ID = d.DIRECTOR_ID AND fd.FILM_ID in (" + inSql + ")";
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            final Film film = filmById.get(rs.getLong("FILM_ID"));
+            film.getDirectors().add(new DirectorRowMapper().mapRow(rs, 0));
+        }, films.stream().map(Film::getId).toArray());
     }
 }
