@@ -23,6 +23,7 @@ import static ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage.*;
 @Repository
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+    private DirectorDbStorage directorDbStorage;
 
     @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -53,9 +54,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         String sqlRequest = "UPDATE USERS SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
-        int rowsUpdated = jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(),
-                user.getBirthday(), user.getId());
-        log.info("User update: {} {}", user.getId(), user.getLogin());
+        jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         return user;
     }
 
@@ -66,28 +65,15 @@ public class UserDbStorage implements UserStorage {
     }
 
     public User getUserById(Long id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where user_id = ?", id);
-        if (userRows.next()) {
-            log.info("User found: {} {}", userRows.getString("user_id"), userRows.getString("name"));
-
-            return User.builder().id(userRows.getLong("user_id")).email(userRows.getString("email"))
-                    .login(userRows.getString("login")).name(userRows.getString("name"))
-                    .birthday(Objects.requireNonNull(userRows.getDate("birthday")).toLocalDate()).build();
-        } else {
-            log.info("Invalid User ID: {}", id);
-            throw new NotFoundException("Invalid User ID:  " + id);
-        }
+        String sql = "select * from users where user_id = ?";
+        return jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
     }
 
     @Override
     public void addFriend(Long idUser, Long idFriend) {
-        if (idFriend <= 0) {
-            throw new NotFoundException("Invalid User ID:  " + idFriend);
-        }
         String sqlRequest = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
-        int rowsUpdated = jdbcTemplate.update(sqlRequest, idUser, idFriend);
+        jdbcTemplate.update(sqlRequest, idUser, idFriend);
         addEvent(idUser, "FRIEND", "ADD", idFriend);
-        log.info("Added friends ID: {}", idFriend);
     }
 
 
@@ -100,16 +86,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Collection<User> getAllFriendsOfUser(Long idUser) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", idUser);
-        if (sqlRows.first()) {
-            log.info("ALG_6. User found: {}", idUser);
-        } else {
-            log.info("ALG_6. User not found: {}", idUser);
-            throw new NotFoundException("ALG_6. User not found: " + idUser);
-        }
-        String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " +
-                "ORDER BY USER_ID";
-
+        String sql = "SELECT * FROM users WHERE user_id IN (select friend_id FROM friends WHERE user_id = ?) " +
+                "ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser);
     }
 
@@ -120,7 +98,6 @@ public class UserDbStorage implements UserStorage {
                 "ORDER BY friend_id) AS ids " +
                 "GROUP BY " + "friend_id HAVING count(friend_id)>1) " +
                 "ORDER BY USER_ID";
-
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
     }
 
@@ -131,7 +108,6 @@ public class UserDbStorage implements UserStorage {
     public void deleteUser(Long id) {
         String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
-        log.info("ALG_6. User ID " + id + " deleted");
     }
 
     /**
@@ -160,8 +136,6 @@ public class UserDbStorage implements UserStorage {
             film.setGenres(getGenresFromDataBase(film.getId()));
             film.setDirectors(getDirectorsFromDataBase(film.getId()));
         }
-
-        log.info("ALG_4. Films were recommended for User with ID: " + id);
         return recommendations;
     }
 
@@ -172,7 +146,6 @@ public class UserDbStorage implements UserStorage {
         String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
                 "VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, userId, eventType, operation, entityId, System.currentTimeMillis());
-        log.info("ALG_5. Added event: User_{} {} {}_{} in time_{}", userId, operation, eventType, entityId, System.currentTimeMillis());
     }
 
     /**
@@ -191,5 +164,32 @@ public class UserDbStorage implements UserStorage {
         log.info("ALG_5. Event was given for User with ID: " + userId);
         return jdbcTemplate.query(sql, new EventRowMapper(), userId);
     }
+
+   /* @Override
+    public List<Film> getFilmsRecommendationsForUser(Long id) {
+        int filmsToRecommend = 15;
+        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
+
+        String userLikesSet = String.format("(%s)", String.join(",",
+                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
+
+        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
+                "(SELECT film_ID FROM likes WHERE user_ID IN " +
+                "(SELECT user_ID FROM likes " +
+                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
+                "GROUP BY user_ID " +
+                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
+                "LIMIT ?) fi ON f.film_ID = fi.film_ID " +
+                "LEFT JOIN films_mpa fm ON f.film_id = fm.film_id " +
+                "LEFT JOIN mpa m ON fm.mpa_id = m.mpa_id;";
+
+        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapperNew(), id, filmsToRecommend);
+
+        loadGenres(recommendations);
+        directorDbStorage.loadDirectors(recommendations);
+
+        log.info("ALG_4. Films were recommended for User with ID: " + id);
+        return recommendations;
+    }*/
 
 }

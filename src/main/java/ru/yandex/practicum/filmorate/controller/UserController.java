@@ -24,42 +24,50 @@ public class UserController {
     @PostMapping
     public User addNewUser(@RequestBody User user) {
         validateService.checkingUserForValid(user);
+        log.info("Create user");
         return userService.addNewUser(user);
     }
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
         validateService.checkIdNotNull(user.getId());
+        log.info("Update user {}", user.getId());
         return userService.updateUser(user);
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable(required = false) String id) {
+        log.info("Get user {}", id);
         return userService.getUserById(Long.parseLong(id));
     }
 
     @GetMapping
     public Collection<User> getAllUsers() {
+        log.info("Get users");
         return userService.getAllUsers();
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Update user{}, add friend {}", id, friendId);
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable(required = false) Long id, @PathVariable(required = false) Long friendId) {
+        log.info("Update user{}, delete friend {}", id, friendId);
         userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public Collection<User> getAllFriendsOfUser(@PathVariable(required = false) Long id) {
+        log.info("Get friends of user {}", id);
         return userService.getAllFriendsOfUser(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> getMutualFriends(@PathVariable(required = false) Long id, @PathVariable(required = false) Long otherId) {
+        log.info("Get mutual friends of users {} & {}", id, otherId);
         return userService.getMutualFriends(id, otherId);
     }
 
@@ -68,6 +76,7 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
+        log.info("Delete user {}", id);
         userService.deleteUser(id);
     }
 
@@ -76,6 +85,7 @@ public class UserController {
      */
     @GetMapping("/{id}/recommendations")
     public List<Film> getFilmsRecommendationsForUser(@PathVariable Long id) {
+        log.info("Get films recommendations for user {}", id);
         return userService.getFilmsRecommendationsForUser(id);
     }
 
@@ -84,6 +94,7 @@ public class UserController {
      */
     @GetMapping("/{id}/feed")
     public Collection<Event> getEvent(@PathVariable("id") Long userId) {
+        log.info("Get events of user {}", userId);
         return userService.getEvent(userId);
     }
 

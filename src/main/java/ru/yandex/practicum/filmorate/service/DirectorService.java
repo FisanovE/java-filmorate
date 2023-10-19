@@ -34,6 +34,7 @@ public class DirectorService {
     }
 
     public Director getDirectorById(Long directorId) {
+        validateService.checkContainsDirectorInDatabase(directorId);
         return directorStorage.getDirectorById(directorId);
     }
 

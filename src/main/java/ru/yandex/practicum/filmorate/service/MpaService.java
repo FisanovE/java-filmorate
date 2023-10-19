@@ -13,12 +13,14 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class MpaService {
     private final FilmStorage filmStorage;
+    private final ValidateService validateService;
 
     public Collection<Mpa> getAllRatingsMpa() {
         return filmStorage.getAllRatingsMpa();
     }
 
     public Mpa getRatingsMpaById(Long id) {
+        validateService.checkContainsMpaInDatabase(id);
         return filmStorage.getRatingsMpaById(id);
     }
 }

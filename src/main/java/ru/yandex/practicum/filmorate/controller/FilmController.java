@@ -26,6 +26,7 @@ public class FilmController {
     @PostMapping
     public Film addNewFilm(@RequestBody Film film) {
         validateService.checkingFilmForValid(film);
+        log.info("Create film");
         return filmService.addNewFilm(film);
     }
 
@@ -33,26 +34,31 @@ public class FilmController {
     public Film updateFilm(@RequestBody Film film) {
         validateService.checkIdNotNull(film.getId());
         validateService.checkingFilmForValid(film);
+        log.info("Update film {}", film.getId());
         return filmService.updateFilm(film);
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable(required = false) Long id) {
+        log.info("Get film {}", id);
         return filmService.getFilmById(id);
     }
 
     @GetMapping
     public Collection<Film> getAllFilms() {
+        log.info("Get films");
         return filmService.getAllFilms();
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Update film {}, liked user {}", id, userId);
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable(required = false) Long id, @PathVariable(required = false) Long userId) {
+        log.info("Delete in film {}, like user {}", id, userId);
         filmService.deleteLike(id, userId);
     }
 
@@ -61,6 +67,7 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public Collection<Film> getTopRatingFilms(@RequestParam(defaultValue = "10", required = false) Integer count, @RequestParam(defaultValue = "-1", required = false) Long genreId, @RequestParam(defaultValue = "-1", required = false) Integer year) {
+        log.info("Get rating films, count {}", count);
         if (genreId != -1 || year != -1) {
             return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
         } else {
@@ -73,6 +80,7 @@ public class FilmController {
      */
     @GetMapping("/director/{directorId}")
     public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+        log.info("Get films/directorId {} sortBy {} ", directorId, sortBy);
         if (Objects.equals(sortBy, "year") || Objects.equals(sortBy, "likes")) {
             return filmService.getAllFilmsByDirector(directorId, sortBy);
         } else {
@@ -85,6 +93,7 @@ public class FilmController {
      */
     @GetMapping("/search")
     public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("Get films/search {} by {} ", query, by);
         String[] fields = by.split(",");
         if (fields.length == 1) {
             SearchSetup setup = SearchSetup.valueOf(fields[0]);
@@ -114,6 +123,7 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public void deleteFilmById(@PathVariable Long id) {
         filmService.deleteFilm(id);
+        log.info("Delete film {}", id);
     }
 
     /**
@@ -121,6 +131,7 @@ public class FilmController {
      */
     @GetMapping("/common")
     public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("Get films/common userId {} friendId {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }
 }
