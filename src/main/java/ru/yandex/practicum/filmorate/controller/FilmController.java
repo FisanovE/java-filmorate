@@ -5,72 +5,62 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.SearchSetup;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.utils.DateUtils;
+import ru.yandex.practicum.filmorate.service.ValidateService;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @RestController
 @Component
 @RequiredArgsConstructor
+@RequestMapping("/films")
 public class FilmController {
 
     private final FilmService filmService;
+    private final ValidateService validateService;
 
-    @PostMapping("/films")
+    @PostMapping
     public Film addNewFilm(@RequestBody Film film) {
-        log.info("Endpoint -> Create film");
-        checkingFilmForValid(film);
+        validateService.checkingFilmForValid(film);
         return filmService.addNewFilm(film);
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        log.info("Endpoint -> Update film");
-        checkingFilmForValid(film);
+        validateService.checkIdNotNull(film.getId());
+        validateService.checkingFilmForValid(film);
         return filmService.updateFilm(film);
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public Film getFilmById(@PathVariable(required = false) Long id) {
-        log.info("Endpoint -> Get film {}", id);
         return filmService.getFilmById(id);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public Collection<Film> getAllFilms() {
-        log.info("Endpoint -> Get films");
         return filmService.getAllFilms();
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Endpoint -> Update film {}, liked user {}", id, userId);
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable(required = false) Long id, @PathVariable(required = false) Long userId) {
-        log.info("Endpoint -> Delete in film {}, like user {}", id, userId);
         filmService.deleteLike(id, userId);
     }
 
     /**
      * ALG_8
      */
-    @GetMapping("/films/popular")
+    @GetMapping("/popular")
     public Collection<Film> getTopRatingFilms(@RequestParam(defaultValue = "10", required = false) Integer count, @RequestParam(defaultValue = "-1", required = false) Long genreId, @RequestParam(defaultValue = "-1", required = false) Integer year) {
-
-        log.info("ALG_8.Endpoint ->  Get rating films, count {}, genreId {}, year {},", count, genreId, year);
         if (genreId != -1 || year != -1) {
             return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
         } else {
@@ -78,52 +68,11 @@ public class FilmController {
         }
     }
 
-    private void checkingFilmForValid(Film film) throws ValidationException {
-        if (film.getName().isBlank()) {
-            throw new ValidationException("Invalid title format: \"" + film.getName() + "\"");
-        }
-        if (film.getDescription().length() > 200) {
-            throw new ValidationException("The maximum description length is 200 characters, you have: \"" + film.getDescription()
-                    .length() + "\" characters");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28", DateUtils.formatter))) {
-            throw new ValidationException("Movie release date should not be earlier than 1895.12.28, you have: \"" + film.getReleaseDate() + "\"");
-        }
-        if (film.getDuration() < 0) {
-            throw new ValidationException("The duration of the film should be positive, you have:  \"" + film.getDuration());
-        }
-    }
-
-    @GetMapping("/genres")
-    public Collection<Genre> getAllGenres() {
-        log.info("Endpoint -> Get genres");
-        return filmService.getAllGenres();
-    }
-
-    @GetMapping("/genres/{id}")
-    public Genre getGenresById(@PathVariable(required = false) Long id) {
-        log.info("Endpoint -> Get genres id {}", id);
-        return filmService.getGenresById(id);
-    }
-
-    @GetMapping("/mpa")
-    public Collection<Mpa> getAllRatingsMpa() {
-        log.info("Endpoint -> Get mpa");
-        return filmService.getAllRatingsMpa();
-    }
-
-    @GetMapping("/mpa/{id}")
-    public Mpa getRatingsMpaById(@PathVariable(required = false) Long id) {
-        log.info("Endpoint -> Get mpa id {}", id);
-        return filmService.getRatingsMpaById(id);
-    }
-
     /**
      * ALG_7
      */
-    @GetMapping("/films/director/{directorId}")
+    @GetMapping("/director/{directorId}")
     public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
-        log.info("ALG_7. Endpoint ->  Get films/directorId {} sortBy {} ", directorId, sortBy);
         if (Objects.equals(sortBy, "year") || Objects.equals(sortBy, "likes")) {
             return filmService.getAllFilmsByDirector(directorId, sortBy);
         } else {
@@ -134,20 +83,35 @@ public class FilmController {
     /**
      * ALG_2
      */
-    @GetMapping("/films/search")
+    @GetMapping("/search")
     public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
-        log.info("ALG_2. Endpoint ->  Get films/search {} by {} ", query, by);
-        if (Objects.equals(by, "director") || Objects.equals(by, "title") || Objects.equals(by, "title,director") || Objects.equals(by, "director,title")) {
-            return filmService.searchFilms(query, by);
-        } else {
-            throw new NotFoundException("ALG_2. Invalid search param:  " + by);
+        String[] fields = by.split(",");
+        if (fields.length == 1) {
+            SearchSetup setup = SearchSetup.valueOf(fields[0]);
+            switch (setup) {
+                case director:
+                case title:
+                    return filmService.searchFilms(query, by);
+                default:
+                    throw new NotFoundException("ALG_2. Invalid search param:  " + by);
+            }
+        } else if (fields.length == 2) {
+            SearchSetup setup1 = SearchSetup.valueOf(fields[0]);
+            SearchSetup setup2 = SearchSetup.valueOf(fields[1]);
+            if ((setup1 == SearchSetup.director && setup2 == SearchSetup.title) ||
+                    (setup1 == SearchSetup.title && setup2 == SearchSetup.director)) {
+                return filmService.searchFilms(query, by);
+            } else {
+                throw new NotFoundException("ALG_2. Invalid search param:  " + by);
+            }
         }
+        throw new NotFoundException("ALG_2. Invalid search param:  " + by);
     }
 
     /**
      * ALG_6
      */
-    @DeleteMapping("/films/{id}")
+    @DeleteMapping("/{id}")
     public void deleteFilmById(@PathVariable Long id) {
         filmService.deleteFilm(id);
     }
@@ -155,90 +119,8 @@ public class FilmController {
     /**
      * ALG_3
      */
-    @GetMapping("/films/common")
+    @GetMapping("/common")
     public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
-        log.info("ALG_3. Endpoint ->  Get films/common userId {} friendId {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
-    }
-
-    /**
-     * ALG_1
-     */
-    @PostMapping("/reviews")
-    public Review addNewReview(@RequestBody Review review) {
-        log.info("ALG_1. Endpoint -> Create review");
-        return filmService.addNewReviews(review);
-    }
-
-    /**
-     * ALG_1
-     */
-    @PutMapping("/reviews")
-    public Review updateReview(@RequestBody Review review) {
-        log.info("ALG_1. Endpoint -> Update review {}", review.getReviewId());
-        return filmService.updateReview(review);
-    }
-
-    /**
-     * ALG_1
-     */
-    @DeleteMapping("/reviews/{id}")
-    public void deleteReview(@PathVariable Long id) {
-        log.info("ALG_1. Endpoint -> Delete review {}", id);
-        filmService.deleteReview(id);
-    }
-
-    /**
-     * ALG_1
-     */
-    @GetMapping("/reviews/{id}")
-    public Review getReviewById(@PathVariable Long id) {
-        log.info("ALG_1. Endpoint -> Get review {}", id);
-        return filmService.getReviewById(id);
-    }
-
-    /**
-     * ALG_1
-     */
-    @GetMapping("/reviews")
-    public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
-        log.info("ALG_1. Endpoint -> Get reviews by filmId {}", filmId);
-        return filmService.getReviewsByFilmId(filmId, count);
-    }
-
-    /**
-     * ALG_1
-     */
-    @PutMapping("/reviews/{id}/like/{userId}")
-    public void addLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("ALG_1. Endpoint -> User {} added Like by Review {}", userId, id);
-        filmService.addLikeByReview(id, userId);
-    }
-
-    /**
-     * ALG_1
-     */
-    @PutMapping("/reviews/{id}/dislike/{userId}")
-    public void addDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("ALG_1. Endpoint -> User {} added Dislike by Review {}", userId, id);
-        filmService.addDislikeByReview(id, userId);
-    }
-
-    /**
-     * ALG_1
-     */
-    @DeleteMapping("/reviews/{id}/like/{userId}")
-    public void deleteLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("ALG_1. Endpoint -> User {} delete Like by Review {}", userId, id);
-        filmService.deleteLikeByReview(id, userId);
-    }
-
-    /**
-     * ALG_1
-     */
-    @DeleteMapping("/reviews/{id}/dislike/{userId}")
-    public void deleteDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("ALG_1. Endpoint -> User {} delete Dislike by Review {}", userId, id);
-        filmService.deleteDislikeByReview(id, userId);
     }
 }

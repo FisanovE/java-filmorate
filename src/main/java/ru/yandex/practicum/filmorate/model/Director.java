@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * ALG_7
  */
-@Data
+@Getter
+@Setter
 @Builder
 public class Director {
     private Long id;

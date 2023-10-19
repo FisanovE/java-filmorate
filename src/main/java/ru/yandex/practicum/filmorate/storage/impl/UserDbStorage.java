@@ -53,12 +53,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         String sqlRequest = "UPDATE USERS SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
-        int rowsUpdated = jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("Invalid User ID:  " + user.getId());
-        }
-
+        int rowsUpdated = jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(),
+                user.getBirthday(), user.getId());
         log.info("User update: {} {}", user.getId(), user.getLogin());
         return user;
     }
@@ -90,10 +86,6 @@ public class UserDbStorage implements UserStorage {
         }
         String sqlRequest = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
         int rowsUpdated = jdbcTemplate.update(sqlRequest, idUser, idFriend);
-
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("User ID is missing in friends:  " + idFriend);
-        }
         addEvent(idUser, "FRIEND", "ADD", idFriend);
         log.info("Added friends ID: {}", idFriend);
     }
