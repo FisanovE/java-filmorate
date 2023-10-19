@@ -17,25 +17,26 @@ public class UserService {
     private final UserStorage userStorage;
     private final ValidateService validateService;
 
-    public User addNewUser(User user) {
+    public User create(User user) {
         setLoginAsNameIfNameIsEmpty(user);
-        return userStorage.addNewUser(user);
+        return userStorage.create(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
         validateService.checkContainsUserInDatabase(user.getId());
         validateService.checkingUserForValid(user);
         setLoginAsNameIfNameIsEmpty(user);
-        return userStorage.updateUser(user);
+        userStorage.update(user);
+        return user;
     }
 
-    public User getUserById(Long userId) {
+    public User getById(Long userId) {
         validateService.checkContainsUserInDatabase(userId);
-        return userStorage.getUserById(userId);
+        return userStorage.getById(userId);
     }
 
-    public Collection<User> getAllUsers() {
-        return userStorage.getAllUsers();
+    public Collection<User> getAll() {
+        return userStorage.getAll();
     }
 
     public void addFriend(Long idUser, Long idFriend) {
@@ -48,9 +49,9 @@ public class UserService {
     /**
      * ALG_6
      */
-    public void deleteUser(Long id) {
+    public void delete(Long id) {
         validateService.checkContainsUserInDatabase(id);
-        userStorage.deleteUser(id);
+        userStorage.delete(id);
     }
 
     public void deleteFriend(Long idUser, Long idFriend) {
@@ -58,9 +59,9 @@ public class UserService {
         userStorage.deleteFriend(idUser, idFriend);
     }
 
-    public Collection<User> getAllFriendsOfUser(Long idUser) {
+    public Collection<User> getAllFriends(Long idUser) {
         validateService.checkContainsUserInDatabase(idUser);
-        return userStorage.getAllFriendsOfUser(idUser);
+        return userStorage.getAllFriends(idUser);
     }
 
 
@@ -88,7 +89,7 @@ public class UserService {
     /**
      * ALG_5
      */
-    public Collection<Event> getEvent(Long userId) {
+    public Collection<Event> getEvents(Long userId) {
         validateService.checkContainsUserInDatabase(userId);
         return userStorage.getEvents(userId);
     }

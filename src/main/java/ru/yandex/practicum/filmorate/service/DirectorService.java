@@ -21,28 +21,29 @@ public class DirectorService {
 
     private final DirectorStorage directorStorage;
 
-    public Director addNewDirector(Director director) {
+    public Director create(Director director) {
         if (director.getName().isBlank()) {
             throw new ValidationException("ALG_7. Invalid name format: \"" + director.getName() + "\"");
         }
         return directorStorage.addNewDirector(director);
     }
 
-    public Director updateDirector(Director director) {
+    public Director update(Director director) {
         validateService.checkContainsDirectorInDatabase(director.getId());
-        return directorStorage.updateDirector(director);
+        directorStorage.updateDirector(director);
+        return director;
     }
 
-    public Director getDirectorById(Long directorId) {
+    public Director getById(Long directorId) {
         validateService.checkContainsDirectorInDatabase(directorId);
         return directorStorage.getDirectorById(directorId);
     }
 
-    public Collection<Director> getAllDirectors() {
+    public Collection<Director> getAll() {
         return directorStorage.getAllDirectors();
     }
 
-    public void deleteDirectorById(Long directorId) {
+    public void delete(Long directorId) {
         validateService.checkContainsDirectorInDatabase(directorId);
         directorStorage.deleteDirectorById(directorId);
     }

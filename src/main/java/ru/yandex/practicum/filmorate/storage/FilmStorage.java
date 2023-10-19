@@ -10,13 +10,13 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    Film addNewFilm(Film film);
+    Film create(Film film);
 
-    Film updateFilm(Film film);
+    void update(Film film);
 
-    Collection<Film> getAllFilms();
+    Collection<Film> getAll();
 
-    Film getFilmById(Long id);
+    Film getById(Long id);
 
     void addLike(Long id, Long userId);
 
@@ -45,7 +45,7 @@ public interface FilmStorage {
     /**
      * ALG_6
      */
-    void deleteFilm(Long filmId);
+    void delete(Long filmId);
 
     /**
      * ALG_2
@@ -57,7 +57,7 @@ public interface FilmStorage {
      */
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 
-    Review addNewReview(Review review);
+    Review createReview(Review review);
 
     Review updateReview(Review review);
 

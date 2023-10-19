@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,17 +22,13 @@ import static ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage.*;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private DirectorDbStorage directorDbStorage;
-
-    @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final DirectorDbStorage directorDbStorage;
 
     @Override
-    public User addNewUser(User user) {
+    public User create(User user) {
         String sqlRequest = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -52,21 +49,29 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public void update(User user) {
         String sqlRequest = "UPDATE USERS SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
         jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-        return user;
     }
 
     @Override
-    public Collection<User> getAllUsers() {
+    public Collection<User> getAll() {
         String sql = "SELECT * FROM USERS ORDER BY USER_ID";
         return jdbcTemplate.query(sql, new UserRowMapper());
     }
 
-    public User getUserById(Long id) {
+    public User getById(Long id) {
         String sql = "select * from users where user_id = ?";
         return jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+    }
+
+    /**
+     * ALG_6
+     */
+    //@Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
@@ -85,7 +90,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getAllFriendsOfUser(Long idUser) {
+    public Collection<User> getAllFriends(Long idUser) {
         String sql = "SELECT * FROM users WHERE user_id IN (select friend_id FROM friends WHERE user_id = ?) " +
                 "ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser);
@@ -99,44 +104,6 @@ public class UserDbStorage implements UserStorage {
                 "GROUP BY " + "friend_id HAVING count(friend_id)>1) " +
                 "ORDER BY USER_ID";
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
-    }
-
-    /**
-     * ALG_6
-     */
-    //@Override
-    public void deleteUser(Long id) {
-        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
-        jdbcTemplate.update(sqlQuery, id);
-    }
-
-    /**
-     * ALG_4
-     */
-    @Override
-    public List<Film> getFilmsRecommendationsForUser(Long id) {
-        int filmsToRecommend = 15;
-        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
-
-        String userLikesSet = String.format("(%s)", String.join(",",
-                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
-
-        String queryForFilms = "SELECT * FROM films AS f JOIN " +
-                "(SELECT film_ID FROM likes WHERE user_ID IN " +
-                "(SELECT user_ID FROM likes " +
-                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
-                "GROUP BY user_ID " +
-                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
-                "LIMIT ?) AS fi ON f.film_ID = fi.film_ID";
-
-        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
-
-        for (Film film : recommendations) {
-            film.setMpa(getMpaFromDataBase(film.getId()));
-            film.setGenres(getGenresFromDataBase(film.getId()));
-            film.setDirectors(getDirectorsFromDataBase(film.getId()));
-        }
-        return recommendations;
     }
 
     /**
@@ -165,7 +132,7 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, new EventRowMapper(), userId);
     }
 
-   /* @Override
+    @Override
     public List<Film> getFilmsRecommendationsForUser(Long id) {
         int filmsToRecommend = 15;
         String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
@@ -188,8 +155,7 @@ public class UserDbStorage implements UserStorage {
         loadGenres(recommendations);
         directorDbStorage.loadDirectors(recommendations);
 
-        log.info("ALG_4. Films were recommended for User with ID: " + id);
         return recommendations;
-    }*/
+    }
 
 }

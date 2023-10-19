@@ -11,7 +11,7 @@ public interface DirectorStorage {
 
     Director addNewDirector(Director director);
 
-    Director updateDirector(Director director);
+    void updateDirector(Director director);
 
     Collection<Director> getAllDirectors();
 

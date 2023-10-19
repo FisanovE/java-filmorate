@@ -24,81 +24,81 @@ public class ReviewController {
      * ALG_1
      */
     @PostMapping
-    public Review addNewReview(@RequestBody Review review) {
+    public Review create(@RequestBody Review review) {
         log.info("Create review");
-        return reviewService.addNewReviews(review);
+        return reviewService.create(review);
     }
 
     /**
      * ALG_1
      */
     @PutMapping
-    public Review updateReview(@RequestBody Review review) {
+    public Review update(@RequestBody Review review) {
         validateService.checkIdNotNull(review.getReviewId());
         log.info("Update review {}", review.getReviewId());
-        return reviewService.updateReview(review);
+        return reviewService.update(review);
     }
 
     /**
      * ALG_1
      */
     @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         log.info("Delete review {}", id);
-        reviewService.deleteReview(id);
+        reviewService.delete(id);
     }
 
     /**
      * ALG_1
      */
     @GetMapping("/{id}")
-    public Review getReviewById(@PathVariable Long id) {
+    public Review getById(@PathVariable Long id) {
         log.info("Get review {}", id);
-        return reviewService.getReviewById(id);
+        return reviewService.getById(id);
     }
 
     /**
      * ALG_1
      */
     @GetMapping
-    public List<Review> getReviewsByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
+    public List<Review> getByFilmId(@RequestParam(defaultValue = "0") Long filmId, @RequestParam(defaultValue = "10") Integer count) {
         log.info("Get reviews by filmId {}", filmId);
-        return reviewService.getReviewsByFilmId(filmId, count);
+        return reviewService.getByFilmId(filmId, count);
     }
 
     /**
      * ALG_1
      */
     @PutMapping("/{id}/like/{userId}")
-    public void addLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("User {} added Like by Review {}", userId, id);
-        reviewService.addLikeByReview(id, userId);
+        reviewService.addLike(id, userId);
     }
 
     /**
      * ALG_1
      */
     @PutMapping("/{id}/dislike/{userId}")
-    public void addDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void addDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("User {} added Dislike by Review {}", userId, id);
-        reviewService.addDislikeByReview(id, userId);
+        reviewService.addDislike(id, userId);
     }
 
     /**
      * ALG_1
      */
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("User {} delete Like by Review {}", userId, id);
-        reviewService.deleteLikeByReview(id, userId);
+        reviewService.deleteLike(id, userId);
     }
 
     /**
      * ALG_1
      */
     @DeleteMapping("/{id}/dislike/{userId}")
-    public void deleteDislikeByReview(@PathVariable Long id, @PathVariable Long userId) {
+    public void deleteDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("User {} delete Dislike by Review {}", userId, id);
-        reviewService.deleteDislikeByReview(id, userId);
+        reviewService.deleteDislike(id, userId);
     }
 }
