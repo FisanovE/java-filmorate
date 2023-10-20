@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -120,15 +118,7 @@ public class UserDbStorage implements UserStorage {
      */
     @Override
     public List<Event> getEvents(Long userId) {
-        SqlRowSet checkUser = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", userId);
-        if (!checkUser.next()) {
-            log.info("ALG_5. Invalid User ID: {}", userId);
-            throw new NotFoundException("ALG_5. Invalid User ID:  " + userId);
-        }
-
         String sql = "SELECT * FROM events WHERE user_id = ?";
-
-        log.info("ALG_5. Event was given for User with ID: " + userId);
         return jdbcTemplate.query(sql, new EventRowMapper(), userId);
     }
 

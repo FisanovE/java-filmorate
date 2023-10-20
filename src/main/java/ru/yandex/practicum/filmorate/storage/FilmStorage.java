@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface FilmStorage {
 
@@ -57,22 +55,9 @@ public interface FilmStorage {
      */
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 
-    Review createReview(Review review);
-
-    Review updateReview(Review review);
-
-    void deleteReview(Long reviewId);
-
-    Review getReviewById(Long reviewId);
-
-    List<Review> getAllReviews();
-
-    void addLikeByReview(Long reviewId, Long userId);
-
-    void addDislikeByReview(Long reviewId, Long userId);
-
-    void deleteLikeByReview(Long reviewId, Long userId);
-
-    void deleteDislikeByReview(Long reviewId, Long userId);
+    /**
+     * ALG5
+     */
+    void addEvent(Long userId, String eventType, String operation, Long entityId);
 }
 

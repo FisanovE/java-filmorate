@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.ReviewDbStorage;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private final FilmStorage filmStorage;
+    private final ReviewDbStorage reviewDbStorage;
     private final ValidateService validateService;
 
     public Review create(Review review) {
         validateService.checkReview(review);
         validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsUserInDatabase(review.getFilmId());
-        return filmStorage.createReview(review);
+        return reviewDbStorage.create(review);
     }
 
     public Review update(Review review) {
@@ -32,21 +32,21 @@ public class ReviewService {
         validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsUserInDatabase(review.getFilmId());
         validateService.checkReview(review);
-        return filmStorage.updateReview(review);
+        return reviewDbStorage.update(review);
     }
 
     public void delete(Long reviewId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        filmStorage.deleteReview(reviewId);
+        reviewDbStorage.delete(reviewId);
     }
 
     public Review getById(Long reviewId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        return filmStorage.getReviewById(reviewId);
+        return reviewDbStorage.getById(reviewId);
     }
 
     public List<Review> getByFilmId(Long filmId, Integer count) {
-        return filmStorage.getAllReviews()
+        return reviewDbStorage.getAll()
                 .stream()
                 .filter(review -> (filmId == 0 || Objects.equals(review.getFilmId(), filmId)))
                 .sorted(Comparator.comparing(Review::getUseful).reversed())
@@ -57,25 +57,25 @@ public class ReviewService {
     public void addLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
-        filmStorage.addLikeByReview(reviewId, userId);
+        reviewDbStorage.addLike(reviewId, userId);
     }
 
     public void addDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
-        filmStorage.addDislikeByReview(reviewId, userId);
+        reviewDbStorage.addDislike(reviewId, userId);
     }
 
     public void deleteLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
-        filmStorage.deleteLikeByReview(reviewId, userId);
+        reviewDbStorage.deleteLike(reviewId, userId);
     }
 
     public void deleteDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
         validateService.checkContainsUserInDatabase(userId);
-        filmStorage.deleteDislikeByReview(reviewId, userId);
+        reviewDbStorage.deleteDislike(reviewId, userId);
     }
 
 }

@@ -23,10 +23,4 @@ public class ErrorHandler {
     public ErrorResponse handle(final ValidationException e) {
         return new ErrorResponse("Validation error.", e.getMessage(), Arrays.toString(e.getStackTrace()));
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(final NullPointerException e) {
-        return new ErrorResponse("Internal error.", e.getMessage(), Arrays.toString(e.getStackTrace()));
-    }
 }
