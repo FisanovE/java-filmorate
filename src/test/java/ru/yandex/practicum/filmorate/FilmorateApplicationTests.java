@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.ReviewDbStorage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +32,7 @@ class FilmorateApplicationTests {
     private final GenreService genreService;
     private final MpaService mpaService;
     private final ReviewService reviewService;
+    private final ReviewDbStorage reviewDbStorage;
     private User user;
     private Film film;
     private Review review;
@@ -526,12 +528,12 @@ class FilmorateApplicationTests {
                 .filmId(film.getId())
                 .build();
 
-        Review addedReview = filmStorage.createReview(reviewMain);
+        Review addedReview = reviewDbStorage.create(reviewMain);
         reviewMain.setContent("False");
         reviewMain.setIsPositive(false);
-        filmStorage.updateReview(reviewMain);
+        reviewDbStorage.update(reviewMain);
         Review reviewInDb = reviewService.getById(1L);
-        List<Review> reviews = filmStorage.getAllReviews();
+        List<Review> reviews = reviewDbStorage.getAll();
         reviewService.addLike(1L, 1L);
         reviewService.addDislike(1L, 2L);
         reviewService.deleteLike(1L, 1L);
