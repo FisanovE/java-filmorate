@@ -105,7 +105,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового пользователя")
     void shouldAddNewUser() {
         User userNew = createUser();
@@ -122,8 +122,8 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
-    @DisplayName("Получеие пользователя по ID")
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
+    @DisplayName("Получение пользователя по ID")
     void shouldReturnUserById() {
         User userNew = createUser();
         userService.create(userNew);
@@ -135,7 +135,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Обновление пользователя")
     void shouldUpdateUser() {
         User userNew = createUser();
@@ -154,7 +154,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка пользователей")
     void shouldReturnListUsers() {
         User userNew = createUser();
@@ -171,7 +171,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление друга")
     void shouldAddFriend() throws ValidationException {
         User userNew = createUser();
@@ -196,7 +196,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка друзей пользователя")
     void shouldAllFriendsByUser() throws ValidationException {
         User userNew = createUser();
@@ -211,7 +211,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка общих друзей")
     void shouldMutualFriends() throws ValidationException {
         User userNew = createUser();
@@ -237,7 +237,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Удаление друга")
     void shouldDeleteFriend() throws ValidationException {
         log.info("Тест: {}", "Удаление друга");
@@ -264,7 +264,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового фильма")
     void shouldAddNewFilm() {
         Film filmNew = createFilm();
@@ -282,7 +282,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Обновление фильма ")
     void shouldUpdateFilm() {
         Film filmNew = createFilm();
@@ -305,7 +305,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех фильмов")
     void shouldReturnListAllFilms() {
         Film filmNew = createFilm();
@@ -323,7 +323,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление лайка")
     void shouldAddLike() {
         User userNew = createUser();
@@ -349,7 +349,7 @@ class FilmorateApplicationTests {
      * ALG_8
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка лучших фильмов")
     void shouldReturnTopRatingFilms() {
         User userNew1 = createUser();
@@ -457,7 +457,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Удаление лайка")
     void shouldDeleteLike() {
         User userNew1 = createUser();
@@ -477,7 +477,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех жанров")
     void shouldReturnListAllGenres() {
         List<Genre> genres = new ArrayList<>(genreService.getAll());
@@ -495,7 +495,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех рейтингов МРА")
     void shouldReturnListAllRatingsMpa() {
         List<Mpa> ratings = new ArrayList<>(mpaService.getAll());
@@ -505,7 +505,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение рейтинга МРА по ID")
     void shouldReturnRatingsMpaById() {
         Mpa mpa = mpaService.getById(2L);
@@ -513,7 +513,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Тестирование Отзывов")
     void reviewDbStorageTest() {
         User user = createUser();
@@ -553,7 +553,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового режиссёра")
     void shouldAddNewDirector() {
         Director director = directorService.create(createDirector());
@@ -568,7 +568,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Обновление режиссёра")
     void shouldUpdateDirector() {
         Director director = createDirector();
@@ -585,7 +585,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка всех режиссёров")
     void shouldReturnListAllDirectors() {
         Director director = directorService.create(Director.builder().id(1L).name("NewDirector").build());
@@ -601,7 +601,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение режиссёра по ID")
     void shouldReturnDirectorById() {
         Director director = createDirector();
@@ -615,7 +615,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Удаление режиссёра по ID")
     void shouldDeleteDirectorById() {
         Director director = createDirector();
@@ -637,7 +637,7 @@ class FilmorateApplicationTests {
      * ALG_4
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Тестирование рекомендаций фильмов")
     void testRecommendations() {
         List<String> filmTitles = List.of("Матрица", "Аватар", "Властелин Колец", "Фауст", "Берсерк", "Зубастики",
@@ -685,7 +685,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка фильмов режиссёра по лайкам или годам")
     public void shouldReturnAllFilmsByDirector() {
         User userNew1 = createUser();
@@ -740,7 +740,7 @@ class FilmorateApplicationTests {
      * ALG_7
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Поиск фильмов по режиссёру и/или названию")
     public void shouldSearchFilmsByDirectorAndName() {
         User userNew1 = createUser();
@@ -809,7 +809,7 @@ class FilmorateApplicationTests {
      * ALG_3
      */
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка общих фильмов")
     public void shouldReturnCommonFilms() {
         User userNew1 = createUser();
@@ -885,7 +885,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Получение списка событий")
     public void shoulReturnListEvents() {
         User userNew1 = createUser();

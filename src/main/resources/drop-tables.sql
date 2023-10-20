@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS users, mpa, films, films_mpa, genres, films_genres, likes, friends, directors, films_directors, reviews, reviews_like, events CASCADE;
