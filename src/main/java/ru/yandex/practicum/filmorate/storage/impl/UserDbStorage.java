@@ -140,7 +140,7 @@ public class UserDbStorage implements UserStorage {
                 "LEFT JOIN films_mpa fm ON f.film_id = fm.film_id " +
                 "LEFT JOIN mpa m ON fm.mpa_id = m.mpa_id;";
 
-        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapperNew(), id, filmsToRecommend);
+        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
 
         loadGenres(recommendations);
         directorDbStorage.loadDirectors(recommendations);
