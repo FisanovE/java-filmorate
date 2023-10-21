@@ -268,7 +268,7 @@ class FilmorateApplicationTests {
     @DisplayName("Добавление нового фильма")
     void shouldAddNewFilm() {
         Film filmNew = createFilm();
-        Film filmAdded = filmService.create(filmNew);
+        Film filmAdded = filmStorage.create(filmNew);
         List<Film> films = new ArrayList<>(filmService.getAll());
         assertThat(films).isNotEmpty().hasSize(1);
         assertThat(films.get(0).getId()).isEqualTo(filmAdded.getId());
@@ -673,8 +673,8 @@ class FilmorateApplicationTests {
         filmService.addLike(6L, 3L);
         filmService.addLike(7L, 4L);
 
-        List<Film> filmsRecommendations = new ArrayList<>(userService.getFilmsRecommendationsForUser(1L));
-        films = List.of(films.get(3), films.get(4), films.get(5), films.get(2));
+        List<Film> filmsRecommendations = new ArrayList<>(filmService.getRecommendationsForUser(1L));
+        films = List.of(films.get(2), films.get(3), films.get(4), films.get(5));
         assertThat(filmsRecommendations.get(0).getId()).isEqualTo(films.get(0).getId());
         assertThat(filmsRecommendations.get(1).getId()).isEqualTo(films.get(1).getId());
         assertThat(filmsRecommendations.get(2).getId()).isEqualTo(films.get(2).getId());

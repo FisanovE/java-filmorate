@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenresStorage;
 
 import java.util.Collection;
 
@@ -12,16 +12,16 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final FilmStorage filmStorage;
+    private final GenresStorage genresStorage;
     private final ValidateService validateService;
 
     public Collection<Genre> getAll() {
-        return filmStorage.getAllGenres();
+        return genresStorage.getAllGenres();
     }
 
     public Genre getById(Long id) {
         validateService.checkContainsGenreInDatabase(id);
-        return filmStorage.getGenresById(id);
+        return genresStorage.getGenresById(id);
     }
 
 }
