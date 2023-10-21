@@ -7,7 +7,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +15,11 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-import static ru.yandex.practicum.filmorate.storage.impl.FilmDbStorage.*;
-
 @Slf4j
 @Repository
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final DirectorDbStorage directorDbStorage;
 
     @Override
     public User create(User user) {
@@ -120,32 +116,6 @@ public class UserDbStorage implements UserStorage {
     public List<Event> getEvents(Long userId) {
         String sql = "SELECT * FROM events WHERE user_id = ?";
         return jdbcTemplate.query(sql, new EventRowMapper(), userId);
-    }
-
-    @Override
-    public List<Film> getFilmsRecommendationsForUser(Long id) {
-        int filmsToRecommend = 15;
-        String queryForUserLikes = "SELECT film_ID FROM likes WHERE user_ID = ?";
-
-        String userLikesSet = String.format("(%s)", String.join(",",
-                jdbcTemplate.query(queryForUserLikes, (rs, rowNum) -> rs.getString("film_ID"), id)));
-
-        String queryForFilms = "SELECT * FROM films AS f RIGHT JOIN " +
-                "(SELECT film_ID FROM likes WHERE user_ID IN " +
-                "(SELECT user_ID FROM likes " +
-                "WHERE film_ID IN " + userLikesSet + " AND user_ID <> ? " +
-                "GROUP BY user_ID " +
-                "ORDER BY COUNT(user_ID) DESC) AND film_ID NOT IN " + userLikesSet + " " +
-                "LIMIT ?) fi ON f.film_ID = fi.film_ID " +
-                "LEFT JOIN films_mpa fm ON f.film_id = fm.film_id " +
-                "LEFT JOIN mpa m ON fm.mpa_id = m.mpa_id;";
-
-        List<Film> recommendations = jdbcTemplate.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
-
-        loadGenres(recommendations);
-        directorDbStorage.loadDirectors(recommendations);
-
-        return recommendations;
     }
 
 }

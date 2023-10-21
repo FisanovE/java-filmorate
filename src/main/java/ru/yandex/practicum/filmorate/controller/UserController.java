@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
 
@@ -18,6 +19,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
+    private final FilmService filmService;
     private final UserService userService;
     private final ValidateService validateService;
 
@@ -84,9 +86,9 @@ public class UserController {
      * ALG_4
      */
     @GetMapping("/{id}/recommendations")
-    public List<Film> getFilmsRecommendations(@PathVariable Long id) {
+    public Collection<Film> getFilmsRecommendations(@PathVariable Long id) {
         log.info("Get films recommendations for user {}", id);
-        return userService.getFilmsRecommendationsForUser(id);
+        return filmService.getRecommendationsForUser(id);
     }
 
     /**

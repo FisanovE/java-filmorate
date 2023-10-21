@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -76,14 +75,6 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-    }
-
-    /**
-     * ALG_4
-     */
-    public List<Film> getFilmsRecommendationsForUser(Long id) {
-        validateService.checkContainsUserInDatabase(id);
-        return userStorage.getFilmsRecommendationsForUser(id);
     }
 
     /**

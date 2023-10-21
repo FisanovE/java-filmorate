@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
 
@@ -26,14 +24,6 @@ public interface FilmStorage {
      * ALG_8
      */
     Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year);
-
-    Collection<Genre> getAllGenres();
-
-    Genre getGenresById(Long id);
-
-    Collection<Mpa> getAllRatingsMpa();
-
-    Mpa getRatingsMpaById(Long id);
 
     /**
      * ALG_7
@@ -59,5 +49,10 @@ public interface FilmStorage {
      * ALG5
      */
     void addEvent(Long userId, String eventType, String operation, Long entityId);
+
+    /**
+     * ALG_4
+     */
+    Collection<Film> getFilmsRecommendationsForUser(Long id);
 }
 

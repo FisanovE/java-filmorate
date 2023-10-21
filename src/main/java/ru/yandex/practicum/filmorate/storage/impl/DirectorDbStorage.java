@@ -11,8 +11,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,14 +66,39 @@ public class DirectorDbStorage implements DirectorStorage {
         int rowsUpdated = jdbcTemplate.update(sqlDeleteDirectorById, id);
     }
 
-    public void loadDirectors(List<Film> films) {
+    @Override
+    public void save(Collection<Film> films) {
+        StringBuilder builder = new StringBuilder("insert into films_directors (film_id, director_id) values");
+
+        for (Film film : films) {
+            if (film.getDirectors() != null) {
+                for (Director director : film.getDirectors()) {
+                    builder.append(String.format(" (%d, %d),", film.getId(), director.getId()));
+                }
+            } else {
+                film.setDirectors(new LinkedHashSet<>());
+            }
+        }
+
+        if (builder.substring(builder.length() - 1).equals("s")) {
+            return;
+        }
+        builder.deleteCharAt(builder.length() - 1);
+
+        jdbcTemplate.update(builder.toString());
+    }
+
+    @Override
+    public void load(Collection<Film> films) {
         final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
         String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
         String sqlQuery = "select * from DIRECTORS d, FILMS_DIRECTORS fd " +
                 "where fd.DIRECTOR_ID = d.DIRECTOR_ID AND fd.FILM_ID in (" + inSql + ")";
         jdbcTemplate.query(sqlQuery, (rs) -> {
             final Film film = filmById.get(rs.getLong("FILM_ID"));
-            film.getDirectors().add(new DirectorRowMapper().mapRow(rs, 0));
-        }, films.stream().map(Film::getId).toArray());
+            if (film.getDirectors() != null) {
+                film.getDirectors().add(new DirectorRowMapper().mapRow(rs, 0));
+            }
+        }, filmById.keySet().toArray());
     }
 }

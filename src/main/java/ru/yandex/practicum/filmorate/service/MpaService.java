@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.util.Collection;
 
@@ -12,15 +12,16 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class MpaService {
-    private final FilmStorage filmStorage;
+    private final MpaStorage mpaStorage;
     private final ValidateService validateService;
 
+
     public Collection<Mpa> getAll() {
-        return filmStorage.getAllRatingsMpa();
+        return mpaStorage.getAllRatingsMpa();
     }
 
     public Mpa getById(Long id) {
         validateService.checkContainsMpaInDatabase(id);
-        return filmStorage.getRatingsMpaById(id);
+        return mpaStorage.getRatingsMpaById(id);
     }
 }

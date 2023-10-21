@@ -7,8 +7,11 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.impl.GenresDbStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -17,6 +20,10 @@ public class FilmService {
     private final ValidateService validateService;
 
     private final FilmStorage filmStorage;
+
+    private final DirectorDbStorage directorStorage;
+
+    private final GenresDbStorage genresStorage;
 
     public Film create(Film film) {
         if (film.getMpa() != null) {
@@ -35,7 +42,10 @@ public class FilmService {
             }
         }
 
-        return filmStorage.create(film);
+        List<Film> withId = List.of(filmStorage.create(film));
+        directorStorage.save(withId);
+        genresStorage.save(withId);
+        return withId.get(0);
     }
 
     public Film update(Film film) {
@@ -56,16 +66,26 @@ public class FilmService {
             }
         }
         filmStorage.update(film);
+        List<Film> updated = List.of(film);
+        genresStorage.save(updated);
+        directorStorage.save(updated);
+
         return film;
     }
 
     public Film getById(Long filmId) {
         validateService.checkContainsFilmInDatabase(filmId);
-        return filmStorage.getById(filmId);
+        List<Film> film = List.of(filmStorage.getById(filmId));
+        genresStorage.load(film);
+        directorStorage.load(film);
+        return film.get(0);
     }
 
     public Collection<Film> getAll() {
-        return filmStorage.getAll();
+        Collection<Film> films = filmStorage.getAll();
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
@@ -89,14 +109,21 @@ public class FilmService {
     }
 
     public Collection<Film> getTopRatingFilms(int count) {
-        return filmStorage.getTopRatingFilms(count);
+        Collection<Film> films = filmStorage.getTopRatingFilms(count);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
      * ALG_8
      */
     public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-        return filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
+        Collection<Film> films = filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
+
     }
 
     /**
@@ -104,14 +131,20 @@ public class FilmService {
      */
     public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
         validateService.checkContainsDirectorInDatabase(id);
-        return filmStorage.getAllFilmsByDirector(id, sortBy);
+        Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortBy);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
      * ALG_2
      */
     public Collection<Film> searchFilms(String query, String by) {
-        return filmStorage.searchFilms(query, by);
+        Collection<Film> films = filmStorage.searchFilms(query, by);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
@@ -120,6 +153,20 @@ public class FilmService {
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         validateService.checkMatchingIdUsers(userId, friendId);
         validateService.checkContainsUserInDatabase(userId);
-        return filmStorage.getCommonFilms(userId, friendId);
+        Collection<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
+    }
+
+    /**
+     * ALG_4
+     */
+    public Collection<Film> getRecommendationsForUser(Long id) {
+        validateService.checkContainsUserInDatabase(id);
+        Collection<Film> films = filmStorage.getFilmsRecommendationsForUser(id);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 }
