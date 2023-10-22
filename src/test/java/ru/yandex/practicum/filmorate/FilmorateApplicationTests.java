@@ -534,7 +534,7 @@ class FilmorateApplicationTests {
         reviewMain.setIsPositive(false);
         reviewDbStorage.update(reviewMain);
         Review reviewInDb = reviewService.getById(1L);
-        List<Review> reviews = reviewDbStorage.getAll();
+        List<Review> reviews = reviewDbStorage.getByFilmId(film.getId(),1);
         reviewService.addLike(1L, 1L);
         reviewService.addDislike(1L, 2L);
         reviewService.deleteLike(1L, 1L);
@@ -544,7 +544,7 @@ class FilmorateApplicationTests {
                 () -> assertEquals(addedReview.getReviewId(), 1L, "addNewReview работает не правильно"),
                 () -> assertNotNull(reviewInDb, "getReviewById работает не правильно"),
                 () -> assertEquals(reviewInDb.getContent(), "False", "updateReview работает не правильно"),
-                () -> assertEquals(reviews.size(), 1, "getAllReview работает не правильно"),
+                () -> assertEquals(reviews.size(), 1, "getByFilmId работает не правильно"),
                 () -> assertEquals(reviewInDb.getUseful(), 0, "Оценка отзыва работает не правильно")
         );
     }
