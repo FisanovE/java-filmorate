@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -111,11 +112,29 @@ public class ValidateService {
 
     public void checkContainsGenreInDatabase(Long id) {
         SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM genres WHERE genre_id = ?", id);
+        sqlRows.getMetaData().getColumnCount();
         if (sqlRows.first()) {
             log.info("Genre found: {}", id);
         } else {
             log.info("Genre not found: {}", id);
             throw new NotFoundException("Genre not found: " + id);
+        }
+    }
+
+    public void checkContainsGenres(Film film) {
+        if (film.getGenres() == null) {
+            return;
+        }
+        String genresIds = film.getGenres().stream()
+                .map(genre -> genre.getId().toString()).collect(Collectors.joining(","));
+        Long genresFound = jdbcTemplate.queryForObject(String.format("SELECT COUNT(genre_id) genres_found " +
+                        "FROM genres WHERE genre_id IN (%s)",
+                genresIds), (rs, rowNum) -> rs.getLong("genres_found"));
+        if (genresFound == film.getGenres().size()) {
+            log.info("All genres found: {}", genresIds);
+        } else {
+            log.info("Some genre(s) not found of: {}", genresIds);
+            throw new NotFoundException("Some genre(s) not found of: " + genresIds);
         }
     }
 

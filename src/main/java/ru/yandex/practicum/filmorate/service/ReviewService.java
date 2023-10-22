@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.impl.ReviewDbStorage;
 
 import java.util.Comparator;
@@ -21,13 +22,16 @@ public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
     private final ValidateService validateService;
     private final UserService userService;
+    private final EventStorage eventStorage;
 
     public Review create(Review review) {
         if (review.getReviewId() != null) throw new ValidationException("Поле id у отзыва не пустое");
         validateService.checkReview(review);
         validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsUserInDatabase(review.getFilmId());
-        return reviewDbStorage.create(review);
+        Review created = reviewDbStorage.create(review);
+        eventStorage.addEvent(created.getUserId(), "REVIEW", "ADD", created.getReviewId());
+        return created;
     }
 
     public Review update(Review review) {
@@ -36,12 +40,14 @@ public class ReviewService {
         validateService.checkContainsFilmInDatabase(review.getFilmId());
         validateService.checkReview(review);
         reviewDbStorage.update(review);
+        eventStorage.addEvent(updated.getUserId(), "REVIEW", "UPDATE", updated.getFilmId());
         return getById(review.getReviewId());
     }
 
     public void delete(Long reviewId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        reviewDbStorage.delete(reviewId);
+        Review deleted = reviewDbStorage.delete(reviewId);
+        eventStorage.addEvent(deleted.getUserId(), "REVIEW", "REMOVE", deleted.getFilmId());
     }
 
     public Review getById(Long reviewId) {

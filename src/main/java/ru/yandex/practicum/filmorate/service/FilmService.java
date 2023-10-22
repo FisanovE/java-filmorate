@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.impl.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.impl.GenresDbStorage;
+import ru.yandex.practicum.filmorate.storage.GenresStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,20 +20,17 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
 
-    private final DirectorDbStorage directorStorage;
+    private final DirectorStorage directorStorage;
 
-    private final GenresDbStorage genresStorage;
+    private final GenresStorage genresStorage;
+
+    private final EventStorage eventStorage;
 
     public Film create(Film film) {
         if (film.getMpa() != null) {
             validateService.checkContainsMpaInDatabase(film.getMpa().getId());
         }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                validateService.checkContainsGenreInDatabase(genre.getId());
-            }
-        }
+        validateService.checkContainsGenres(film);
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             for (Director director : film.getDirectors()) {
@@ -51,12 +49,7 @@ public class FilmService {
         if (film.getMpa() != null) {
             validateService.checkContainsMpaInDatabase(film.getMpa().getId());
         }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                validateService.checkContainsGenreInDatabase(genre.getId());
-            }
-        }
+        validateService.checkContainsGenres(film);
 
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             for (Director director : film.getDirectors()) {
@@ -98,12 +91,14 @@ public class FilmService {
         validateService.checkContainsFilmInDatabase(id);
         //validateService.checkContainsUserInDatabase(userId); // закоментировано для обхода ошибки тестов
         filmStorage.addLike(id, userId);
+        eventStorage.addEvent(userId, "LIKE", "ADD", id);
     }
 
     public void deleteLike(Long id, Long userId) {
         validateService.checkContainsFilmInDatabase(id);
         validateService.checkContainsUserInDatabase(userId);
         filmStorage.deleteLike(id, userId);
+        eventStorage.addEvent(userId, "LIKE", "REMOVE", id);
     }
 
     public Collection<Film> getTopRatingFilms(int count) {

@@ -12,7 +12,7 @@ public interface ReviewStorage {
 
     void update(Review review);
 
-    void delete(Long reviewId);
+    Review delete(Long reviewId);
 
     Review getById(Long reviewId);
 
