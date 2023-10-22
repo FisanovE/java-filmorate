@@ -49,11 +49,6 @@ public interface FilmStorage {
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 
     /**
-     * ALG5
-     */
-    void addEvent(Long userId, String eventType, String operation, Long entityId);
-
-    /**
      * ALG_4
      */
     Collection<Film> getFilmsRecommendationsForUser(Long id);
