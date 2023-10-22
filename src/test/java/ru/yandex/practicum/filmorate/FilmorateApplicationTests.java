@@ -907,7 +907,7 @@ class FilmorateApplicationTests {
 
         List<Event> events = new ArrayList<>(eventService.getEvents(userNew1.getId()));
 
-        assertThat(events).isNotEmpty().hasSize(7);
+        assertThat(events).isNotEmpty().hasSize(8);
         assertThat(events.get(0).getEventId()).isEqualTo(1L);
         assertThat(events.get(0).getUserId()).isEqualTo(1L);
         assertThat(events.get(0).getEventType()).isEqualTo("LIKE");
@@ -953,7 +953,7 @@ class FilmorateApplicationTests {
         assertThat(events.get(6).getEventId()).isEqualTo(7L);
         assertThat(events.get(6).getUserId()).isEqualTo(1L);
         assertThat(events.get(6).getEventType()).isEqualTo("REVIEW");
-        assertThat(events.get(6).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(6).getOperation()).isEqualTo("UPDATE");
         assertThat(events.get(6).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(6).getTimestamp() > 1670590017281L);
     }
