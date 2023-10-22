@@ -28,7 +28,6 @@ public class ReviewDbStorage implements ReviewStorage {
      */
     @Override
     public Review create(Review review) {
-        if (review.getReviewId() != null) throw new ValidationException("Поле id у отзыва не пустое");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         simpleJdbcInsert.withTableName("reviews").usingGeneratedKeyColumns("review_id");
         Map<String, Object> reviewInMap = new HashMap<>();
@@ -45,14 +44,13 @@ public class ReviewDbStorage implements ReviewStorage {
      * ALG_1
      */
     @Override
-    public Review update(Review review) {
+    public void update(Review review) {
         Review updatedReview = getById(review.getReviewId());
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
         jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         updatedReview.setContent(review.getContent());
         updatedReview.setIsPositive(review.getIsPositive());
         filmDbStorage.addEvent(updatedReview.getUserId(), "REVIEW", "UPDATE", updatedReview.getFilmId());
-        return updatedReview;
     }
 
     /**
@@ -85,13 +83,26 @@ public class ReviewDbStorage implements ReviewStorage {
      * ALG_1
      */
     @Override
-    public List<Review> getAll() {
-        String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
-                "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
-                "FROM reviews r " +
-                "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
-                "GROUP BY r.review_id";
-        return jdbcTemplate.query(sql, reviewRowMapper);
+    public List<Review> getByFilmId(Long filmId, Integer count) {
+        String sql;
+        if (filmId == 0) {
+            sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
+                    "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                    "FROM reviews r " +
+                    "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                    "GROUP BY r.review_id " +
+                    "LIMIT ?";
+            return jdbcTemplate.query(sql, reviewRowMapper, count);
+        } else {
+            sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
+                    "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                    "FROM reviews r " +
+                    "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                    "WHERE r.film_id = ?" +
+                    "GROUP BY r.review_id " +
+                    "LIMIT ?";
+            return jdbcTemplate.query(sql, reviewRowMapper, filmId, count);
+        }
     }
 
     /**

@@ -10,13 +10,13 @@ import java.util.List;
 public interface ReviewStorage {
     Review create(Review review);
 
-    Review update(Review review);
+    void update(Review review);
 
     void delete(Long reviewId);
 
     Review getById(Long reviewId);
 
-    List<Review> getAll();
+    List<Review> getByFilmId(Long filmId, Integer count);
 
     void addLike(Long reviewId, Long userId);
 
