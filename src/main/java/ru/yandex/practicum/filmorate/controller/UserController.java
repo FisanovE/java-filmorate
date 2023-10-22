@@ -99,5 +99,4 @@ public class UserController {
         log.info("Get events of user {}", userId);
         return userService.getEvents(userId);
     }
-
 }

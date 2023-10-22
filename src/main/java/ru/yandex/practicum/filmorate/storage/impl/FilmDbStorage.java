@@ -115,20 +115,6 @@ public class FilmDbStorage implements FilmStorage {
         addEvent(userId, "LIKE", "REMOVE", filmId);
     }
 
-    @Override
-    public Collection<Film> getTopRatingFilms(int count) {
-        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, m.mpa_id, m.mpa_name " +
-                "FROM FILMS AS F " +
-                "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
-                "LEFT JOIN mpa m ON m.mpa_id = fm.mpa_id " +
-                "LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID " +
-                "GROUP BY F.FILM_ID " +
-                "ORDER BY COUNT(L.USER_ID) DESC " +
-                "LIMIT ?";
-
-        return jdbcTemplate.query(sql, new FilmRowMapper(), count);
-    }
-
     /**
      * ALG_8
      */
@@ -150,14 +136,17 @@ public class FilmDbStorage implements FilmStorage {
             String sql = joiner.add(sqlEnd).toString();
             log.info("вошли в поиск 2/2000");
             films = jdbcTemplate.query(sql, new FilmRowMapper(), year, genreId, count);
-        } else if (genreId != -1) {
+        } else if (genreId != -1 && year == -1) {
             joiner.add("WHERE FG.GENRE_ID = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcTemplate.query(sql, new FilmRowMapper(), genreId, count);
-        } else {
+        } else if (genreId == -1 && year != -1){
             joiner.add("WHERE YEAR(F.RELEASE_DATE) = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcTemplate.query(sql, new FilmRowMapper(), year, count);
+        }  else {
+            String sql = joiner.add(sqlEnd).toString();
+            films = jdbcTemplate.query(sql, new FilmRowMapper(), count);
         }
 
         return films;
