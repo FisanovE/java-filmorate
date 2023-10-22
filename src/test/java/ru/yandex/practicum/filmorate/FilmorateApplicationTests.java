@@ -515,7 +515,7 @@ class FilmorateApplicationTests {
 
     @Test
     @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
-    @DisplayName("Тестирование Отзывов")
+    @DisplayName("Тестирование отзывов")
     void reviewDbStorageTest() {
         User user = createUser();
         User user2 = createUser();
