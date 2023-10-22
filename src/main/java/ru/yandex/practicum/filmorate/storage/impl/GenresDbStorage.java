@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -17,18 +17,18 @@ import static java.util.function.UnaryOperator.identity;
 @Repository
 @RequiredArgsConstructor
 public class GenresDbStorage implements GenresStorage {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcOperations jdbcOperations;
 
     @Override
     public Collection<Genre> getAllGenres() {
         String sql = "SELECT genre_id, genre_name FROM genres ORDER BY genre_id";
-        return jdbcTemplate.query(sql, new GenreRowMapper());
+        return jdbcOperations.query(sql, new GenreRowMapper());
     }
 
     @Override
     public Genre getGenresById(Long id) {
         String sql = "SELECT * FROM genres WHERE genre_id = ?";
-        return jdbcTemplate.queryForObject(sql, new GenreRowMapper(), id);
+        return jdbcOperations.queryForObject(sql, new GenreRowMapper(), id);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GenresDbStorage implements GenresStorage {
         }
         builder.deleteCharAt(builder.length() - 1);
 
-        jdbcTemplate.update(builder.toString());
+        jdbcOperations.update(builder.toString());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class GenresDbStorage implements GenresStorage {
         String inSql = String.join(",", Collections.nCopies(films.size(), "?"));
         String sqlQuery = "select * from GENRES g, films_genres fg " +
                 "where fg.GENRE_ID = g.GENRE_ID AND fg.FILM_ID in (" + inSql + ")";
-        jdbcTemplate.query(sqlQuery, (rs) -> {
+        jdbcOperations.query(sqlQuery, (rs) -> {
             final Film film = filmById.get(rs.getLong("FILM_ID"));
             if (film.getGenres() != null) {
                 film.getGenres().add(new GenreRowMapper().mapRow(rs, 0));
