@@ -8,11 +8,9 @@ import lombok.experimental.Accessors;
 public class ErrorResponse {
     private String error;
     private String description;
-    private String stacktrace;
 
-    public ErrorResponse(String error, String description, String stacktrace) {
+    public ErrorResponse(String error, String description) {
         this.error = error;
         this.description = description;
-        this.stacktrace = stacktrace;
     }
 }

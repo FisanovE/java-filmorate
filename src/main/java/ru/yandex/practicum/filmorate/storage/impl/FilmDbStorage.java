@@ -133,11 +133,11 @@ public class FilmDbStorage implements FilmStorage {
             String sql = joiner.add(sqlEnd).toString();
             log.info("вошли в поиск 2/2000");
             films = jdbcOperations.query(sql, new FilmRowMapper(), year, genreId, count);
-        } else if (genreId != -1 && year == -1) {
+        } else if (genreId != -1) {
             joiner.add("WHERE FG.GENRE_ID = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcOperations.query(sql, new FilmRowMapper(), genreId, count);
-        } else if (genreId == -1 && year != -1){
+        } else if (year != -1){
             joiner.add("WHERE YEAR(F.RELEASE_DATE) = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcOperations.query(sql, new FilmRowMapper(), year, count);

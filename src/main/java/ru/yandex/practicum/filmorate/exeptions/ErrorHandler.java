@@ -17,7 +17,7 @@ public class ErrorHandler {
     public ErrorResponse handle(final NotFoundException e) {
         log.info(("Exception! In DB not found entity"));
         e.printStackTrace();
-        return new ErrorResponse("Invalid ID.", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        return new ErrorResponse("Invalid ID.", e.getMessage());
     }
 
     @ExceptionHandler
@@ -25,6 +25,6 @@ public class ErrorHandler {
     public ErrorResponse handle(final ValidationException e) {
         log.info(("Exception! Entity is not validated"));
         e.printStackTrace();
-        return new ErrorResponse("Validation error.", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        return new ErrorResponse("Validation error.", e.getMessage());
     }
 }
