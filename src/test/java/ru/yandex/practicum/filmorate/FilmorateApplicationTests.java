@@ -522,6 +522,7 @@ class FilmorateApplicationTests {
         userService.create(user);
         userService.create(user2);
         Film film = createFilm();
+        Film dbFilm = filmService.create(film);
         Review reviewMain = Review.builder()
                 .content("True")
                 .isPositive(true)
@@ -534,7 +535,7 @@ class FilmorateApplicationTests {
         reviewMain.setIsPositive(false);
         reviewDbStorage.update(reviewMain);
         Review reviewInDb = reviewService.getById(1L);
-        List<Review> reviews = reviewDbStorage.getByFilmId(film.getId(),1);
+        List<Review> reviews = reviewService.getByFilmId(dbFilm.getId(), 1);
         reviewService.addLike(1L, 1L);
         reviewService.addDislike(1L, 2L);
         reviewService.deleteLike(1L, 1L);
