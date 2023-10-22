@@ -9,6 +9,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchParameter;
+import ru.yandex.practicum.filmorate.model.SortParameter;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.*;
@@ -164,9 +166,9 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * ALG_7
      */
-    public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+    public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
         String sql;
-        if (Objects.equals(sortBy, "likes")) {
+        if (sortBy == SortParameter.LIKES) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films f " +
                     "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
@@ -176,7 +178,7 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE fd.director_id = ? " +
                     "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration " +
                     "ORDER BY COUNT(l.user_id) DESC";
-        } else if (Objects.equals(sortBy, "year")) {
+        } else if (sortBy == SortParameter.YEAR) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films f " +
                     "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
@@ -194,9 +196,9 @@ public class FilmDbStorage implements FilmStorage {
      * ALG_2
      */
     @Override
-    public Collection<Film> searchFilms(String query, String by) {
+    public Collection<Film> searchFilms(String query, List<SearchParameter> by) {
         String sql;
-        if (Objects.equals(by, "director")) {
+        if (by.contains(SearchParameter.DIRECTOR) && !by.contains(SearchParameter.TITLE)) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films f " +
                     "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
@@ -207,7 +209,7 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE LOWER(d.director_name) LIKE LOWER('%" + query + "%') " +
                     "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "ORDER BY COUNT(l.film_id)";
-        } else if (Objects.equals(by, "title")) {
+        } else if (!by.contains(SearchParameter.DIRECTOR) && by.contains(SearchParameter.TITLE)) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films AS f " +
                     "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
@@ -216,7 +218,7 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE LOWER(f.name) LIKE LOWER('%" + query + "%') " +
                     "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "ORDER BY COUNT (l.film_id)";
-        } else {
+        } else if (by.contains(SearchParameter.DIRECTOR) && by.contains(SearchParameter.TITLE)) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films f " +
                     "LEFT JOIN films_mpa fm ON fm.film_id = f.film_id " +
@@ -227,6 +229,8 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE LOWER (d.director_name) LIKE LOWER ('%" + query + "%') OR LOWER (f.name) LIKE LOWER ('%" + query + "%') " +
                     "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "ORDER BY COUNT(l.film_id) DESC";
+        } else {
+            throw new NotFoundException("ALG_2. Invalid RequestParam:  " + by);
         }
         return jdbcTemplate.query(sql, new FilmRowMapper());
     }

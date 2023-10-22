@@ -3,9 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.impl.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.impl.GenresDbStorage;
@@ -129,7 +127,7 @@ public class FilmService {
     /**
      * ALG_7
      */
-    public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+    public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
         validateService.checkContainsDirectorInDatabase(id);
         Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortBy);
         genresStorage.load(films);
@@ -140,7 +138,7 @@ public class FilmService {
     /**
      * ALG_2
      */
-    public Collection<Film> searchFilms(String query, String by) {
+    public Collection<Film> searchFilms(String query, List<SearchParameter> by) {
         Collection<Film> films = filmStorage.searchFilms(query, by);
         genresStorage.load(films);
         directorStorage.load(films);
