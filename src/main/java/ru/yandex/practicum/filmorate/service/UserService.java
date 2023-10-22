@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
@@ -15,6 +15,7 @@ import java.util.*;
 public class UserService {
     private final UserStorage userStorage;
     private final ValidateService validateService;
+    private final EventStorage eventStorage;
 
     public User create(User user) {
         setLoginAsNameIfNameIsEmpty(user);
@@ -43,6 +44,7 @@ public class UserService {
         validateService.checkContainsUserInDatabase(idUser);
         validateService.checkContainsUserInDatabase(idFriend);
         userStorage.addFriend(idUser, idFriend);
+        eventStorage.addEvent(idUser, "FRIEND", "ADD", idFriend);
     }
 
     /**
@@ -56,6 +58,7 @@ public class UserService {
     public void deleteFriend(Long idUser, Long idFriend) {
         validateService.checkContainsUserInDatabase(idUser);
         userStorage.deleteFriend(idUser, idFriend);
+        eventStorage.addEvent(idUser, "FRIEND", "REMOVE", idFriend);
     }
 
     public Collection<User> getAllFriends(Long idUser) {
@@ -77,11 +80,4 @@ public class UserService {
         }
     }
 
-    /**
-     * ALG_5
-     */
-    public Collection<Event> getEvents(Long userId) {
-        validateService.checkContainsUserInDatabase(userId);
-        return userStorage.getEvents(userId);
-    }
 }
