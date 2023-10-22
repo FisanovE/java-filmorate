@@ -6,8 +6,9 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.*;
@@ -23,12 +24,14 @@ public class ReviewDbStorage implements ReviewStorage {
     private final JdbcOperations jdbcOperations;
     private final ReviewRowMapper reviewRowMapper = new ReviewRowMapper();
 
+    private final EventStorage eventStorage;
+
     /**
      * ALG_1
      */
     @Override
     public Review create(Review review) {
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert((JdbcTemplate) jdbcOperations);
         simpleJdbcInsert.withTableName("reviews").usingGeneratedKeyColumns("review_id");
         Map<String, Object> reviewInMap = new HashMap<>();
         reviewInMap.put("content", review.getContent());
@@ -50,7 +53,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcOperations.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         updatedReview.setContent(review.getContent());
         updatedReview.setIsPositive(review.getIsPositive());
-        filmDbStorage.addEvent(updatedReview.getUserId(), "REVIEW", "UPDATE", updatedReview.getFilmId());
+        eventStorage.addEvent(updatedReview.getUserId(), "REVIEW", "UPDATE", updatedReview.getFilmId());
     }
 
     /**
@@ -91,7 +94,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
                     "GROUP BY r.review_id " +
                     "LIMIT ?";
-            return jdbcTemplate.query(sql, reviewRowMapper, count);
+            return jdbcOperations.query(sql, reviewRowMapper, count);
         } else {
             sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
                     "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
@@ -100,7 +103,7 @@ public class ReviewDbStorage implements ReviewStorage {
                     "WHERE r.film_id = ?" +
                     "GROUP BY r.review_id " +
                     "LIMIT ?";
-            return jdbcTemplate.query(sql, reviewRowMapper, filmId, count);
+            return jdbcOperations.query(sql, reviewRowMapper, filmId, count);
         }
     }
 
