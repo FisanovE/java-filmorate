@@ -33,6 +33,7 @@ class FilmorateApplicationTests {
     private final MpaService mpaService;
     private final ReviewService reviewService;
     private final ReviewDbStorage reviewDbStorage;
+    private final EventService eventService;
     private User user;
     private Film film;
     private Review review;
@@ -653,8 +654,6 @@ class FilmorateApplicationTests {
             filmService.create(film);
 
             film.setId(i);
-            film.setGenres(new LinkedHashSet<>());
-            film.setDirectors(new LinkedHashSet<>());
             films.add(film);
         }
         for (String name : userNames) {
@@ -905,7 +904,7 @@ class FilmorateApplicationTests {
         reviewService.update(reviewUpdate);
         reviewService.delete(reviewUpdate.getReviewId());
 
-        List<Event> events = new ArrayList<>(userService.getEvents(userNew1.getId()));
+        List<Event> events = new ArrayList<>(eventService.getEvents(userNew1.getId()));
 
         assertThat(events).isNotEmpty().hasSize(7);
         assertThat(events.get(0).getEventId()).isEqualTo(1L);
