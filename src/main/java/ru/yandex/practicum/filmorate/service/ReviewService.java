@@ -20,7 +20,6 @@ public class ReviewService {
 
     private final ReviewDbStorage reviewDbStorage;
     private final ValidateService validateService;
-    private final UserService userService;
     private final EventStorage eventStorage;
 
     public Review create(Review review) {
@@ -35,7 +34,7 @@ public class ReviewService {
 
     public Review update(Review review) {
         validateService.checkContainsReviewInDatabase(review.getReviewId());
-        userService.getById(review.getUserId());
+        validateService.checkContainsUserInDatabase(review.getUserId());
         validateService.checkContainsFilmInDatabase(review.getFilmId());
         validateService.checkReview(review);
         reviewDbStorage.update(review);
@@ -63,25 +62,25 @@ public class ReviewService {
 
     public void addLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        userService.getById(userId);
+        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.addLike(reviewId, userId);
     }
 
     public void addDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        userService.getById(userId);
+        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.addDislike(reviewId, userId);
     }
 
     public void deleteLike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        userService.getById(userId);
+        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.deleteLike(reviewId, userId);
     }
 
     public void deleteDislike(Long reviewId, Long userId) {
         validateService.checkContainsReviewInDatabase(reviewId);
-        userService.getById(userId);
+        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.deleteDislike(reviewId, userId);
     }
 
