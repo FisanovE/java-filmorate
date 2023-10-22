@@ -113,19 +113,6 @@ public class FilmDbStorage implements FilmStorage {
         jdbcOperations.update(sql, filmId, userId);
     }
 
-    @Override
-    public Collection<Film> getTopRatingFilms(int count) {
-        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, m.mpa_id, m.mpa_name " +
-                "FROM FILMS AS F " +
-                "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
-                "LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID " +
-                "GROUP BY F.FILM_ID " +
-                "ORDER BY COUNT(L.USER_ID) DESC " +
-                "LIMIT ?";
-
-        return jdbcOperations.query(sql, new FilmRowMapper(), count);
-    }
-
     /**
      * ALG_8
      */
