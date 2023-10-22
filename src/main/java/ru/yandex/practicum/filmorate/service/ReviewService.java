@@ -39,7 +39,7 @@ public class ReviewService {
         validateService.checkContainsFilmInDatabase(review.getFilmId());
         validateService.checkReview(review);
         reviewDbStorage.update(review);
-        eventStorage.addEvent(updated.getUserId(), "REVIEW", "UPDATE", updated.getFilmId());
+        eventStorage.addEvent(review.getReviewId(), "REVIEW", "UPDATE", review.getReviewId());
         return getById(review.getReviewId());
     }
 
