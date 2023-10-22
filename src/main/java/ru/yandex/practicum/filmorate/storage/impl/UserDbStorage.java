@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import lombok.extern.slf4j.Slf4j;
@@ -17,16 +17,12 @@ import java.util.*;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     @Override
-    public User addNewUser(User user) {
+    public User create(User user) {
         String sqlRequest = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -47,50 +43,36 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public void update(User user) {
         String sqlRequest = "UPDATE USERS SET EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? WHERE USER_ID = ?";
-        int rowsUpdated = jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("Invalid User ID:  " + user.getId());
-        }
-
-        log.info("User update: {} {}", user.getId(), user.getLogin());
-        return user;
+        jdbcTemplate.update(sqlRequest, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
     }
 
     @Override
-    public Collection<User> getAllUsers() {
+    public Collection<User> getAll() {
         String sql = "SELECT * FROM USERS ORDER BY USER_ID";
         return jdbcTemplate.query(sql, new UserRowMapper());
     }
 
-    public User getUserById(Long id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where user_id = ?", id);
-        if (userRows.next()) {
-            log.info("User found: {} {}", userRows.getString("user_id"), userRows.getString("name"));
+    public User getById(Long id) {
+        String sql = "select * from users where user_id = ?";
+        return jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
+    }
 
-            return User.builder().id(userRows.getLong("user_id")).email(userRows.getString("email"))
-                    .login(userRows.getString("login")).name(userRows.getString("name"))
-                    .birthday(Objects.requireNonNull(userRows.getDate("birthday")).toLocalDate()).build();
-        } else {
-            log.info("Invalid User ID: {}", id);
-            throw new NotFoundException("Invalid User ID:  " + id);
-        }
+    /**
+     * ALG_6
+     */
+    //@Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
     public void addFriend(Long idUser, Long idFriend) {
-        if (idFriend <= 0) {
-            throw new NotFoundException("Invalid User ID:  " + idFriend);
-        }
         String sqlRequest = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
-        int rowsUpdated = jdbcTemplate.update(sqlRequest, idUser, idFriend);
-
-        if (rowsUpdated == 0) {
-            throw new NotFoundException("User ID is missing in friends:  " + idFriend);
-        }
-        log.info("Added friends ID: {}", idFriend);
+        jdbcTemplate.update(sqlRequest, idUser, idFriend);
+        addEvent(idUser, "FRIEND", "ADD", idFriend);
     }
 
 
@@ -98,20 +80,13 @@ public class UserDbStorage implements UserStorage {
     public void deleteFriend(Long idUser, Long idFriend) {
         String sql = "DELETE FROM friends WHERE USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sql, idUser, idFriend);
+        addEvent(idUser, "FRIEND", "REMOVE", idFriend);
     }
 
     @Override
-    public Collection<User> getAllFriendsOfUser(Long idUser) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", idUser);
-        if (sqlRows.first()) {
-            log.info("ALG_6. User found: {}", idUser);
-        } else {
-            log.info("ALG_6. User not found: {}", idUser);
-            throw new NotFoundException("ALG_6. User not found: " + idUser);
-        }
-        String sql = "SELECT * FROM USERS WHERE user_ID IN (select friend_id FROM friends WHERE user_id = ?) " +
-                "ORDER BY USER_ID";
-
+    public Collection<User> getAllFriends(Long idUser) {
+        String sql = "SELECT * FROM users WHERE user_id IN (select friend_id FROM friends WHERE user_id = ?) " +
+                "ORDER BY user_id";
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser);
     }
 
@@ -122,17 +97,25 @@ public class UserDbStorage implements UserStorage {
                 "ORDER BY friend_id) AS ids " +
                 "GROUP BY " + "friend_id HAVING count(friend_id)>1) " +
                 "ORDER BY USER_ID";
-
         return jdbcTemplate.query(sql, new UserRowMapper(), idUser, idOtherUser, idUser, idOtherUser);
     }
 
     /**
-     * ALG_6
+     * ALG5
      */
-    //@Override
-    public void deleteUser(Long id) {
-        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
-        jdbcTemplate.update(sqlQuery, id);
-        log.info("ALG_6. User ID " + id + " deleted");
+    private void addEvent(Long userId, String eventType, String operation, Long entityId) {
+        String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, userId, eventType, operation, entityId, System.currentTimeMillis());
     }
+
+    /**
+     * ALG5
+     */
+    @Override
+    public List<Event> getEvents(Long userId) {
+        String sql = "SELECT * FROM events WHERE user_id = ?";
+        return jdbcTemplate.query(sql, new EventRowMapper(), userId);
+    }
+
 }

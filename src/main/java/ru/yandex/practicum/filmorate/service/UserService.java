@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -13,53 +13,61 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
-    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    private final ValidateService validateService;
 
-    public User addNewUser(User user) {
+    public User create(User user) {
         setLoginAsNameIfNameIsEmpty(user);
-        return userStorage.addNewUser(user);
+        return userStorage.create(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
+        validateService.checkContainsUserInDatabase(user.getId());
+        validateService.checkingUserForValid(user);
         setLoginAsNameIfNameIsEmpty(user);
-        return userStorage.updateUser(user);
+        userStorage.update(user);
+        return user;
     }
 
-    public User getUserById(Long userId) {
-        return userStorage.getUserById(userId);
+    public User getById(Long userId) {
+        validateService.checkContainsUserInDatabase(userId);
+        return userStorage.getById(userId);
     }
 
-    public Collection<User> getAllUsers() {
-        return userStorage.getAllUsers();
+    public Collection<User> getAll() {
+        return userStorage.getAll();
     }
 
     public void addFriend(Long idUser, Long idFriend) {
-        if (idUser.equals(idFriend)) {
-            throw new IllegalArgumentException("You can't add yourself as a friend:  " + idFriend);
-        } else {
-            userStorage.addFriend(idUser, idFriend);
-        }
+        validateService.checkMatchingIdUsers(idUser, idFriend);
+        validateService.checkContainsUserInDatabase(idUser);
+        validateService.checkContainsUserInDatabase(idFriend);
+        userStorage.addFriend(idUser, idFriend);
     }
 
     /**
      * ALG_6
      */
-    public void deleteUser(Long id) {
-        userStorage.deleteUser(id);
+    public void delete(Long id) {
+        validateService.checkContainsUserInDatabase(id);
+        userStorage.delete(id);
     }
 
     public void deleteFriend(Long idUser, Long idFriend) {
+        validateService.checkContainsUserInDatabase(idUser);
         userStorage.deleteFriend(idUser, idFriend);
     }
 
-    public Collection<User> getAllFriendsOfUser(Long idUser) {
-        return userStorage.getAllFriendsOfUser(idUser);
+    public Collection<User> getAllFriends(Long idUser) {
+        validateService.checkContainsUserInDatabase(idUser);
+        return userStorage.getAllFriends(idUser);
     }
 
 
     public Collection<User> getMutualFriends(Long idUser, Long idOtherUser) {
+        validateService.checkMatchingIdUsers(idUser, idOtherUser);
+        validateService.checkContainsUserInDatabase(idUser);
+        validateService.checkContainsUserInDatabase(idOtherUser);
         return userStorage.getMutualFriends(idUser, idOtherUser);
     }
 
@@ -67,5 +75,13 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+    }
+
+    /**
+     * ALG_5
+     */
+    public Collection<Event> getEvents(Long userId) {
+        validateService.checkContainsUserInDatabase(userId);
+        return userStorage.getEvents(userId);
     }
 }

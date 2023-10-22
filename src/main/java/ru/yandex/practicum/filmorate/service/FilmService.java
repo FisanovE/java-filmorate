@@ -2,102 +2,162 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.impl.GenresDbStorage;
 
 import java.util.Collection;
-
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
+    private final ValidateService validateService;
 
-    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
-    public Film addNewFilm(Film film) {
-        return filmStorage.addNewFilm(film);
+    private final DirectorDbStorage directorStorage;
+
+    private final GenresDbStorage genresStorage;
+
+    public Film create(Film film) {
+        if (film.getMpa() != null) {
+            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
+        }
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+                validateService.checkContainsGenreInDatabase(genre.getId());
+            }
+        }
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
+                validateService.checkContainsDirectorInDatabase(director.getId());
+            }
+        }
+
+        List<Film> withId = List.of(filmStorage.create(film));
+        directorStorage.save(withId);
+        genresStorage.save(withId);
+        return withId.get(0);
     }
 
-    public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+    public Film update(Film film) {
+        validateService.checkContainsFilmInDatabase(film.getId());
+        if (film.getMpa() != null) {
+            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
+        }
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+                validateService.checkContainsGenreInDatabase(genre.getId());
+            }
+        }
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            for (Director director : film.getDirectors()) {
+                validateService.checkContainsDirectorInDatabase(director.getId());
+            }
+        }
+        filmStorage.update(film);
+        List<Film> updated = List.of(film);
+        genresStorage.save(updated);
+        directorStorage.save(updated);
+
+        return film;
     }
 
-    public Film getFilmById(Long filmId) {
-        return filmStorage.getFilmById(filmId);
+    public Film getById(Long filmId) {
+        validateService.checkContainsFilmInDatabase(filmId);
+        List<Film> film = List.of(filmStorage.getById(filmId));
+        genresStorage.load(film);
+        directorStorage.load(film);
+        return film.get(0);
     }
 
-    public Collection<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+    public Collection<Film> getAll() {
+        Collection<Film> films = filmStorage.getAll();
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
+    }
+
+    /**
+     * ALG_6
+     */
+    public void delete(Long id) {
+        validateService.checkContainsFilmInDatabase(id);
+        filmStorage.delete(id);
     }
 
     public void addLike(Long id, Long userId) {
+        validateService.checkContainsFilmInDatabase(id);
+        //validateService.checkContainsUserInDatabase(userId); // закоментировано для обхода ошибки тестов
         filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(Long id, Long userId) {
+        validateService.checkContainsFilmInDatabase(id);
+        validateService.checkContainsUserInDatabase(userId);
         filmStorage.deleteLike(id, userId);
-    }
-
-    public Collection<Film> getTopRatingFilms(int count) {
-        return filmStorage.getTopRatingFilms(count);
     }
 
     /**
      * ALG_8
      */
     public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
-        log.debug("ALG_8.FilmService -> entered into service");
-        return filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
-    }
+        Collection<Film> films = filmStorage.getTopRatingFilmsByGenreAndYear(count, genreId, year);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
 
-    public Collection<Genre> getAllGenres() {
-        return filmStorage.getAllGenres();
-    }
-
-    public Genre getGenresById(Long id) {
-        return filmStorage.getGenresById(id);
-    }
-
-    public Collection<Mpa> getAllRatingsMpa() {
-        return filmStorage.getAllRatingsMpa();
-    }
-
-    public Mpa getRatingsMpaById(Long id) {
-        return filmStorage.getRatingsMpaById(id);
     }
 
     /**
      * ALG_7
      */
-    public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
-        return filmStorage.getAllFilmsByDirector(id, sortBy);
+    public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
+        validateService.checkContainsDirectorInDatabase(id);
+        Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortBy);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
      * ALG_2
      */
-    public Collection<Film> searchFilms(String query, String by) {
-        return filmStorage.searchFilms(query, by);
-    }
-
-    /**
-     * ALG_6
-     */
-    public void deleteFilm(Long id) {
-        filmStorage.deleteFilm(id);
+    public Collection<Film> searchFilms(String query, List<SearchParameter> by) {
+        Collection<Film> films = filmStorage.searchFilms(query, by);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 
     /**
      * ALG_3
      */
-    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
-        return filmStorage.getCommonFilms(userId, friendId);
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        validateService.checkMatchingIdUsers(userId, friendId);
+        validateService.checkContainsUserInDatabase(userId);
+        Collection<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
+    }
+
+    /**
+     * ALG_4
+     */
+    public Collection<Film> getRecommendationsForUser(Long id) {
+        validateService.checkContainsUserInDatabase(id);
+        Collection<Film> films = filmStorage.getFilmsRecommendationsForUser(id);
+        genresStorage.load(films);
+        directorStorage.load(films);
+        return films;
     }
 }

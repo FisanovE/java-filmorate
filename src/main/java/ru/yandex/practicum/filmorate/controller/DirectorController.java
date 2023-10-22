@@ -22,33 +22,33 @@ public class DirectorController {
     private final DirectorService directorService;
 
     @PostMapping
-    public Director addNewDirector(@RequestBody Director director) {
-        log.info("ALG_7. Endpoint -> Create director");
-        return directorService.addNewDirector(director);
+    public Director create(@RequestBody Director director) {
+        log.info("Create director");
+        return directorService.create(director);
     }
 
     @PutMapping
-    public Director updateFilm(@RequestBody Director director) {
-        log.info("ALG_7. Endpoint -> Update director");
-        return directorService.updateDirector(director);
+    public Director update(@RequestBody Director director) {
+        log.info("Update director {}", director.getId());
+        return directorService.update(director);
     }
 
     @GetMapping("/{id}")
-    public Director getDirectorById(@PathVariable Long id) {
-        log.info("ALG_7. Endpoint -> Get directors {}", id);
-        return directorService.getDirectorById(id);
+    public Director getById(@PathVariable Long id) {
+        log.info("Get directors {}", id);
+        return directorService.getById(id);
     }
 
     @GetMapping
-    public Collection<Director> getAllDirectors() {
-        log.info("ALG_7. Endpoint -> Get directors");
-        return directorService.getAllDirectors();
+    public Collection<Director> getAll() {
+        log.info("Get directors");
+        return directorService.getAll();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDirectorById(@PathVariable Long id) {
-        log.info("ALG_7. Endpoint -> Delete directors {}", id);
-        directorService.deleteDirectorById(id);
+    public void deleteById(@PathVariable Long id) {
+        log.info("Delete directors {}", id);
+        directorService.delete(id);
     }
 
 }

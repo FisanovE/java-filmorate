@@ -16,25 +16,34 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class DirectorService {
 
+    private final ValidateService validateService;
+
     private final DirectorStorage directorStorage;
 
-    public Director addNewDirector(Director director) {
+    public Director create(Director director) {
+        validateService.checkNameNotBlank(director.getName());
         return directorStorage.addNewDirector(director);
     }
 
-    public Director updateDirector(Director director) {
-        return directorStorage.updateDirector(director);
+    public Director update(Director director) {
+        validateService.checkIdNotNull(director.getId());
+        validateService.checkNameNotBlank(director.getName());
+        validateService.checkContainsDirectorInDatabase(director.getId());
+        directorStorage.updateDirector(director);
+        return director;
     }
 
-    public Director getDirectorById(Long directorId) {
+    public Director getById(Long directorId) {
+        validateService.checkContainsDirectorInDatabase(directorId);
         return directorStorage.getDirectorById(directorId);
     }
 
-    public Collection<Director> getAllDirectors() {
+    public Collection<Director> getAll() {
         return directorStorage.getAllDirectors();
     }
 
-    public void deleteDirectorById(Long directorId) {
+    public void delete(Long directorId) {
+        validateService.checkContainsDirectorInDatabase(directorId);
         directorStorage.deleteDirectorById(directorId);
     }
 
