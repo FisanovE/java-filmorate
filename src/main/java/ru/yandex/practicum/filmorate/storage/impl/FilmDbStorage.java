@@ -224,7 +224,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT F.FILM_ID, F.name, F.description, F.release_date, F.duration, m.mpa_id, m.mpa_name " +
                 "FROM FILMS f " +
                 "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
-                "LEFT JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
+                "JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
                 "WHERE F.FILM_ID IN (SELECT FILM_ID " +
                 "FROM LIKES " +
                 "WHERE FILM_ID IN (SELECT FILM_ID " +
