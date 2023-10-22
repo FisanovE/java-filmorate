@@ -4,14 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.SearchSetup;
+import ru.yandex.practicum.filmorate.model.SearchParameter;
+import ru.yandex.practicum.filmorate.model.SortParameter;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -79,12 +82,14 @@ public class FilmController {
      * ALG_7
      */
     @GetMapping("/director/{directorId}")
-    public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+    public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam SortParameter sortBy) {
         log.info("Get films/directorId {} sortBy {} ", directorId, sortBy);
-        if (Objects.equals(sortBy, "year") || Objects.equals(sortBy, "likes")) {
-            return filmService.getAllFilmsByDirector(directorId, sortBy);
-        } else {
-            throw new NotFoundException("ALG_7. Invalid RequestParam:  " + sortBy);
+        switch (sortBy) {
+            case YEAR:
+            case LIKES:
+                return filmService.getAllFilmsByDirector(directorId, sortBy);
+            default:
+                throw new ValidationException("ALG_7. Invalid RequestParam:  " + sortBy);
         }
     }
 
@@ -94,27 +99,10 @@ public class FilmController {
     @GetMapping("/search")
     public Collection<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
         log.info("Get films/search {} by {} ", query, by);
-        String[] fields = by.split(",");
-        if (fields.length == 1) {
-            SearchSetup setup = SearchSetup.valueOf(fields[0]);
-            switch (setup) {
-                case director:
-                case title:
-                    return filmService.searchFilms(query, by);
-                default:
-                    throw new NotFoundException("ALG_2. Invalid search param:  " + by);
-            }
-        } else if (fields.length == 2) {
-            SearchSetup setup1 = SearchSetup.valueOf(fields[0]);
-            SearchSetup setup2 = SearchSetup.valueOf(fields[1]);
-            if ((setup1 == SearchSetup.director && setup2 == SearchSetup.title) ||
-                    (setup1 == SearchSetup.title && setup2 == SearchSetup.director)) {
-                return filmService.searchFilms(query, by);
-            } else {
-                throw new NotFoundException("ALG_2. Invalid search param:  " + by);
-            }
-        }
-        throw new NotFoundException("ALG_2. Invalid search param:  " + by);
+        return filmService.searchFilms(query, new ArrayList<>(List.of(by.split(","))).stream()
+                .map(String::toUpperCase)
+                .map(SearchParameter::valueOf)
+                .collect(Collectors.toList()));
     }
 
     /**

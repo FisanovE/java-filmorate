@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchParameter;
+import ru.yandex.practicum.filmorate.model.SortParameter;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
 
@@ -28,7 +31,7 @@ public interface FilmStorage {
     /**
      * ALG_7
      */
-    Collection<Film> getAllFilmsByDirector(Long id, String sortBy);
+    Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy);
 
     /**
      * ALG_6
@@ -38,7 +41,7 @@ public interface FilmStorage {
     /**
      * ALG_2
      */
-    Collection<Film> searchFilms(String query, String by);
+    Collection<Film> searchFilms(String query, List<SearchParameter> by);
 
     /**
      * ALG_3

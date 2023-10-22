@@ -721,8 +721,8 @@ class FilmorateApplicationTests {
         filmService.addLike(filmAdded2.getId(), userAdded2.getId());
         filmService.addLike(filmAdded3.getId(), userAdded1.getId());
 
-        List<Film> filmsSortByLikes = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), "likes"));
-        List<Film> filmsSortByYear = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), "year"));
+        List<Film> filmsSortByLikes = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), SortParameter.LIKES));
+        List<Film> filmsSortByYear = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), SortParameter.YEAR));
 
         assertThat(filmsSortByLikes).isNotEmpty().hasSize(3);
         assertThat(filmsSortByLikes.get(0).getId()).isEqualTo(filmAdded1.getId());
@@ -780,10 +780,10 @@ class FilmorateApplicationTests {
         filmService.addLike(filmAdded3.getId(), userAdded2.getId());
         filmService.addLike(filmAdded2.getId(), userAdded1.getId());
 
-        List<Film> filmsSearchByDirector = new ArrayList<>(filmService.searchFilms("aV", "director"));
-        List<Film> filmsSearchByTitle = new ArrayList<>(filmService.searchFilms("aV", "title"));
-        List<Film> filmsSearchByTitleAndDirector = new ArrayList<>(filmService.searchFilms("aV", "title,director"));
-        List<Film> filmsSearchByDirectorAndTitle = new ArrayList<>(filmService.searchFilms("aV", "director,title"));
+        List<Film> filmsSearchByDirector = new ArrayList<>(filmService.searchFilms("aV", new ArrayList<SearchParameter>(Arrays.asList(SearchParameter.DIRECTOR))));
+        List<Film> filmsSearchByTitle = new ArrayList<>(filmService.searchFilms("aV", new ArrayList<SearchParameter>(Arrays.asList(SearchParameter.TITLE))));
+        List<Film> filmsSearchByTitleAndDirector = new ArrayList<>(filmService.searchFilms("aV", new ArrayList<SearchParameter>(Arrays.asList(SearchParameter.TITLE, SearchParameter.DIRECTOR))));
+        List<Film> filmsSearchByDirectorAndTitle = new ArrayList<>(filmService.searchFilms("aV", new ArrayList<SearchParameter>(Arrays.asList(SearchParameter.DIRECTOR, SearchParameter.TITLE))));
 
         assertThat(filmsSearchByDirector).isNotEmpty().hasSize(2);
         assertThat(filmsSearchByDirector.get(0).getId()).isEqualTo(filmAdded3.getId());

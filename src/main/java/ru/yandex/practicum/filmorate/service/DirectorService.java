@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
@@ -22,13 +21,13 @@ public class DirectorService {
     private final DirectorStorage directorStorage;
 
     public Director create(Director director) {
-        if (director.getName().isBlank()) {
-            throw new ValidationException("ALG_7. Invalid name format: \"" + director.getName() + "\"");
-        }
+        validateService.checkNameNotBlank(director.getName());
         return directorStorage.addNewDirector(director);
     }
 
     public Director update(Director director) {
+        validateService.checkIdNotNull(director.getId());
+        validateService.checkNameNotBlank(director.getName());
         validateService.checkContainsDirectorInDatabase(director.getId());
         directorStorage.updateDirector(director);
         return director;

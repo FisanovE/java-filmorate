@@ -33,6 +33,12 @@ public class ValidateService {
         }
     }
 
+    public void checkNameNotBlank(String name) throws ValidationException {
+        if (name.isBlank()) {
+            throw new ValidationException("Name is empty: \"" + name + "\"");
+        }
+    }
+
     public void checkingFilmForValid(Film film) throws ValidationException {
         if (film.getName().isBlank()) {
             throw new ValidationException("Invalid title format: \"" + film.getName() + "\"");
