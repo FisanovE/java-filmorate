@@ -535,7 +535,7 @@ class FilmorateApplicationTests {
         reviewMain.setIsPositive(false);
         reviewDbStorage.update(reviewMain);
         Review reviewInDb = reviewService.getById(1L);
-        List<Review> reviews = reviewDbStorage.getAll();
+        List<Review> reviews = reviewService.getByFilmId(1L, 10);
         reviewService.addLike(1L, 1L);
         reviewService.addDislike(1L, 2L);
         reviewService.deleteLike(1L, 1L);

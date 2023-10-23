@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.*;
@@ -51,7 +50,7 @@ public class ReviewDbStorage implements ReviewStorage {
      * ALG_1
      */
     @Override
-    public Review update(Review review) {
+    public void update(Review review) {
         userDbStorage.checkContainsUser(review.getUserId());
         filmDbStorage.checkContainsFilm(review.getFilmId());
         Review updatedReview = getById(review.getReviewId());
@@ -62,7 +61,6 @@ public class ReviewDbStorage implements ReviewStorage {
         if (rows == 0) {
             throw new NotFoundException("Invalid Review ID:  " + review.getReviewId());
         }
-        return updatedReview;
     }
 
     /**
@@ -101,7 +99,7 @@ public class ReviewDbStorage implements ReviewStorage {
      * ALG_1
      */
     @Override
-    public List<Review> getAll(Long filmId, Integer count) {
+    public List<Review> getByFilmId(Long filmId, Integer count) {
         String sql;
         if (filmId == 0) {
             sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
