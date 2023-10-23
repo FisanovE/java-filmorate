@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -11,7 +10,6 @@ import java.util.LinkedHashSet;
 @Getter
 @Setter
 @Builder
-@ToString
 public class Film {
     private Long id;
     private String name;

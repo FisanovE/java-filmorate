@@ -10,7 +10,7 @@ name VARCHAR(255) NOT NULL,
 description VARCHAR,
 release_date DATE NOT NULL,
 duration INTEGER NOT NULL,
-mpa_id BIGINT REFERENCES public.mpa (mpa_id) on update cascade ON DELETE CASCADE
+mpa_id BIGINT NOT NULL REFERENCES public.mpa (mpa_id) on update cascade ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS public.genres (

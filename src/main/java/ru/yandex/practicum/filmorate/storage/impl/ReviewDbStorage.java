@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -127,5 +128,10 @@ public class ReviewDbStorage implements ReviewStorage {
     public void deleteDislike(Long reviewId, Long userId) {
         String sql = "DELETE FROM reviews_like WHERE review_id = ? AND user_id = ? AND is_useful = false";
         jdbcOperations.update(sql, reviewId, userId);
+    }
+
+    @Override
+    public SqlRowSet getReviewRow(Long id) {
+        return jdbcOperations.queryForRowSet("SELECT * FROM reviews WHERE review_id = ?", id);
     }
 }

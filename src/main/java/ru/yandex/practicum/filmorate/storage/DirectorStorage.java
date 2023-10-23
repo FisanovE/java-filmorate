@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -23,5 +24,7 @@ public interface DirectorStorage {
     void save(Collection<Film> film);
 
     void load(Collection<Film> films);
+
+    SqlRowSet getDirectorRow(Long id);
 }
 

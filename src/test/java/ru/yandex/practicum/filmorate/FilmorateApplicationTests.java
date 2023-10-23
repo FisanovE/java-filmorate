@@ -269,6 +269,7 @@ class FilmorateApplicationTests {
     @DisplayName("Добавление нового фильма")
     void shouldAddNewFilm() {
         Film filmNew = createFilm();
+        filmNew.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded = filmStorage.create(filmNew);
         List<Film> films = new ArrayList<>(filmService.getAll());
         assertThat(films).isNotEmpty().hasSize(1);
@@ -277,7 +278,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(0).getDescription()).isEqualTo(filmAdded.getDescription());
         assertThat(films.get(0).getDuration()).isEqualTo(filmAdded.getDuration());
         assertThat(films.get(0).getReleaseDate()).isEqualTo(filmAdded.getReleaseDate());
-        assertThat(films.get(0).getMpa()).isEqualTo(filmAdded.getMpa());
+        assertThat(films.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(0).getDirectors()).isEqualTo(filmAdded.getDirectors());
         assertThat(films.get(0).getGenres()).isEqualTo(filmAdded.getGenres());
     }
@@ -287,8 +289,10 @@ class FilmorateApplicationTests {
     @DisplayName("Обновление фильма ")
     void shouldUpdateFilm() {
         Film filmNew = createFilm();
+        filmNew.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded = filmService.create(filmNew);
         Film filmUpdate = updateFilm();
+        filmUpdate.setMpa(Mpa.builder().id(1L).name("G").build());
 
         Film filmUpdate2 = filmService.update(filmUpdate);
 
@@ -300,7 +304,8 @@ class FilmorateApplicationTests {
         assertThat(listUpdate.get(0).getDescription()).isEqualTo(filmUpdate2.getDescription());
         assertThat(listUpdate.get(0).getDuration()).isEqualTo(filmUpdate2.getDuration());
         assertThat(listUpdate.get(0).getReleaseDate()).isEqualTo(filmUpdate2.getReleaseDate());
-        assertThat(listUpdate.get(0).getMpa()).isEqualTo(filmUpdate2.getMpa());
+        assertThat(listUpdate.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(listUpdate.get(0).getDirectors()).isEqualTo(filmUpdate2.getDirectors());
         assertThat(listUpdate.get(0).getGenres()).isEqualTo(filmUpdate2.getGenres());
     }
@@ -310,6 +315,7 @@ class FilmorateApplicationTests {
     @DisplayName("Получение списка всех фильмов")
     void shouldReturnListAllFilms() {
         Film filmNew = createFilm();
+        filmNew.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded = filmService.create(filmNew);
         List<Film> listAllFilms = new ArrayList<>(filmService.getAll());
         assertThat(listAllFilms).isNotEmpty().hasSize(1);
@@ -318,7 +324,8 @@ class FilmorateApplicationTests {
         assertThat(listAllFilms.get(0).getDescription()).isEqualTo(filmAdded.getDescription());
         assertThat(listAllFilms.get(0).getDuration()).isEqualTo(filmAdded.getDuration());
         assertThat(listAllFilms.get(0).getReleaseDate()).isEqualTo(filmAdded.getReleaseDate());
-        assertThat(listAllFilms.get(0).getMpa()).isEqualTo(filmAdded.getMpa());
+        assertThat(listAllFilms.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(listAllFilms.get(0).getDirectors()).isEqualTo(filmAdded.getDirectors());
         assertThat(listAllFilms.get(0).getGenres()).isEqualTo(filmAdded.getGenres());
     }
@@ -330,6 +337,7 @@ class FilmorateApplicationTests {
         User userNew = createUser();
         User userAdded = userService.create(userNew);
         Film filmNew = createFilm();
+        filmNew.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded = filmService.create(filmNew);
         filmService.addLike(filmAdded.getId(), userAdded.getId());
 
@@ -341,7 +349,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(0).getDescription()).isEqualTo(filmAdded.getDescription());
         assertThat(films.get(0).getDuration()).isEqualTo(filmAdded.getDuration());
         assertThat(films.get(0).getReleaseDate()).isEqualTo(filmAdded.getReleaseDate());
-        assertThat(films.get(0).getMpa()).isEqualTo(filmAdded.getMpa());
+        assertThat(films.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(0).getDirectors()).isEqualTo(filmAdded.getDirectors());
         assertThat(films.get(0).getGenres()).isEqualTo(filmAdded.getGenres());
     }
@@ -362,6 +371,9 @@ class FilmorateApplicationTests {
         Film filmNew1 = createFilm();
         Film filmNew2 = createFilm();
         Film filmNew3 = createFilm();
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew2.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew3.setMpa(Mpa.builder().id(1L).name("G").build());
         filmNew2.setName("Name Film2");
         filmNew3.setName("Name Film3");
         Film filmAdded1 = filmService.create(filmNew1);
@@ -382,7 +394,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(0).getDescription()).isEqualTo(filmAdded1.getDescription());
         assertThat(films.get(0).getDuration()).isEqualTo(filmAdded1.getDuration());
         assertThat(films.get(0).getReleaseDate()).isEqualTo(filmAdded1.getReleaseDate());
-        assertThat(films.get(0).getMpa()).isEqualTo(filmAdded1.getMpa());
+        assertThat(films.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(0).getDirectors()).isEqualTo(filmAdded1.getDirectors());
         assertThat(films.get(0).getGenres()).isEqualTo(filmAdded1.getGenres());
 
@@ -391,7 +404,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(1).getDescription()).isEqualTo(filmAdded2.getDescription());
         assertThat(films.get(1).getDuration()).isEqualTo(filmAdded2.getDuration());
         assertThat(films.get(1).getReleaseDate()).isEqualTo(filmAdded2.getReleaseDate());
-        assertThat(films.get(1).getMpa()).isEqualTo(filmAdded2.getMpa());
+        assertThat(films.get(1).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(1).getDirectors()).isEqualTo(filmAdded2.getDirectors());
         assertThat(films.get(1).getGenres()).isEqualTo(filmAdded2.getGenres());
 
@@ -400,13 +414,15 @@ class FilmorateApplicationTests {
         assertThat(films.get(2).getDescription()).isEqualTo(filmAdded3.getDescription());
         assertThat(films.get(2).getDuration()).isEqualTo(filmAdded3.getDuration());
         assertThat(films.get(2).getReleaseDate()).isEqualTo(filmAdded3.getReleaseDate());
-        assertThat(films.get(2).getMpa()).isEqualTo(filmAdded3.getMpa());
+        assertThat(films.get(2).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(2).getDirectors()).isEqualTo(filmAdded3.getDirectors());
         assertThat(films.get(2).getGenres()).isEqualTo(filmAdded3.getGenres());
 
         Film filmNew4 = createFilm();
         filmNew4.setName("Name Film4");
         filmNew4.setGenres(new LinkedHashSet<>(List.of(Genre.builder().id(1L).name("Комедия").build())));
+        filmNew4.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded4 = filmService.create(filmNew4);
 
         List<Film> filmsByGenre = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, 1L, -1));
@@ -417,13 +433,15 @@ class FilmorateApplicationTests {
         assertThat(filmsByGenre.get(0).getDescription()).isEqualTo(filmAdded4.getDescription());
         assertThat(filmsByGenre.get(0).getDuration()).isEqualTo(filmAdded4.getDuration());
         assertThat(filmsByGenre.get(0).getReleaseDate()).isEqualTo(filmAdded4.getReleaseDate());
-        assertThat(filmsByGenre.get(0).getMpa()).isEqualTo(filmAdded4.getMpa());
+        assertThat(filmsByGenre.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(filmsByGenre.get(0).getDirectors()).isEqualTo(filmAdded4.getDirectors());
         assertThat(filmsByGenre.get(0).getGenres()).isEqualTo(filmAdded4.getGenres());
 
         Film filmNew5 = createFilm();
         filmNew5.setName("Name Film5");
         filmNew5.setReleaseDate(LocalDate.of(2020, 01, 01));
+        filmNew5.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded5 = filmService.create(filmNew5);
 
         List<Film> filmsByYear = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, -1, 2020));
@@ -434,7 +452,8 @@ class FilmorateApplicationTests {
         assertThat(filmsByYear.get(0).getDescription()).isEqualTo(filmAdded5.getDescription());
         assertThat(filmsByYear.get(0).getDuration()).isEqualTo(filmAdded5.getDuration());
         assertThat(filmsByYear.get(0).getReleaseDate()).isEqualTo(filmAdded5.getReleaseDate());
-        assertThat(filmsByYear.get(0).getMpa()).isEqualTo(filmAdded5.getMpa());
+        assertThat(filmsByYear.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(filmsByYear.get(0).getDirectors()).isEqualTo(filmAdded5.getDirectors());
         assertThat(filmsByYear.get(0).getGenres()).isEqualTo(filmAdded5.getGenres());
 
@@ -442,6 +461,7 @@ class FilmorateApplicationTests {
         filmNew6.setName("Name Film5");
         filmNew6.setReleaseDate(LocalDate.of(2021, 01, 01));
         filmNew6.setGenres(new LinkedHashSet<>(List.of(Genre.builder().id(2L).name("Драма").build())));
+        filmNew6.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded6 = filmService.create(filmNew6);
 
         List<Film> filmsByGenreAndYear = new ArrayList<>(filmService.getTopRatingFilmsByGenreAndYear(10, 2L, 2021));
@@ -452,7 +472,8 @@ class FilmorateApplicationTests {
         assertThat(filmsByGenreAndYear.get(0).getDescription()).isEqualTo(filmAdded6.getDescription());
         assertThat(filmsByGenreAndYear.get(0).getDuration()).isEqualTo(filmAdded6.getDuration());
         assertThat(filmsByGenreAndYear.get(0).getReleaseDate()).isEqualTo(filmAdded6.getReleaseDate());
-        assertThat(filmsByGenreAndYear.get(0).getMpa()).isEqualTo(filmAdded6.getMpa());
+        assertThat(filmsByGenreAndYear.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(filmsByGenreAndYear.get(0).getDirectors()).isEqualTo(filmAdded6.getDirectors());
         assertThat(filmsByGenreAndYear.get(0).getGenres()).isEqualTo(filmAdded6.getGenres());
     }
@@ -464,8 +485,10 @@ class FilmorateApplicationTests {
         User userNew1 = createUser();
         User userAdded1 = userService.create(userNew1);
         Film filmNew1 = createFilm();
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded1 = filmService.create(filmNew1);
         Film filmNew2 = createFilm();
+        filmNew2.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded2 = filmService.create(filmNew2);
         filmService.addLike(filmAdded1.getId(), userAdded1.getId());
         filmService.addLike(filmAdded2.getId(), userAdded1.getId());
@@ -651,6 +674,7 @@ class FilmorateApplicationTests {
         for (long i = 1; i <= filmTitles.size(); i++) {
             film = createFilm();
             film.setName(filmTitles.get((int) i - 1));
+            film.setMpa(Mpa.builder().id(1L).name("G").build());
             filmService.create(film);
 
             film.setId(i);
@@ -710,6 +734,9 @@ class FilmorateApplicationTests {
         filmNew1.setGenres(new LinkedHashSet<>());
         filmNew2.setGenres(new LinkedHashSet<>());
         filmNew3.setGenres(new LinkedHashSet<>());
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew2.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew3.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded1 = filmService.create(filmNew1);
         Film filmAdded2 = filmService.create(filmNew2);
         Film filmAdded3 = filmService.create(filmNew3);
@@ -757,6 +784,9 @@ class FilmorateApplicationTests {
         director2.setName("John Cassavetes");
         Director directorAdded1 = directorService.create(director1);
         Director directorAdded2 = directorService.create(director2);
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew2.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew3.setMpa(Mpa.builder().id(1L).name("G").build());
         filmNew1.setGenres(new LinkedHashSet<>());
         filmNew2.setGenres(new LinkedHashSet<>());
         filmNew3.setGenres(new LinkedHashSet<>());
@@ -836,6 +866,11 @@ class FilmorateApplicationTests {
         filmNew3.setDirectors(new LinkedHashSet<>());
         filmNew4.setDirectors(new LinkedHashSet<>());
         filmNew5.setDirectors(new LinkedHashSet<>());
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew2.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew3.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew4.setMpa(Mpa.builder().id(1L).name("G").build());
+        filmNew5.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded1 = filmService.create(filmNew1);
         Film filmAdded2 = filmService.create(filmNew2);
         Film filmAdded3 = filmService.create(filmNew3);
@@ -860,7 +895,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(0).getDescription()).isEqualTo(filmAdded4.getDescription());
         assertThat(films.get(0).getDuration()).isEqualTo(filmAdded4.getDuration());
         assertThat(films.get(0).getReleaseDate()).isEqualTo(filmAdded4.getReleaseDate());
-        assertThat(films.get(0).getMpa()).isEqualTo(filmAdded4.getMpa());
+        assertThat(films.get(0).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(0).getDirectors()).isEqualTo(filmAdded4.getDirectors());
         assertThat(films.get(0).getGenres()).isEqualTo(filmAdded4.getGenres());
 
@@ -869,7 +905,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(1).getDescription()).isEqualTo(filmAdded2.getDescription());
         assertThat(films.get(1).getDuration()).isEqualTo(filmAdded2.getDuration());
         assertThat(films.get(1).getReleaseDate()).isEqualTo(filmAdded2.getReleaseDate());
-        assertThat(films.get(1).getMpa()).isEqualTo(filmAdded2.getMpa());
+        assertThat(films.get(1).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(1).getDirectors()).isEqualTo(filmAdded2.getDirectors());
         assertThat(films.get(1).getGenres()).isEqualTo(filmAdded2.getGenres());
 
@@ -878,7 +915,8 @@ class FilmorateApplicationTests {
         assertThat(films.get(2).getDescription()).isEqualTo(filmAdded3.getDescription());
         assertThat(films.get(2).getDuration()).isEqualTo(filmAdded3.getDuration());
         assertThat(films.get(2).getReleaseDate()).isEqualTo(filmAdded3.getReleaseDate());
-        assertThat(films.get(2).getMpa()).isEqualTo(filmAdded3.getMpa());
+        assertThat(films.get(2).getMpa()).hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
         assertThat(films.get(2).getDirectors()).isEqualTo(filmAdded3.getDirectors());
         assertThat(films.get(2).getGenres()).isEqualTo(filmAdded3.getGenres());
     }
@@ -892,6 +930,7 @@ class FilmorateApplicationTests {
         User userAdded1 = userService.create(userNew1);
         User userAdded2 = userService.create(userNew2);
         Film filmNew1 = createFilm();
+        filmNew1.setMpa(Mpa.builder().id(1L).name("G").build());
         Film filmAdded1 = filmService.create(filmNew1);
         filmService.addLike(filmAdded1.getId(), userAdded1.getId());
         filmService.deleteLike(filmAdded1.getId(), userAdded1.getId());
