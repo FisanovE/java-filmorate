@@ -27,17 +27,6 @@ public class FilmService {
     private final EventStorage eventStorage;
 
     public Film create(Film film) {
-        if (film.getMpa() != null) {
-            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
-        }
-        validateService.checkContainsGenres(film);
-
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                validateService.checkContainsDirectorInDatabase(director.getId());
-            }
-        }
-
         List<Film> withId = List.of(filmStorage.create(film));
         directorStorage.save(withId);
         genresStorage.save(withId);
@@ -46,16 +35,6 @@ public class FilmService {
 
     public Film update(Film film) {
         validateService.checkContainsFilmInDatabase(film.getId());
-        if (film.getMpa() != null) {
-            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
-        }
-        validateService.checkContainsGenres(film);
-
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                validateService.checkContainsDirectorInDatabase(director.getId());
-            }
-        }
         filmStorage.update(film);
         List<Film> updated = List.of(film);
         genresStorage.save(updated);

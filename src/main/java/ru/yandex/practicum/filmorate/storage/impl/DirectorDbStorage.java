@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -100,5 +101,10 @@ public class DirectorDbStorage implements DirectorStorage {
                 film.getDirectors().add(new DirectorRowMapper().mapRow(rs, 0));
             }
         }, filmById.keySet().toArray());
+    }
+
+    @Override
+    public SqlRowSet getDirectorRow(Long id) {
+        return jdbcOperations.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
     }
 }

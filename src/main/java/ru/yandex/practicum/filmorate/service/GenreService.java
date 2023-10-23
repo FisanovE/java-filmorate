@@ -20,7 +20,7 @@ public class GenreService {
     }
 
     public Genre getById(Long id) {
-        validateService.checkContainsGenreInDatabase(id);
+        validateService.checkGenreValidity(id);
         return genresStorage.getGenresById(id);
     }
 

@@ -13,20 +13,15 @@ public class FilmRowMapper implements RowMapper<Film> {
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Mpa mpa = null;
-        if (rs.getLong("mpa.mpa_id") != 0) {
-            mpa = Mpa.builder()
-                    .name(rs.getString("mpa.mpa_name"))
-                    .id(rs.getLong("mpa.mpa_id"))
-                    .build();
-        }
-
         return Film.builder().id(rs.getLong("film_id")).name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .releaseDate(Objects.requireNonNull(rs.getDate("release_date")).toLocalDate())
                 .duration(rs.getInt("duration"))
                 .genres(new LinkedHashSet<>())
-                .mpa(mpa)
+                .mpa(Mpa.builder()
+                        .name(rs.getString("mpa.mpa_name"))
+                        .id(rs.getLong("mpa.mpa_id"))
+                        .build())
                 .directors(new LinkedHashSet<>())
                 .build();
     }

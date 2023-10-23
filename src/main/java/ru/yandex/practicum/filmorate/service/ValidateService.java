@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
@@ -10,6 +9,7 @@ import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.*;
 import ru.yandex.practicum.filmorate.utils.DateUtils;
 
 import java.time.LocalDate;
@@ -20,13 +20,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ValidateService {
-    private static JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public ValidateService(JdbcTemplate jdbcTemplate) {
-        ValidateService.jdbcTemplate = jdbcTemplate;
-    }
+    private final GenresStorage genresStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
+    private final ReviewStorage reviewStorage;
+    private final MpaStorage mpaStorage;
 
     public void checkIdNotNull(Long id) throws ValidationException {
         if (id == null) {
@@ -54,6 +55,11 @@ public class ValidateService {
         if (film.getDuration() < 0) {
             throw new ValidationException("The duration of the film should be positive, you have:  \"" + film.getDuration());
         }
+        if (film.getMpa() == null) {
+            throw new ValidationException("Mpa cannot be empty");
+        } else {
+            checkContainsMpaInDatabase(film.getMpa().getId());
+        }
     }
 
     public void checkingUserForValid(User user) throws ValidationException {
@@ -80,7 +86,7 @@ public class ValidateService {
     }
 
     public void checkContainsUserInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", id);
+        SqlRowSet sqlRows = userStorage.getUserRow(id);
         if (sqlRows.first()) {
             log.info("User found: {}", id);
         } else {
@@ -90,7 +96,7 @@ public class ValidateService {
     }
 
     public void checkContainsFilmInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM films WHERE film_id = ?", id);
+        SqlRowSet sqlRows = filmStorage.getFilmRow(id);
         if (sqlRows.first()) {
             log.info("Film found: {}", id);
         } else {
@@ -100,7 +106,7 @@ public class ValidateService {
     }
 
     public void checkContainsDirectorInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
+        SqlRowSet sqlRows = directorStorage.getDirectorRow(id);
         if (sqlRows.first()) {
             log.info("Director found: {}", id);
         } else {
@@ -109,9 +115,8 @@ public class ValidateService {
         }
     }
 
-    public void checkContainsGenreInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM genres WHERE genre_id = ?", id);
-        sqlRows.getMetaData().getColumnCount();
+    public void checkGenreValidity(Long id) {
+        SqlRowSet sqlRows = genresStorage.getGenreRow(id);
         if (sqlRows.first()) {
             log.info("Genre found: {}", id);
         } else {
@@ -120,15 +125,13 @@ public class ValidateService {
         }
     }
 
-    public void checkContainsGenres(Film film) {
+    public void checkGenresValidity(Film film) {
         if (film.getGenres() == null) {
             return;
         }
-        String genresIds = film.getGenres().stream()
-                .map(genre -> genre.getId().toString()).collect(Collectors.joining(","));
-        Long genresFound = jdbcTemplate.queryForObject(String.format("SELECT COUNT(genre_id) genres_found " +
-                        "FROM genres WHERE genre_id IN (%s)",
-                genresIds), (rs, rowNum) -> rs.getLong("genres_found"));
+        String genresIds = film.getGenres().stream().map(genre -> genre.getId().toString()).collect(
+                Collectors.joining(","));
+        Long genresFound = genresStorage.getExistingGenresCountFromGenresSet(genresIds);
         if (genresFound == film.getGenres().size()) {
             log.info("All genres found: {}", genresIds);
         } else {
@@ -138,7 +141,7 @@ public class ValidateService {
     }
 
     public void checkContainsMpaInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM mpa WHERE mpa_id = ?", id);
+        SqlRowSet sqlRows = mpaStorage.getMpaRow(id);
         if (sqlRows.first()) {
             log.info("Mpa found: {}", id);
         } else {
@@ -148,7 +151,7 @@ public class ValidateService {
     }
 
     public void checkContainsReviewInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM reviews WHERE review_id = ?", id);
+        SqlRowSet sqlRows = reviewStorage.getReviewRow(id);
         if (sqlRows.first()) {
             log.info("Review found: {}", id);
         } else {

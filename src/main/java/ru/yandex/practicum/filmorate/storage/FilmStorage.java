@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SearchParameter;
 import ru.yandex.practicum.filmorate.model.SortParameter;
@@ -52,5 +53,7 @@ public interface FilmStorage {
      * ALG_4
      */
     Collection<Film> getFilmsRecommendationsForUser(Long id);
+
+    SqlRowSet getFilmRow(Long id);
 }
 
