@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -65,5 +66,17 @@ public class GenresDbStorage implements GenresStorage {
                 film.getGenres().add(new GenreRowMapper().mapRow(rs, 0));
             }
         }, filmById.keySet().toArray());
+    }
+
+    @Override
+    public SqlRowSet getGenreRow(Long id) {
+        return jdbcOperations.queryForRowSet("SELECT * FROM genres WHERE genre_id = ?", id);
+    }
+
+    @Override
+    public Long getExistingGenresCountFromGenresSet(String genresIds) {
+        return jdbcOperations.queryForObject(String.format("SELECT COUNT(genre_id) genres_found " +
+                "FROM genres WHERE genre_id IN (%s)",
+                genresIds), (rs, rowNum) -> rs.getLong("genres_found"));
     }
 }

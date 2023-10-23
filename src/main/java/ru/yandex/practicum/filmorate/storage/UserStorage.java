@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -26,5 +27,7 @@ public interface UserStorage {
      * ALG_6
      */
     void delete(Long id);
+
+    SqlRowSet getUserRow(Long id);
 
 }

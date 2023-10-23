@@ -38,11 +38,7 @@ public class FilmDbStorage implements FilmStorage {
             ps.setString(2, film.getDescription());
             ps.setDate(3, Date.valueOf(film.getReleaseDate()));
             ps.setInt(4, film.getDuration());
-            if (film.getMpa() != null) {
-                ps.setLong(5, film.getMpa().getId());
-            } else {
-                ps.setNull(5, Types.BIGINT);
-            }
+            ps.setLong(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
 
@@ -54,15 +50,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void update(Film film) {
-        String sqlRequest;
-        if (film.getMpa() != null) {
-            sqlRequest = String.format("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
+        String sqlRequest = String.format("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
                     "mpa_id = %d WHERE film_id = ?", film.getMpa().getId());
-        } else {
-            sqlRequest = String.format("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
-                    "mpa_id = %s WHERE film_id = ?", "NULL");
-        }
-
         jdbcOperations.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getId());
         String sqlDeleteDirector = "DELETE FROM films_directors WHERE film_id = ?";
@@ -268,4 +257,8 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcOperations.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
     }
 
+    @Override
+    public SqlRowSet getFilmRow(Long id) {
+        return jdbcOperations.queryForRowSet("SELECT * FROM films WHERE film_id = ?", id);
+    }
 }

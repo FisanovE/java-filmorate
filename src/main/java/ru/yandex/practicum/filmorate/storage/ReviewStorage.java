@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
@@ -25,5 +26,7 @@ public interface ReviewStorage {
     void deleteLike(Long reviewId, Long userId);
 
     void deleteDislike(Long reviewId, Long userId);
+
+    SqlRowSet getReviewRow(Long id);
 }
 

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
@@ -25,5 +26,10 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa getRatingsMpaById(Long id) {
         String sql = "SELECT * FROM mpa WHERE mpa_id = ?";
         return jdbcOperations.queryForObject(sql, new MpaRowMapper(), id);
+    }
+
+    @Override
+    public SqlRowSet getMpaRow(Long id) {
+        return jdbcOperations.queryForRowSet("SELECT * FROM mpa WHERE mpa_id = ?", id);
     }
 }
