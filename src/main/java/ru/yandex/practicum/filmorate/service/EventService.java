@@ -13,7 +13,7 @@ public class EventService {
 
     private final EventStorage eventStorage;
 
-    public List<Event> getEvents(Long userId) {
-        return eventStorage.getEvents(userId);
+    public List<Event> get(Long userId) {
+        return eventStorage.get(userId);
     }
 }

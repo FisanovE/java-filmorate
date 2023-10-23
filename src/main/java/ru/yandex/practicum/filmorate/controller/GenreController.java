@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.Collection;
 
-
 @Slf4j
 @RestController
 @Component
@@ -30,5 +29,4 @@ public class GenreController {
         log.info("Get genre {}", id);
         return filmService.getById(id);
     }
-
 }

@@ -29,7 +29,7 @@ public class DirectorDbStorage implements DirectorStorage {
     private final JdbcOperations jdbcOperations;
 
     @Override
-    public Director addNewDirector(Director director) {
+    public Director create(Director director) {
         String sqlAddNewDirector = "INSERT INTO directors (director_name) VALUES (?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcOperations.update(connection -> {
@@ -44,7 +44,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void updateDirector(Director director) {
+    public void update(Director director) {
         String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
         int rows = jdbcOperations.update(sqlUpdateDirector, director.getName(), director.getId());
         if (rows == 0) {
@@ -53,13 +53,13 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Collection<Director> getAllDirectors() {
+    public Collection<Director> getAll() {
         String sqlGetAllDirectors = "SELECT * FROM directors ORDER BY director_id";
         return jdbcOperations.query(sqlGetAllDirectors, new DirectorRowMapper());
     }
 
     @Override
-    public Director getDirectorById(Long id) {
+    public Director getById(Long id) {
         try {
             String sql = "SELECT * FROM directors WHERE director_id = ?";
             return jdbcOperations.queryForObject(sql, new DirectorRowMapper(), id);
@@ -69,7 +69,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void deleteDirectorById(Long id) {
+    public void delete(Long id) {
         String sqlDeleteDirectorById = "DELETE FROM directors WHERE director_id = ?";
         int rows = jdbcOperations.update(sqlDeleteDirectorById, id);
         if (rows == 0) {

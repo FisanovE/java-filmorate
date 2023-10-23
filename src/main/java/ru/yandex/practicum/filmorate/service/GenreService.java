@@ -15,11 +15,11 @@ public class GenreService {
     private final GenresStorage genresStorage;
 
     public Collection<Genre> getAll() {
-        return genresStorage.getAllGenres();
+        return genresStorage.getAll();
     }
 
     public Genre getById(Long id) {
-        return genresStorage.getGenreById(id);
+        return genresStorage.getById(id);
     }
 
 }

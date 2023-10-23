@@ -105,6 +105,13 @@ class FilmorateApplicationTests {
         return review;
     }
 
+    /**
+     * ALG_7
+     */
+    private Director createDirector() {
+        return Director.builder().name("Name Director").build();
+    }
+
     @Test
     @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Добавление нового пользователя")
@@ -629,13 +636,6 @@ class FilmorateApplicationTests {
     }
 
     /**
-     * ALG_7
-     */
-    private Director createDirector() {
-        return Director.builder().name("Name Director").build();
-    }
-
-    /**
      * ALG_4
      */
     @Test
@@ -905,7 +905,7 @@ class FilmorateApplicationTests {
         reviewService.update(reviewUpdate);
         reviewService.delete(reviewUpdate.getReviewId());
 
-        List<Event> events = new ArrayList<>(eventService.getEvents(userNew1.getId()));
+        List<Event> events = new ArrayList<>(eventService.get(userNew1.getId()));
 
         assertThat(events).isNotEmpty().hasSize(7);
         assertThat(events.get(0).getEventId()).isEqualTo(1L);
@@ -957,5 +957,4 @@ class FilmorateApplicationTests {
         assertThat(events.get(6).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(6).getTimestamp() > 1670590017281L);
     }
-
 }

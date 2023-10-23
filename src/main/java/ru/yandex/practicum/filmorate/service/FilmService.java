@@ -44,6 +44,13 @@ public class FilmService {
         return film;
     }
 
+    /**
+     * ALG_6
+     */
+    public void delete(Long id) {
+        filmStorage.delete(id);
+    }
+
     public Film getById(Long filmId) {
         List<Film> film = List.of(filmStorage.getById(filmId));
         genresStorage.load(film);
@@ -58,21 +65,14 @@ public class FilmService {
         return films;
     }
 
-    /**
-     * ALG_6
-     */
-    public void delete(Long id) {
-        filmStorage.delete(id);
-    }
-
     public void addLike(Long id, Long userId) {
         filmStorage.addLike(id, userId);
-        eventStorage.addEvent(userId, "LIKE", "ADD", id);
+        eventStorage.create(userId, "LIKE", "ADD", id);
     }
 
     public void deleteLike(Long id, Long userId) {
         filmStorage.deleteLike(id, userId);
-        eventStorage.addEvent(userId, "LIKE", "REMOVE", id);
+        eventStorage.create(userId, "LIKE", "REMOVE", id);
     }
 
     /**

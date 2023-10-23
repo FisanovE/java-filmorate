@@ -73,6 +73,18 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    /**
+     * ALG_6
+     */
+    @Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
+        int rows = jdbcOperations.update(sqlQuery, id);
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Film ID:  " + id);
+        }
+    }
+
     @Override
     public Film getById(Long id) {
         try {
@@ -93,18 +105,6 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
                 "ORDER BY film_id";
         return jdbcOperations.query(sql, new FilmRowMapper());
-    }
-
-    /**
-     * ALG_6
-     */
-    @Override
-    public void delete(Long id) {
-        String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
-        int rows = jdbcOperations.update(sqlQuery, id);
-        if (rows == 0) {
-            throw new NotFoundException("Invalid Film ID:  " + id);
-        }
     }
 
     @Override

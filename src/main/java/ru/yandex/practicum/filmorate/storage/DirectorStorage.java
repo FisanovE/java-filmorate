@@ -10,15 +10,15 @@ import java.util.Collection;
  */
 public interface DirectorStorage {
 
-    Director addNewDirector(Director director);
+    Director create(Director director);
 
-    void updateDirector(Director director);
+    void update(Director director);
 
-    Collection<Director> getAllDirectors();
+    Collection<Director> getAll();
 
-    Director getDirectorById(Long id);
+    Director getById(Long id);
 
-    void deleteDirectorById(Long id);
+    void delete(Long id);
 
     void save(Collection<Film> film);
 

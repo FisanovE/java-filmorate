@@ -38,6 +38,12 @@ public class DirectorController {
         return directorService.update(director);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        log.info("Delete directors {}", id);
+        directorService.delete(id);
+    }
+
     @GetMapping("/{id}")
     public Director getById(@PathVariable Long id) {
         log.info("Get directors {}", id);
@@ -49,11 +55,4 @@ public class DirectorController {
         log.info("Get directors");
         return directorService.getAll();
     }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        log.info("Delete directors {}", id);
-        directorService.delete(id);
-    }
-
 }

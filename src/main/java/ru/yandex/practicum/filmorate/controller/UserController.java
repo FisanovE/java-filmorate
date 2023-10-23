@@ -35,6 +35,15 @@ public class UserController {
         return userService.update(user);
     }
 
+    /**
+     * ALG_6
+     */
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        log.info("Delete user {}", id);
+        userService.delete(id);
+    }
+
     @GetMapping("/{id}")
     public User getById(@PathVariable(required = false) String id) {
         log.info("Get user {}", id);
@@ -72,15 +81,6 @@ public class UserController {
     }
 
     /**
-     * ALG_6
-     */
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        log.info("Delete user {}", id);
-        userService.delete(id);
-    }
-
-    /**
      * ALG_4
      */
     @GetMapping("/{id}/recommendations")
@@ -88,6 +88,4 @@ public class UserController {
         log.info("Get films recommendations for user {}", id);
         return filmService.getRecommendationsForUser(id);
     }
-
-
 }

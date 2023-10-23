@@ -18,24 +18,23 @@ public class DirectorService {
     private final DirectorStorage directorStorage;
 
     public Director create(Director director) {
-        return directorStorage.addNewDirector(director);
+        return directorStorage.create(director);
     }
 
     public Director update(Director director) {
-        directorStorage.updateDirector(director);
+        directorStorage.update(director);
         return director;
     }
 
+    public void delete(Long directorId) {
+        directorStorage.delete(directorId);
+    }
+
     public Director getById(Long directorId) {
-        return directorStorage.getDirectorById(directorId);
+        return directorStorage.getById(directorId);
     }
 
     public Collection<Director> getAll() {
-        return directorStorage.getAllDirectors();
+        return directorStorage.getAll();
     }
-
-    public void delete(Long directorId) {
-        directorStorage.deleteDirectorById(directorId);
-    }
-
 }

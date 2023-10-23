@@ -8,7 +8,7 @@ public interface EventStorage {
     /**
      * ALG5
      */
-    List<Event> getEvents(Long userId);
+    List<Event> get(Long userId);
 
-    void addEvent(Long userId, String eventType, String operation, Long entityId);
+    void create(Long userId, String eventType, String operation, Long entityId);
 }

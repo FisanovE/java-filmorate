@@ -53,6 +53,18 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    /**
+     * ALG_6
+     */
+    //@Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
+        int rows = jdbcOperations.update(sqlQuery, id);
+        if (rows == 0) {
+            throw new NotFoundException("Invalid User ID: " + id);
+        }
+    }
+
     @Override
     public Collection<User> getAll() {
         String sql = "SELECT * FROM USERS ORDER BY USER_ID";
@@ -64,18 +76,6 @@ public class UserDbStorage implements UserStorage {
             String sql = "select * from users where user_id = ?";
             return jdbcOperations.queryForObject(sql, new UserRowMapper(), id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Invalid User ID: " + id);
-        }
-    }
-
-    /**
-     * ALG_6
-     */
-    //@Override
-    public void delete(Long id) {
-        String sqlQuery = "DELETE FROM users WHERE USER_ID = ?";
-        int rows = jdbcOperations.update(sqlQuery, id);
-        if (rows == 0) {
             throw new NotFoundException("Invalid User ID: " + id);
         }
     }

@@ -7,9 +7,9 @@ import java.util.Collection;
 
 public interface GenresStorage {
 
-    Collection<Genre> getAllGenres();
+    Collection<Genre> getAll();
 
-    Genre getGenreById(Long id);
+    Genre getById(Long id);
 
     void save(Collection<Film> film);
 

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface MpaStorage {
 
-    Collection<Mpa> getAllRatingsMpa();
+    Collection<Mpa> getAll();
 
-    Mpa getRatingsMpaById(Long id);
+    Mpa getById(Long id);
 }

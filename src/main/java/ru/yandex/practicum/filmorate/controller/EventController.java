@@ -22,8 +22,8 @@ public class EventController {
      * ALG_5
      */
     @GetMapping("/users/{id}/feed")
-    public Collection<Event> getEvents(@PathVariable("id") Long userId) {
+    public Collection<Event> get(@PathVariable("id") Long userId) {
         log.info("Get events of user {}", userId);
-        return eventService.getEvents(userId);
+        return eventService.get(userId);
     }
 }

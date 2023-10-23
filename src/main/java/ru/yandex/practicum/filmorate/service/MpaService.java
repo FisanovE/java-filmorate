@@ -15,10 +15,10 @@ public class MpaService {
     private final MpaStorage mpaStorage;
 
     public Collection<Mpa> getAll() {
-        return mpaStorage.getAllRatingsMpa();
+        return mpaStorage.getAll();
     }
 
     public Mpa getById(Long id) {
-        return mpaStorage.getRatingsMpaById(id);
+        return mpaStorage.getById(id);
     }
 }
