@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.*;
@@ -100,13 +101,26 @@ public class ReviewDbStorage implements ReviewStorage {
      * ALG_1
      */
     @Override
-    public List<Review> getAll() {
-        String sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
-                "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
-                "FROM reviews r " +
-                "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
-                "GROUP BY r.review_id";
-        return jdbcOperations.query(sql, reviewRowMapper);
+    public List<Review> getAll(Long filmId, Integer count) {
+        String sql;
+        if (filmId == 0) {
+            sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
+                    "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                    "FROM reviews r " +
+                    "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                    "GROUP BY r.review_id " +
+                    "LIMIT ?";
+            return jdbcOperations.query(sql, reviewRowMapper, count);
+        } else {
+            sql = "SELECT r.review_id, r.content, r.is_positive, r.user_id, r.film_id, " +
+                    "SUM(CASE rl.is_useful WHEN true THEN 1 WHEN false THEN -1 END) AS score " +
+                    "FROM reviews r " +
+                    "LEFT JOIN reviews_like rl ON r.review_id = rl.review_id " +
+                    "WHERE r.film_id = ?" +
+                    "GROUP BY r.review_id " +
+                    "LIMIT ?";
+            return jdbcOperations.query(sql, reviewRowMapper, filmId, count);
+        }
     }
 
     /**

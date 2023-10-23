@@ -62,7 +62,8 @@ public class ValidateService {
     }
 
     public void checkReview(Review review) {
-        if (review.getContent() == null) throw new ValidationException("Review must not be empty");
+        if (review == null) throw new ValidationException("Review must not be empty");
+        if (review.getContent() == null) throw new ValidationException("Review content must not be empty");
         if (review.getIsPositive() == null) throw new ValidationException("Type review must not be empty");
         if (review.getUserId() == null) throw new ValidationException("Not valid user id");
         if (review.getFilmId() == null) throw new ValidationException("Not valid film id");

@@ -31,9 +31,9 @@ public class ReviewService {
 
     public Review update(Review review) {
         validateService.checkReview(review);
-        Review updated = reviewDbStorage.update(review);
-        eventStorage.addEvent(updated.getUserId(), "REVIEW", "UPDATE", updated.getFilmId());
-        return updated;
+        reviewDbStorage.update(review);
+        eventStorage.addEvent(review.getReviewId(), "REVIEW", "UPDATE", review.getReviewId());
+        return getById(review.getReviewId());
     }
 
     public void delete(Long reviewId) {
@@ -46,11 +46,9 @@ public class ReviewService {
     }
 
     public List<Review> getByFilmId(Long filmId, Integer count) {
-        return reviewDbStorage.getAll()
+        return reviewDbStorage.getByFilmId(filmId, count)
                 .stream()
-                .filter(review -> (filmId == 0 || Objects.equals(review.getFilmId(), filmId)))
                 .sorted(Comparator.comparing(Review::getUseful).reversed())
-                .limit(count)
                 .collect(Collectors.toList());
     }
 
