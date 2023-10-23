@@ -24,17 +24,12 @@ public class ReviewService {
 
     public Review create(Review review) {
         validateService.checkReview(review);
-        validateService.checkContainsUserInDatabase(review.getUserId());
-        validateService.checkContainsUserInDatabase(review.getFilmId());
         Review created = reviewDbStorage.create(review);
         eventStorage.addEvent(created.getUserId(), "REVIEW", "ADD", created.getReviewId());
         return created;
     }
 
     public Review update(Review review) {
-        validateService.checkContainsReviewInDatabase(review.getReviewId());
-        validateService.checkContainsUserInDatabase(review.getUserId());
-        validateService.checkContainsUserInDatabase(review.getFilmId());
         validateService.checkReview(review);
         Review updated = reviewDbStorage.update(review);
         eventStorage.addEvent(updated.getUserId(), "REVIEW", "UPDATE", updated.getFilmId());
@@ -42,13 +37,11 @@ public class ReviewService {
     }
 
     public void delete(Long reviewId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
         Review deleted = reviewDbStorage.delete(reviewId);
         eventStorage.addEvent(deleted.getUserId(), "REVIEW", "REMOVE", deleted.getFilmId());
     }
 
     public Review getById(Long reviewId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
         return reviewDbStorage.getById(reviewId);
     }
 
@@ -62,26 +55,18 @@ public class ReviewService {
     }
 
     public void addLike(Long reviewId, Long userId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
-        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.addLike(reviewId, userId);
     }
 
     public void addDislike(Long reviewId, Long userId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
-        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.addDislike(reviewId, userId);
     }
 
     public void deleteLike(Long reviewId, Long userId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
-        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.deleteLike(reviewId, userId);
     }
 
     public void deleteDislike(Long reviewId, Long userId) {
-        validateService.checkContainsReviewInDatabase(reviewId);
-        validateService.checkContainsUserInDatabase(userId);
         reviewDbStorage.deleteDislike(reviewId, userId);
     }
 

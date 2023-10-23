@@ -13,15 +13,12 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class MpaService {
     private final MpaStorage mpaStorage;
-    private final ValidateService validateService;
-
 
     public Collection<Mpa> getAll() {
         return mpaStorage.getAllRatingsMpa();
     }
 
     public Mpa getById(Long id) {
-        validateService.checkContainsMpaInDatabase(id);
         return mpaStorage.getRatingsMpaById(id);
     }
 }

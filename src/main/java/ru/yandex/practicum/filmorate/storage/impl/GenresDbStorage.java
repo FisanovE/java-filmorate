@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenresStorage;
@@ -26,9 +28,13 @@ public class GenresDbStorage implements GenresStorage {
     }
 
     @Override
-    public Genre getGenresById(Long id) {
+    public Genre getGenreById(Long id) {
+        try {
         String sql = "SELECT * FROM genres WHERE genre_id = ?";
         return jdbcOperations.queryForObject(sql, new GenreRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Invalid Genre ID: " + id);
+        }
     }
 
     @Override

@@ -15,26 +15,18 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class DirectorService {
-
-    private final ValidateService validateService;
-
     private final DirectorStorage directorStorage;
 
     public Director create(Director director) {
-        validateService.checkNameNotBlank(director.getName());
         return directorStorage.addNewDirector(director);
     }
 
     public Director update(Director director) {
-        validateService.checkIdNotNull(director.getId());
-        validateService.checkNameNotBlank(director.getName());
-        validateService.checkContainsDirectorInDatabase(director.getId());
         directorStorage.updateDirector(director);
         return director;
     }
 
     public Director getById(Long directorId) {
-        validateService.checkContainsDirectorInDatabase(directorId);
         return directorStorage.getDirectorById(directorId);
     }
 
@@ -43,7 +35,6 @@ public class DirectorService {
     }
 
     public void delete(Long directorId) {
-        validateService.checkContainsDirectorInDatabase(directorId);
         directorStorage.deleteDirectorById(directorId);
     }
 

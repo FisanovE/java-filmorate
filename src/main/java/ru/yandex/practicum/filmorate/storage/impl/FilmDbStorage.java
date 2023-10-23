@@ -2,15 +2,14 @@ package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.SearchParameter;
-import ru.yandex.practicum.filmorate.model.SortParameter;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.*;
@@ -63,21 +62,28 @@ public class FilmDbStorage implements FilmStorage {
                     "mpa_id = %s WHERE film_id = ?", "NULL");
         }
 
-        jdbcOperations.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(),
+        int rows = jdbcOperations.update(sqlRequest, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getId());
         String sqlDeleteDirector = "DELETE FROM films_directors WHERE film_id = ?";
         jdbcOperations.update(sqlDeleteDirector, film.getId());
         String sqlDeleteGenre = "DELETE FROM films_genres WHERE film_id = ?";
         jdbcOperations.update(sqlDeleteGenre, film.getId());
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Film ID:  " + film.getId());
+        }
     }
 
     @Override
     public Film getById(Long id) {
-        String sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
-                "FROM films AS f " +
-                "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
-                "WHERE f.film_id = ?";
-        return jdbcOperations.queryForObject(sql, new FilmRowMapper(), id);
+        try {
+            String sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
+                    "FROM films AS f " +
+                    "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
+                    "WHERE f.film_id = ?";
+            return jdbcOperations.queryForObject(sql, new FilmRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Invalid Film ID: " + id);
+        }
     }
 
     @Override
@@ -93,13 +99,16 @@ public class FilmDbStorage implements FilmStorage {
      * ALG_6
      */
     @Override
-    public void delete(Long filmId) {
+    public void delete(Long id) {
         String sqlQuery = "DELETE FROM films WHERE FILM_ID = ?";
-        jdbcOperations.update(sqlQuery, filmId);
+        int rows = jdbcOperations.update(sqlQuery, id);
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Film ID:  " + id);
+        }
     }
 
     @Override
-    public void addLike(Long filmId, Long userId) { // проверка не перенесена в service для обход ошибки тестов
+    public void addLike(Long filmId, Long userId) {
         SqlRowSet sqlRows = jdbcOperations.queryForRowSet("SELECT * FROM likes WHERE film_id = ? AND user_id = ?", filmId, userId);
         if (!sqlRows.first()) {
             String sql = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
@@ -110,7 +119,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteLike(Long filmId, Long userId) {
         String sql = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-        jdbcOperations.update(sql, filmId, userId);
+        int rows = jdbcOperations.update(sql, filmId, userId);
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Film ID:  " + filmId);
+        }
     }
 
     @Override
@@ -132,7 +144,6 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year) {
         log.debug("ALG_8.FilmDbStorage -> entered into DataBaseStorage");
-
         List<Film> films;
         StringJoiner joiner = new StringJoiner(" ");
         String sqlEnd = "GROUP BY F.FILM_ID ORDER BY COUNT(L.USER_ID) DESC " + "LIMIT ?;";
@@ -155,7 +166,6 @@ public class FilmDbStorage implements FilmStorage {
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcOperations.query(sql, new FilmRowMapper(), year, count);
         }
-
         return films;
     }
 
@@ -163,6 +173,13 @@ public class FilmDbStorage implements FilmStorage {
      * ALG_7
      */
     public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
+        SqlRowSet mpaRows = jdbcOperations.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
+        if (mpaRows.next()) {
+            log.info("ALG_7. Director found: {}", id);
+        } else {
+            log.info("ALG_7. Invalid Director ID: {}", id);
+            throw new NotFoundException("ALG_7. Invalid Director ID: " + id);
+        }
         String sql;
         if (sortBy == SortParameter.LIKES) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
@@ -268,4 +285,13 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcOperations.query(queryForFilms, new FilmRowMapper(), id, filmsToRecommend);
     }
 
+    public void checkContainsFilm(Long id) {
+        SqlRowSet sqlRows = jdbcOperations.queryForRowSet("SELECT * FROM films WHERE film_id = ?", id);
+        if (sqlRows.first()) {
+            log.info("Film found: {}", id);
+        } else {
+            log.info("Film not found: {}", id);
+            throw new NotFoundException("Film not found: " + id);
+        }
+    }
 }

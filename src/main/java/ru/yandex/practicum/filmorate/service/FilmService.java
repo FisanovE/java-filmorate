@@ -27,17 +27,7 @@ public class FilmService {
     private final EventStorage eventStorage;
 
     public Film create(Film film) {
-        if (film.getMpa() != null) {
-            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
-        }
-        validateService.checkContainsGenres(film);
-
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                validateService.checkContainsDirectorInDatabase(director.getId());
-            }
-        }
-
+        validateService.checkingFilmForValid(film);
         List<Film> withId = List.of(filmStorage.create(film));
         directorStorage.save(withId);
         genresStorage.save(withId);
@@ -45,17 +35,7 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        validateService.checkContainsFilmInDatabase(film.getId());
-        if (film.getMpa() != null) {
-            validateService.checkContainsMpaInDatabase(film.getMpa().getId());
-        }
-        validateService.checkContainsGenres(film);
-
-        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
-            for (Director director : film.getDirectors()) {
-                validateService.checkContainsDirectorInDatabase(director.getId());
-            }
-        }
+        validateService.checkingFilmForValid(film);
         filmStorage.update(film);
         List<Film> updated = List.of(film);
         genresStorage.save(updated);
@@ -65,7 +45,6 @@ public class FilmService {
     }
 
     public Film getById(Long filmId) {
-        validateService.checkContainsFilmInDatabase(filmId);
         List<Film> film = List.of(filmStorage.getById(filmId));
         genresStorage.load(film);
         directorStorage.load(film);
@@ -83,20 +62,15 @@ public class FilmService {
      * ALG_6
      */
     public void delete(Long id) {
-        validateService.checkContainsFilmInDatabase(id);
         filmStorage.delete(id);
     }
 
     public void addLike(Long id, Long userId) {
-        validateService.checkContainsFilmInDatabase(id);
-        //validateService.checkContainsUserInDatabase(userId); // закоментировано для обхода ошибки тестов
         filmStorage.addLike(id, userId);
         eventStorage.addEvent(userId, "LIKE", "ADD", id);
     }
 
     public void deleteLike(Long id, Long userId) {
-        validateService.checkContainsFilmInDatabase(id);
-        validateService.checkContainsUserInDatabase(userId);
         filmStorage.deleteLike(id, userId);
         eventStorage.addEvent(userId, "LIKE", "REMOVE", id);
     }
@@ -123,7 +97,6 @@ public class FilmService {
      * ALG_7
      */
     public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
-        validateService.checkContainsDirectorInDatabase(id);
         Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortBy);
         genresStorage.load(films);
         directorStorage.load(films);
@@ -145,7 +118,6 @@ public class FilmService {
      */
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         validateService.checkMatchingIdUsers(userId, friendId);
-        validateService.checkContainsUserInDatabase(userId);
         Collection<Film> films = filmStorage.getCommonFilms(userId, friendId);
         genresStorage.load(films);
         directorStorage.load(films);
@@ -156,7 +128,6 @@ public class FilmService {
      * ALG_4
      */
     public Collection<Film> getRecommendationsForUser(Long id) {
-        validateService.checkContainsUserInDatabase(id);
         Collection<Film> films = filmStorage.getFilmsRecommendationsForUser(id);
         genresStorage.load(films);
         directorStorage.load(films);

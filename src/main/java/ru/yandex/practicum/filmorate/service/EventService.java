@@ -13,10 +13,7 @@ public class EventService {
 
     private final EventStorage eventStorage;
 
-    private final ValidateService validateService;
-
     public List<Event> getEvents(Long userId) {
-        validateService.checkContainsUserInDatabase(userId);
         return eventStorage.getEvents(userId);
     }
 }

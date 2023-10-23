@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
-
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
@@ -15,14 +13,14 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handle(final NotFoundException e) {
-        e.printStackTrace();
-        return new ErrorResponse("Invalid ID.", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        log.error("Invalid data.", e.getMessage(), e);
+        return new ErrorResponse("Invalid data.", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final ValidationException e) {
-        e.printStackTrace();
-        return new ErrorResponse("Validation error.", e.getMessage(), Arrays.toString(e.getStackTrace()));
+        log.error("Validation error.", e.getMessage(), e);
+        return new ErrorResponse("Validation error.", e.getMessage());
     }
 }

@@ -254,8 +254,8 @@ class FilmorateApplicationTests {
         userService.addFriend(userAdded.getId(), userAdded3.getId());
         userService.addFriend(userAdded2.getId(), userAdded3.getId());
 
-        userService.deleteFriend(userAdded.getId(), userAdded2.getId());
         userService.deleteFriend(userAdded.getId(), userAdded3.getId());
+        userService.deleteFriend(userAdded2.getId(), userAdded3.getId());
 
 
         List<User> list1AfterDeleteFriend = new ArrayList<>(userService.getAllFriends(userAdded.getId()));
@@ -517,16 +517,17 @@ class FilmorateApplicationTests {
     @Sql({"/drop-tables.sql", "/schema.sql", "/data.sql"})
     @DisplayName("Тестирование Отзывов")
     void reviewDbStorageTest() {
-        User user = createUser();
+        User user1 = createUser();
         User user2 = createUser();
-        userService.create(user);
+        userService.create(user1);
         userService.create(user2);
         Film film = createFilm();
+        Film filmAdded = filmService.create(film);
         Review reviewMain = Review.builder()
                 .content("True")
                 .isPositive(true)
-                .userId(user.getId())
-                .filmId(film.getId())
+                .userId(user1.getId())
+                .filmId(filmAdded.getId())
                 .build();
 
         Review addedReview = reviewDbStorage.create(reviewMain);

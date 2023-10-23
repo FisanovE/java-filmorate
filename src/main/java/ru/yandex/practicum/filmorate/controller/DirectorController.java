@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.service.ValidateService;
 
 import java.util.Collection;
 
@@ -20,15 +21,19 @@ import java.util.Collection;
 public class DirectorController {
 
     private final DirectorService directorService;
+    private final ValidateService validateService;
 
     @PostMapping
     public Director create(@RequestBody Director director) {
+        validateService.checkNameNotBlank(director.getName());
         log.info("Create director");
         return directorService.create(director);
     }
 
     @PutMapping
     public Director update(@RequestBody Director director) {
+        validateService.checkIdNotNull(director.getId());
+        validateService.checkNameNotBlank(director.getName());
         log.info("Update director {}", director.getId());
         return directorService.update(director);
     }

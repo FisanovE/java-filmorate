@@ -36,7 +36,6 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         validateService.checkIdNotNull(film.getId());
-        validateService.checkingFilmForValid(film);
         log.info("Update film {}", film.getId());
         return filmService.update(film);
     }

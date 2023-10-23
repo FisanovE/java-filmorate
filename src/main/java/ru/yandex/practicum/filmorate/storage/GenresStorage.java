@@ -9,7 +9,7 @@ public interface GenresStorage {
 
     Collection<Genre> getAllGenres();
 
-    Genre getGenresById(Long id);
+    Genre getGenreById(Long id);
 
     void save(Collection<Film> film);
 

@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.storage.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
@@ -24,7 +26,6 @@ import static java.util.function.UnaryOperator.identity;
 @Repository
 @RequiredArgsConstructor
 public class DirectorDbStorage implements DirectorStorage {
-
     private final JdbcOperations jdbcOperations;
 
     @Override
@@ -45,7 +46,10 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public void updateDirector(Director director) {
         String sqlUpdateDirector = "UPDATE directors SET director_name = ? WHERE director_id = ?";
-        int rowsUpdated = jdbcOperations.update(sqlUpdateDirector, director.getName(), director.getId());
+        int rows = jdbcOperations.update(sqlUpdateDirector, director.getName(), director.getId());
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Director ID:  " + director.getId());
+        }
     }
 
     @Override
@@ -56,14 +60,21 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director getDirectorById(Long id) {
-        String sql = "SELECT * FROM directors WHERE director_id = ?";
-        return jdbcOperations.queryForObject(sql, new DirectorRowMapper(), id);
+        try {
+            String sql = "SELECT * FROM directors WHERE director_id = ?";
+            return jdbcOperations.queryForObject(sql, new DirectorRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Invalid Director ID: " + id);
+        }
     }
 
     @Override
     public void deleteDirectorById(Long id) {
         String sqlDeleteDirectorById = "DELETE FROM directors WHERE director_id = ?";
-        int rowsUpdated = jdbcOperations.update(sqlDeleteDirectorById, id);
+        int rows = jdbcOperations.update(sqlDeleteDirectorById, id);
+        if (rows == 0) {
+            throw new NotFoundException("Invalid Director ID:  " + id);
+        }
     }
 
     @Override
@@ -84,7 +95,6 @@ public class DirectorDbStorage implements DirectorStorage {
             return;
         }
         builder.deleteCharAt(builder.length() - 1);
-
         jdbcOperations.update(builder.toString());
     }
 

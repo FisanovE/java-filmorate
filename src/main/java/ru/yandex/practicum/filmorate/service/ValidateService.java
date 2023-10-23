@@ -1,11 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -16,17 +12,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class ValidateService {
-    private static JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public ValidateService(JdbcTemplate jdbcTemplate) {
-        ValidateService.jdbcTemplate = jdbcTemplate;
-    }
 
     public void checkIdNotNull(Long id) throws ValidationException {
         if (id == null) {
@@ -79,83 +68,6 @@ public class ValidateService {
         if (review.getFilmId() == null) throw new ValidationException("Not valid film id");
     }
 
-    public void checkContainsUserInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("User found: {}", id);
-        } else {
-            log.info("User not found: {}", id);
-            throw new NotFoundException("User not found: " + id);
-        }
-    }
-
-    public void checkContainsFilmInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM films WHERE film_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("Film found: {}", id);
-        } else {
-            log.info("Film not found: {}", id);
-            throw new NotFoundException("Film not found: " + id);
-        }
-    }
-
-    public void checkContainsDirectorInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM directors WHERE director_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("Director found: {}", id);
-        } else {
-            log.info("Director not found: {}", id);
-            throw new NotFoundException("Director not found: " + id);
-        }
-    }
-
-    public void checkContainsGenreInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM genres WHERE genre_id = ?", id);
-        sqlRows.getMetaData().getColumnCount();
-        if (sqlRows.first()) {
-            log.info("Genre found: {}", id);
-        } else {
-            log.info("Genre not found: {}", id);
-            throw new NotFoundException("Genre not found: " + id);
-        }
-    }
-
-    public void checkContainsGenres(Film film) {
-        if (film.getGenres() == null) {
-            return;
-        }
-        String genresIds = film.getGenres().stream()
-                .map(genre -> genre.getId().toString()).collect(Collectors.joining(","));
-        Long genresFound = jdbcTemplate.queryForObject(String.format("SELECT COUNT(genre_id) genres_found " +
-                        "FROM genres WHERE genre_id IN (%s)",
-                genresIds), (rs, rowNum) -> rs.getLong("genres_found"));
-        if (genresFound == film.getGenres().size()) {
-            log.info("All genres found: {}", genresIds);
-        } else {
-            log.info("Some genre(s) not found of: {}", genresIds);
-            throw new NotFoundException("Some genre(s) not found of: " + genresIds);
-        }
-    }
-
-    public void checkContainsMpaInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM mpa WHERE mpa_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("Mpa found: {}", id);
-        } else {
-            log.info("Mpa not found: {}", id);
-            throw new NotFoundException("Mpa not found: " + id);
-        }
-    }
-
-    public void checkContainsReviewInDatabase(Long id) {
-        SqlRowSet sqlRows = jdbcTemplate.queryForRowSet("SELECT * FROM reviews WHERE review_id = ?", id);
-        if (sqlRows.first()) {
-            log.info("Review found: {}", id);
-        } else {
-            log.info("Review not found: {}", id);
-            throw new NotFoundException("Review not found: " + id);
-        }
-    }
 
     public void checkMatchingIdUsers(Long userId, Long friendId) {
         if (Objects.equals(userId, friendId)) {
