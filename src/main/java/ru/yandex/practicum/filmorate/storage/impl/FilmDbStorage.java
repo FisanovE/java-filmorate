@@ -125,19 +125,6 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    @Override
-    public Collection<Film> getTopRatingFilms(int count) {
-        String sql = "SELECT F.FILM_ID, F.NAME, F.DESCRIPTION, F.RELEASE_DATE, F.DURATION, m.mpa_id, m.mpa_name " +
-                "FROM FILMS AS F " +
-                "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
-                "LEFT JOIN LIKES AS L ON F.FILM_ID = L.FILM_ID " +
-                "GROUP BY F.FILM_ID " +
-                "ORDER BY COUNT(L.USER_ID) DESC " +
-                "LIMIT ?";
-
-        return jdbcOperations.query(sql, new FilmRowMapper(), count);
-    }
-
     /**
      * ALG_8
      */
@@ -161,10 +148,13 @@ public class FilmDbStorage implements FilmStorage {
             joiner.add("WHERE FG.GENRE_ID = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcOperations.query(sql, new FilmRowMapper(), genreId, count);
-        } else {
+        } else if (year != -1) {
             joiner.add("WHERE YEAR(F.RELEASE_DATE) = ?");
             String sql = joiner.add(sqlEnd).toString();
             films = jdbcOperations.query(sql, new FilmRowMapper(), year, count);
+        } else {
+            String sql = joiner.add(sqlEnd).toString();
+            films = jdbcOperations.query(sql, new FilmRowMapper(), count);
         }
         return films;
     }
@@ -251,7 +241,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT F.FILM_ID, F.name, F.description, F.release_date, F.duration, m.mpa_id, m.mpa_name " +
                 "FROM FILMS f " +
                 "LEFT JOIN mpa m ON m.mpa_id = f.mpa_id " +
-                "LEFT JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
+                "JOIN LIKES l ON F.FILM_ID = L.FILM_ID " +
                 "WHERE F.FILM_ID IN (SELECT FILM_ID " +
                 "FROM LIKES " +
                 "WHERE FILM_ID IN (SELECT FILM_ID " +

@@ -75,13 +75,6 @@ public class FilmService {
         eventStorage.addEvent(userId, "LIKE", "REMOVE", id);
     }
 
-    public Collection<Film> getTopRatingFilms(int count) {
-        Collection<Film> films = filmStorage.getTopRatingFilms(count);
-        genresStorage.load(films);
-        directorStorage.load(films);
-        return films;
-    }
-
     /**
      * ALG_8
      */

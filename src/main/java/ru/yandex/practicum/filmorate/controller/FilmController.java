@@ -68,13 +68,11 @@ public class FilmController {
      * ALG_8
      */
     @GetMapping("/popular")
-    public Collection<Film> getTopRatingFilms(@RequestParam(defaultValue = "10", required = false) Integer count, @RequestParam(defaultValue = "-1", required = false) Long genreId, @RequestParam(defaultValue = "-1", required = false) Integer year) {
-        log.info("Get rating films, count {}", count);
-        if (genreId != -1 || year != -1) {
-            return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
-        } else {
-            return filmService.getTopRatingFilms(count);
-        }
+    public Collection<Film> getTopRatingFilms(@RequestParam(defaultValue = "10", required = false) Integer count,
+                                              @RequestParam(defaultValue = "-1", required = false) Long genreId,
+                                              @RequestParam(defaultValue = "-1", required = false) Integer year) {
+        log.info("Get rating films, count {}, genreId {}, year {}", count, genreId, year);
+        return filmService.getTopRatingFilmsByGenreAndYear(count, genreId, year);
     }
 
     /**

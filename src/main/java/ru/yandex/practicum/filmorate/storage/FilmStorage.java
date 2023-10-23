@@ -21,8 +21,6 @@ public interface FilmStorage {
 
     void deleteLike(Long id, Long userId);
 
-    Collection<Film> getTopRatingFilms(int count);
-
     /**
      * ALG_8
      */
