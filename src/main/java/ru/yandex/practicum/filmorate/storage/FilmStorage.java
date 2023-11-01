@@ -1,33 +1,54 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
 
-	Film addNewFilm(Film film);
+    Film create(Film film);
 
-	Film updateFilm(Film film);
+    void update(Film film);
 
-	Collection<Film> getAllFilms();
+    Collection<Film> getAll();
 
-	Film getFilmById(Long id);
+    Film getById(Long id);
 
-	void addLike(Long id, Long userId);
+    void addLike(Long id, Long userId);
 
-	void deleteLike(Long id, Long userId);
+    void deleteLike(Long id, Long userId);
 
-	Collection<Film> getTopRatingFilms(int count);
+    /**
+     * ALG_8
+     */
+    Collection<Film> getTopRatingFilmsByGenreAndYear(int count, long genreId, int year);
 
-	Collection<Genre> getAllGenres();
+    /**
+     * ALG_7
+     */
+    Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy);
 
-	Genre getGenresById(Long id);
+    /**
+     * ALG_6
+     */
+    void delete(Long filmId);
 
-	Collection<Mpa> getAllRatingsMpa();
+    /**
+     * ALG_2
+     */
+    Collection<Film> searchFilms(String query, List<SearchParameter> by);
 
-	Mpa getRatingsMpaById(Long id);
+    /**
+     * ALG_3
+     */
+    Collection<Film> getCommonFilms(Long userId, Long friendId);
+
+    /**
+     * ALG_4
+     */
+    Collection<Film> getFilmsRecommendationsForUser(Long id);
 }
 

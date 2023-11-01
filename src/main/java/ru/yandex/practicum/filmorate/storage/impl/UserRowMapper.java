@@ -8,14 +8,10 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class UserRowMapper implements RowMapper<User> {
-	@Override
-	public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return User.builder()
-				   .id(rs.getLong("user_id"))
-				   .email(rs.getString("email"))
-				   .login(rs.getString("login"))
-				   .name(rs.getString("name"))
-				   .birthday(Objects.requireNonNull(rs.getDate("birthday")).toLocalDate())
-				   .build();
-	}
+    @Override
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return User.builder().id(rs.getLong("user_id")).email(rs.getString("email")).login(rs.getString("login"))
+                .name(rs.getString("name")).birthday(Objects.requireNonNull(rs.getDate("birthday")).toLocalDate())
+                .build();
+    }
 }
