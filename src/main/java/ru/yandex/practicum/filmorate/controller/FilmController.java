@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.SearchParameter;
-import ru.yandex.practicum.filmorate.model.SortParameter;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.ValidateService;
 
@@ -79,15 +77,9 @@ public class FilmController {
      * ALG_7
      */
     @GetMapping("/director/{directorId}")
-    public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam SortParameter sortBy) {
+    public Collection<Film> getAllFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
         log.info("Get films/directorId {} sortBy {} ", directorId, sortBy);
-        switch (sortBy) {
-            case YEAR:
-            case LIKES:
-                return filmService.getAllFilmsByDirector(directorId, sortBy);
-            default:
-                throw new ValidationException("ALG_7. Invalid RequestParam:  " + sortBy);
-        }
+        return filmService.getAllFilmsByDirector(directorId, sortBy);
     }
 
     /**

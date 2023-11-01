@@ -9,6 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.OperationType;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 import ru.yandex.practicum.filmorate.service.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.impl.ReviewDbStorage;
@@ -721,8 +725,10 @@ class FilmorateApplicationTests {
         filmService.addLike(filmAdded2.getId(), userAdded2.getId());
         filmService.addLike(filmAdded3.getId(), userAdded1.getId());
 
-        List<Film> filmsSortByLikes = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), SortParameter.LIKES));
-        List<Film> filmsSortByYear = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(), SortParameter.YEAR));
+        List<Film> filmsSortByLikes = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(),
+                String.valueOf(SortParameter.LIKES)));
+        List<Film> filmsSortByYear = new ArrayList<>(filmService.getAllFilmsByDirector(directorAdded.getId(),
+                String.valueOf(SortParameter.YEAR)));
 
         assertThat(filmsSortByLikes).isNotEmpty().hasSize(3);
         assertThat(filmsSortByLikes.get(0).getId()).isEqualTo(filmAdded1.getId());
@@ -802,7 +808,7 @@ class FilmorateApplicationTests {
         assertThat(filmsSearchByDirectorAndTitle.get(0).getId()).isEqualTo(filmAdded1.getId());
         assertThat(filmsSearchByDirectorAndTitle.get(1).getId()).isEqualTo(filmAdded3.getId());
         assertThat(filmsSearchByDirectorAndTitle.get(2).getId()).isEqualTo(filmAdded2.getId());
-            }
+    }
 
 
     /**
@@ -910,50 +916,50 @@ class FilmorateApplicationTests {
         assertThat(events).isNotEmpty().hasSize(7);
         assertThat(events.get(0).getEventId()).isEqualTo(1L);
         assertThat(events.get(0).getUserId()).isEqualTo(1L);
-        assertThat(events.get(0).getEventType()).isEqualTo("LIKE");
-        assertThat(events.get(0).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(0).getEventType()).isEqualTo(EventType.LIKE);
+        assertThat(events.get(0).getOperation()).isEqualTo(OperationType.ADD);
         assertThat(events.get(0).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(0).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(1).getEventId()).isEqualTo(2L);
         assertThat(events.get(1).getUserId()).isEqualTo(1L);
-        assertThat(events.get(1).getEventType()).isEqualTo("LIKE");
-        assertThat(events.get(1).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(1).getEventType()).isEqualTo(EventType.LIKE);
+        assertThat(events.get(1).getOperation()).isEqualTo(OperationType.REMOVE);
         assertThat(events.get(1).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(1).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(2).getEventId()).isEqualTo(3L);
         assertThat(events.get(2).getUserId()).isEqualTo(1L);
-        assertThat(events.get(2).getEventType()).isEqualTo("FRIEND");
-        assertThat(events.get(2).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(2).getEventType()).isEqualTo(EventType.FRIEND);
+        assertThat(events.get(2).getOperation()).isEqualTo(OperationType.ADD);
         assertThat(events.get(2).getEntityId()).isEqualTo(2L);
         assertTrue(events.get(2).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(3).getEventId()).isEqualTo(4L);
         assertThat(events.get(3).getUserId()).isEqualTo(1L);
-        assertThat(events.get(3).getEventType()).isEqualTo("FRIEND");
-        assertThat(events.get(3).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(3).getEventType()).isEqualTo(EventType.FRIEND);
+        assertThat(events.get(3).getOperation()).isEqualTo(OperationType.REMOVE);
         assertThat(events.get(3).getEntityId()).isEqualTo(2L);
         assertTrue(events.get(3).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(4).getEventId()).isEqualTo(5L);
         assertThat(events.get(4).getUserId()).isEqualTo(1L);
-        assertThat(events.get(4).getEventType()).isEqualTo("REVIEW");
-        assertThat(events.get(4).getOperation()).isEqualTo("ADD");
+        assertThat(events.get(4).getEventType()).isEqualTo(EventType.REVIEW);
+        assertThat(events.get(4).getOperation()).isEqualTo(OperationType.ADD);
         assertThat(events.get(4).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(4).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(5).getEventId()).isEqualTo(6L);
         assertThat(events.get(5).getUserId()).isEqualTo(1L);
-        assertThat(events.get(5).getEventType()).isEqualTo("REVIEW");
-        assertThat(events.get(5).getOperation()).isEqualTo("UPDATE");
+        assertThat(events.get(5).getEventType()).isEqualTo(EventType.REVIEW);
+        assertThat(events.get(5).getOperation()).isEqualTo(OperationType.UPDATE);
         assertThat(events.get(5).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(5).getTimestamp() > 1670590017281L);
 
         assertThat(events.get(6).getEventId()).isEqualTo(7L);
         assertThat(events.get(6).getUserId()).isEqualTo(1L);
-        assertThat(events.get(6).getEventType()).isEqualTo("REVIEW");
-        assertThat(events.get(6).getOperation()).isEqualTo("REMOVE");
+        assertThat(events.get(6).getEventType()).isEqualTo(EventType.REVIEW);
+        assertThat(events.get(6).getOperation()).isEqualTo(OperationType.REMOVE);
         assertThat(events.get(6).getEntityId()).isEqualTo(1L);
         assertTrue(events.get(6).getTimestamp() > 1670590017281L);
     }

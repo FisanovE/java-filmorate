@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.utils;
 
 import org.springframework.core.convert.converter.Converter;
-import ru.yandex.practicum.filmorate.model.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
 
 public class StringToSearchParameterConverter implements Converter<String, SearchParameter> {
     @Override

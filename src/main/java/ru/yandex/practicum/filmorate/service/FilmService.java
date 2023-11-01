@@ -3,7 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.OperationType;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -67,12 +72,12 @@ public class FilmService {
 
     public void addLike(Long id, Long userId) {
         filmStorage.addLike(id, userId);
-        eventStorage.create(userId, "LIKE", "ADD", id);
+        eventStorage.create(userId, EventType.LIKE, OperationType.ADD, id);
     }
 
     public void deleteLike(Long id, Long userId) {
         filmStorage.deleteLike(id, userId);
-        eventStorage.create(userId, "LIKE", "REMOVE", id);
+        eventStorage.create(userId, EventType.LIKE, OperationType.REMOVE, id);
     }
 
     /**
@@ -89,11 +94,18 @@ public class FilmService {
     /**
      * ALG_7
      */
-    public Collection<Film> getAllFilmsByDirector(Long id, SortParameter sortBy) {
-        Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortBy);
-        genresStorage.load(films);
-        directorStorage.load(films);
-        return films;
+    public Collection<Film> getAllFilmsByDirector(Long id, String sortBy) {
+        SortParameter sortParameter = SortParameter.valueOf(sortBy.toUpperCase());
+        switch (sortParameter) {
+            case YEAR:
+            case LIKES:
+                Collection<Film> films = filmStorage.getAllFilmsByDirector(id, sortParameter);
+                genresStorage.load(films);
+                directorStorage.load(films);
+                return films;
+            default:
+                throw new ValidationException("ALG_7. Invalid RequestParam:  " + sortBy);
+        }
     }
 
     /**

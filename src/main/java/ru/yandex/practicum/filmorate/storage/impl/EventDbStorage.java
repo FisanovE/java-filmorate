@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.OperationType;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 
 import java.util.List;
@@ -20,10 +22,10 @@ public class EventDbStorage implements EventStorage {
      * ALG5
      */
     @Override
-    public void create(Long userId, String eventType, String operation, Long entityId) {
+    public void create(Long userId, EventType eventType, OperationType operation, Long entityId) {
         String sql = "INSERT INTO events (user_id, event_type, operation, entity_id, time_stamp) " +
                 "VALUES (?, ?, ?, ?, ?)";
-        jdbcOperations.update(sql, userId, eventType, operation, entityId, System.currentTimeMillis());
+        jdbcOperations.update(sql, userId, eventType.toString(), operation.toString(), entityId, System.currentTimeMillis());
     }
 
     /**

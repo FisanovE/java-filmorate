@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.OperationType;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.impl.ReviewDbStorage;
 
@@ -24,20 +26,20 @@ public class ReviewService {
     public Review create(Review review) {
         validateService.checkReview(review);
         Review created = reviewDbStorage.create(review);
-        eventStorage.create(created.getUserId(), "REVIEW", "ADD", created.getReviewId());
+        eventStorage.create(created.getUserId(), EventType.REVIEW, OperationType.ADD, created.getReviewId());
         return created;
     }
 
     public Review update(Review review) {
         validateService.checkReview(review);
         reviewDbStorage.update(review);
-        eventStorage.create(review.getReviewId(), "REVIEW", "UPDATE", review.getReviewId());
+        eventStorage.create(review.getReviewId(), EventType.REVIEW, OperationType.UPDATE, review.getReviewId());
         return getById(review.getReviewId());
     }
 
     public void delete(Long reviewId) {
         Review deleted = reviewDbStorage.delete(reviewId);
-        eventStorage.create(deleted.getUserId(), "REVIEW", "REMOVE", deleted.getFilmId());
+        eventStorage.create(deleted.getUserId(), EventType.REVIEW, OperationType.REMOVE, deleted.getFilmId());
     }
 
     public Review getById(Long reviewId) {

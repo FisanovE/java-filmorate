@@ -10,6 +10,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exeptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.*;
@@ -142,7 +144,6 @@ public class FilmDbStorage implements FilmStorage {
         if (genreId != -1 && year != -1) {
             joiner.add("WHERE YEAR(F.RELEASE_DATE) = ? AND FG.GENRE_ID = ?");
             String sql = joiner.add(sqlEnd).toString();
-            log.info("вошли в поиск 2/2000");
             films = jdbcOperations.query(sql, new FilmRowMapper(), year, genreId, count);
         } else if (genreId != -1) {
             joiner.add("WHERE FG.GENRE_ID = ?");
@@ -198,7 +199,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public Collection<Film> searchFilms(String query, List<SearchParameter> by) {
-        String sql;
+        String sql = "";
         if (by.contains(SearchParameter.DIRECTOR) && !by.contains(SearchParameter.TITLE)) {
             sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "FROM films f " +
@@ -227,8 +228,6 @@ public class FilmDbStorage implements FilmStorage {
                     "WHERE LOWER (d.director_name) LIKE LOWER ('%" + query + "%') OR LOWER (f.name) LIKE LOWER ('%" + query + "%') " +
                     "GROUP BY f.film_id, f.name, f.description, f.release_date, f.duration, m.mpa_id, m.mpa_name " +
                     "ORDER BY COUNT(l.film_id) DESC";
-        } else {
-            throw new NotFoundException("ALG_2. Invalid RequestParam:  " + by);
         }
         return jdbcOperations.query(sql, new FilmRowMapper());
     }

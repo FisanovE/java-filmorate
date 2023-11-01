@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.SearchParameter;
-import ru.yandex.practicum.filmorate.model.SortParameter;
+import ru.yandex.practicum.filmorate.model.enums.SearchParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 
 import java.util.Collection;
 import java.util.List;

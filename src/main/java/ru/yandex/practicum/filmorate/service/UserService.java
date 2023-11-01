@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.OperationType;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -48,12 +50,12 @@ public class UserService {
     public void addFriend(Long idUser, Long idFriend) {
         validateService.checkMatchingIdUsers(idUser, idFriend);
         userStorage.addFriend(idUser, idFriend);
-        eventStorage.create(idUser, "FRIEND", "ADD", idFriend);
+        eventStorage.create(idUser, EventType.FRIEND, OperationType.ADD, idFriend);
     }
 
     public void deleteFriend(Long idUser, Long idFriend) {
         userStorage.deleteFriend(idUser, idFriend);
-        eventStorage.create(idUser, "FRIEND", "REMOVE", idFriend);
+        eventStorage.create(idUser, EventType.FRIEND, OperationType.REMOVE, idFriend);
     }
 
     public Collection<User> getAllFriends(Long idUser) {

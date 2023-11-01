@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.utils;
 
 import org.springframework.core.convert.converter.Converter;
-import ru.yandex.practicum.filmorate.model.SortParameter;
+import ru.yandex.practicum.filmorate.model.enums.SortParameter;
 
 public class StringToSortParameterConverter implements Converter<String, SortParameter> {
     @Override

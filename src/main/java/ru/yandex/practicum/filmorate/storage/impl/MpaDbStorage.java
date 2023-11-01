@@ -25,7 +25,6 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa getById(Long id) {
-        //checkContainsMpa(id);
         try {
         String sql = "SELECT * FROM mpa WHERE mpa_id = ?";
         return jdbcOperations.queryForObject(sql, new MpaRowMapper(), id);
